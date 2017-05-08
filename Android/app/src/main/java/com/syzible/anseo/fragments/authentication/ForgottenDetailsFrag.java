@@ -13,10 +13,10 @@ import com.syzible.anseo.R;
  * Created by ed on 08/05/2017.
  */
 
-public class RegisterFrag extends Fragment {
+public class ForgottenDetailsFrag extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.register_frag, container, false);
+        return inflater.inflate(R.layout.forgotten_details_frag, container, false);
     }
 }
