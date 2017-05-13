@@ -1,8 +1,12 @@
 <resources>
-    <string name="app_name">Anseo</string>
+    <string name="app_name">Loinnir</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Socruithe</string>
+
+    <!-- dev keys -->
+    <string name="facebook_app_id">126609207898041</string>
+    <string name="fb_login_protocol_scheme">fb126609207898041</string>
 </resources>
