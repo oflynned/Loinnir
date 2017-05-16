@@ -88,7 +88,7 @@
             android:layout_below="@+id/view_login_1"
             android:layout_marginTop="8dp"
             android:gravity="center_horizontal"
-            android:text="Easpa chúntais? Deimhnigh le gliogáil anseo"
+            android:text="Easpa chúntais? Cláraigh le gliogáil anseo"
             android:textColor="@android:color/white" />
 
         <View
@@ -106,7 +106,7 @@
             android:layout_below="@+id/view_login_2"
             android:layout_marginTop="8dp"
             android:gravity="center_horizontal"
-            android:text="Dearmad déanta agat ar shonraí do chuid chúntais? Gliogáil anseo."
+            android:text="Dearmad déanta ar shonraí do chúntais?"
             android:textColor="@android:color/white" />
 
         <View

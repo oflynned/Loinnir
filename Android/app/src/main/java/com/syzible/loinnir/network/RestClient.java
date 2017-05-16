@@ -14,9 +14,10 @@ public class RestClient {
     private static final String REMOTE_ENDPOINT = "http://www.loinnir.ie";
     private static final String BASE_URL = LOCAL_ENDPOINT + "/api/v" + API_VERSION;
 
-    public static final String CREATE_USER = "/user/create";
-    public static final String GET_USER = "/user/get";
-    public static final String DELETE_USER = "/user/delete";
+    public static final String CREATE_USER = "/users/create";
+    public static final String GET_USER = "/users/get";
+    public static final String EDIT_USER = "/users/edit";
+    public static final String DELETE_USER = "/users/delete";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
     private RestClient() {}
@@ -27,6 +28,10 @@ public class RestClient {
 
     public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         client.post(getAbsoluteUrl(url), params, responseHandler);
+    }
+
+    public static void put(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        client.put(getAbsoluteUrl(url), params, responseHandler);
     }
 
     public static void delete(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
