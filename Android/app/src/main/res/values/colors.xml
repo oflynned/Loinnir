@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/red500</color>
-    <color name="colorPrimaryDark">@color/red700</color>
+    <color name="colorPrimary">@color/amber500</color>
+    <color name="colorPrimaryDark">@color/amber700</color>
     <color name="colorAccent">@color/white</color>
 
-    <color name="white">#ffffff</color>
+    <color name="black">#000</color>
+    <color name="white">#fff</color>
 
     <color name="red500">#F44336</color>
     <color name="red700">#D32F2F</color>
 
     <color name="blue500">#2196F3</color>
     <color name="blue700">#1976D2</color>
+
+    <color name="amber300">#FFD54F</color>
+    <color name="amber500">#FFC107</color>
+    <color name="amber700">#FFA000</color>
 </resources>

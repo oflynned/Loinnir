@@ -3,7 +3,6 @@ package com.syzible.loinnir.fragments.authentication;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.AuthenticationActivity;
@@ -22,9 +20,6 @@ import com.syzible.loinnir.utils.DisplayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import cz.msebera.android.httpclient.Header;
 
 /**
@@ -33,7 +28,6 @@ import cz.msebera.android.httpclient.Header;
 
 public class RegisterFrag extends Fragment {
     private EditText etForename, etSurname, etEmail, etPassword, etConfirmPassword;
-    private Button registerBtn;
 
     @Nullable
     @Override
@@ -54,13 +48,14 @@ public class RegisterFrag extends Fragment {
         etPassword = (EditText) view.findViewById(R.id.et_register_password);
         etConfirmPassword = (EditText) view.findViewById(R.id.et_register_password_confirmation);
 
-        registerBtn = (Button) view.findViewById(R.id.btn_register_register);
+        Button registerBtn = (Button) view.findViewById(R.id.btn_register_register);
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isValidInput()) {
                     // postRegistrationData();
                     AuthenticationActivity.removeFragment(getFragmentManager());
+                    DisplayUtils.generateSnackbar(getActivity(), "Is féidir leat logáil isteach anois :D");
                 }
             }
         });

@@ -9,4 +9,5 @@
     <!-- dev keys -->
     <string name="facebook_app_id">126609207898041</string>
     <string name="fb_login_protocol_scheme">fb126609207898041</string>
+    <string name="maps_api_key">AIzaSyBdsQV1GAXfIhXVjLwlAg1PrWnvCTBqW84</string>
 </resources>

@@ -50,8 +50,8 @@ public class LoginFrag extends Fragment {
     }
 
     private void startMain() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        startActivity(intent);
+        getActivity().finish();
+        startActivity(new Intent(getActivity(), MainActivity.class));
     }
 
     @Nullable
@@ -88,10 +88,6 @@ public class LoginFrag extends Fragment {
         facebookLoginButton.setFragment(this);
         facebookLoginButton.setReadPermissions(Arrays.asList("public_profile", "email"));
 
-        if (FacebookUtils.hasExistingToken(getActivity())) {
-            startMain();
-        }
-
         facebookLoginSetup();
 
         usernameEditText = (EditText) view.findViewById(R.id.et_login_email);
@@ -103,11 +99,14 @@ public class LoginFrag extends Fragment {
     }
 
     private void facebookLoginSetup() {
+        System.out.println("Facebook login ...");
         facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                System.out.println("Login result ...");
                 String accessToken = loginResult.getAccessToken().getToken();
                 FacebookUtils.saveToken(accessToken, getActivity());
+                System.out.println(accessToken);
 
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
                         new GraphRequest.GraphJSONObjectCallback() {
@@ -121,17 +120,17 @@ public class LoginFrag extends Fragment {
                                 try {
                                     System.out.println(facebookData);
 
-                                    String id = facebookData.getString(LocalStorage.Pref.id.name());
-                                    String f_name = facebookData.getString(LocalStorage.Pref.first_name.name());
-                                    String l_name = facebookData.getString(LocalStorage.Pref.last_name.name());
+                                    String fbId = facebookData.getString(LocalStorage.Pref.id.name());
+                                    String forename = facebookData.getString(LocalStorage.Pref.first_name.name());
+                                    String surname = facebookData.getString(LocalStorage.Pref.last_name.name());
                                     String url = facebookData.getString(LocalStorage.Pref.profile_pic.name());
 
-                                    postData.put("fb_id", id);
-                                    postData.put("f_name", f_name);
-                                    postData.put("l_name", l_name);
-                                    postData.put("pic_url", url);
+                                    postData.put("fb_id", fbId);
+                                    postData.put("forename", forename);
+                                    postData.put("surname", surname);
+                                    postData.put("url", url);
 
-                                    checkLogin.put("fb_id", id);
+                                    checkLogin.put("fb_id", fbId);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

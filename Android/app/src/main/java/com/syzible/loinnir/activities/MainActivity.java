@@ -18,6 +18,8 @@ import com.syzible.loinnir.fragments.portal.ConversationsFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.utils.DisplayUtils;
+import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONObject;
 
@@ -25,6 +27,8 @@ import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    // TODO consider using emojis in the snackbars to make it look more fun
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +48,19 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().getItem(0).setChecked(true);
 
         setFragment(new MapFrag());
+
+        DisplayUtils.generateSnackbar(this, "Fáilte romhat, a " +
+                LocalStorage.getPref(LocalStorage.Pref.first_name, this));
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (getFragmentManager().getBackStackEntryCount() == 1) {
+            // TODO make an alert dialog, could be annoying for the user otherwise
+            this.finish();
+        }
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
