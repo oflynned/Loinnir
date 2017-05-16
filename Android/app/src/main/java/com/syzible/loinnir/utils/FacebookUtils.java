@@ -32,7 +32,8 @@ public class FacebookUtils {
     }
 
     public static boolean hasExistingToken(Context context) {
-        return !getToken(context).equals("-1");
+        System.out.println("Token is: " + getToken(context));
+        return !getToken(context).equals("");
     }
 
     private static void clearToken(Context context) {
@@ -69,7 +70,7 @@ public class FacebookUtils {
     }
 
     public static void getStoredPrefs(Context context) {
-        for(LocalStorage.Pref pref : LocalStorage.Pref.values())
+        for (LocalStorage.Pref pref : LocalStorage.Pref.values())
             System.out.println(pref.name() + ": " + LocalStorage.getPref(pref, context));
     }
 
@@ -84,15 +85,7 @@ public class FacebookUtils {
                 profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?type=large");
                 details.put(LocalStorage.Pref.profile_pic.name(), profile_pic.toString());
                 details.put(LocalStorage.Pref.id.name(), id);
-
-                if (object.has(LocalStorage.Pref.first_name.name()))
-                    details.put(LocalStorage.Pref.first_name.name(), object.getString(LocalStorage.Pref.first_name.name()));
-                if (object.has(LocalStorage.Pref.last_name.name()))
-                    details.put(LocalStorage.Pref.last_name.name(), object.getString(LocalStorage.Pref.last_name.name()));
-                if (object.has(LocalStorage.Pref.email.name()))
-                    details.put(LocalStorage.Pref.email.name(), object.getString(LocalStorage.Pref.email.name()));
-                if (object.has(LocalStorage.Pref.gender.name()))
-                    details.put(LocalStorage.Pref.gender.name(), object.getString(LocalStorage.Pref.gender.name()));
+                details.put(LocalStorage.Pref.name.name(), object.getString("name"));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 return null;
@@ -113,15 +106,8 @@ public class FacebookUtils {
         return details;
     }
 
-    public static void deleteToken(final Context context) {
-        new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken old, AccessToken curr) {
-                if (curr == null) {
-                    clearToken(context);
-                    LoginManager.getInstance().logOut();
-                }
-            }
-        };
+    public static void deleteToken(Context context) {
+        clearToken(context);
+        LoginManager.getInstance().logOut();
     }
 }

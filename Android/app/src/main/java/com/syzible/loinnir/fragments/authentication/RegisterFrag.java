@@ -121,14 +121,18 @@ public class RegisterFrag extends Fragment {
     }
 
     private void postRegistrationData() {
-        RequestParams params = new RequestParams();
-        params.put("forename", etForename.getText());
-        params.put("surname", etSurname.getText());
-        params.put("email", etEmail.getText());
-        params.put("password", etPassword.getText());
-        params.put("is_fb", false);
+        JSONObject params = new JSONObject();
+        try {
+            params.put("forename", etForename.getText());
+            params.put("surname", etSurname.getText());
+            params.put("email", etEmail.getText());
+            params.put("password", etPassword.getText());
+            params.put("is_fb", false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        RestClient.post(RestClient.CREATE_USER, params, new BaseJsonHttpResponseHandler<JSONObject>() {
+        RestClient.post(getActivity(), RestClient.CREATE_USER, params, new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                 try {

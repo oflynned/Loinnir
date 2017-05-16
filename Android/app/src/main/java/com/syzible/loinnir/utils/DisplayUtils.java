@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.design.widget.Snackbar;
+import android.widget.Toast;
 
 import com.syzible.loinnir.R;
 
@@ -12,6 +13,10 @@ import com.syzible.loinnir.R;
  */
 
 public class DisplayUtils {
+
+    public static void generateToast(Activity activity, String message) {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+    }
 
     public static void generateSnackbar(Activity activity, String message) {
         Snackbar.make(activity.findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG)

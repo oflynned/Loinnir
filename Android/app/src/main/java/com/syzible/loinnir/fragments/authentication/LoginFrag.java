@@ -12,26 +12,39 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.AuthenticationActivity;
 import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 /**
  * Created by ed on 08/05/2017.
@@ -40,8 +53,9 @@ import java.util.Arrays;
 public class LoginFrag extends Fragment {
     private EditText usernameEditText, passwordEditText;
     private View view;
-    private CallbackManager callbackManager;
-    private LoginButton facebookLoginButton;
+
+    CallbackManager callbackManager;
+    LoginButton facebookLoginButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,96 +100,67 @@ public class LoginFrag extends Fragment {
 
         facebookLoginButton = (LoginButton) view.findViewById(R.id.login_fb_login_button);
         facebookLoginButton.setFragment(this);
-        facebookLoginButton.setReadPermissions(Arrays.asList("public_profile", "email"));
-
-        facebookLoginSetup();
+        facebookLoginButton.setReadPermissions("public_profile");
 
         usernameEditText = (EditText) view.findViewById(R.id.et_login_email);
         passwordEditText = (EditText) view.findViewById(R.id.et_login_password);
 
-        System.out.println("Token: " + FacebookUtils.getToken(getActivity()));
-
-        return view;
-    }
-
-    private void facebookLoginSetup() {
-        System.out.println("Facebook login ...");
         facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                System.out.println("Login result ...");
                 String accessToken = loginResult.getAccessToken().getToken();
                 FacebookUtils.saveToken(accessToken, getActivity());
-                System.out.println(accessToken);
 
-                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
+                final GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
                         new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(JSONObject o, GraphResponse response) {
-                                JSONObject facebookData = FacebookUtils.getFacebookData(o, getActivity());
-
-                                final JSONObject postData = new JSONObject();
-                                JSONObject checkLogin = new JSONObject();
-
                                 try {
-                                    System.out.println(facebookData);
+                                    String id = o.getString("id");
+                                    String name = o.getString("name");
+                                    String pic = "https://graph.facebook.com/" + id + "/picture?type=large";
 
-                                    String fbId = facebookData.getString(LocalStorage.Pref.id.name());
-                                    String forename = facebookData.getString(LocalStorage.Pref.first_name.name());
-                                    String surname = facebookData.getString(LocalStorage.Pref.last_name.name());
-                                    String url = facebookData.getString(LocalStorage.Pref.profile_pic.name());
+                                    JSONObject postData = new JSONObject();
+                                    postData.put("fb_id", id);
+                                    postData.put("name", name);
+                                    postData.put("profile_pic", pic);
 
-                                    postData.put("fb_id", fbId);
-                                    postData.put("forename", forename);
-                                    postData.put("surname", surname);
-                                    postData.put("url", url);
+                                    LocalStorage.setPref(LocalStorage.Pref.id, id, getActivity());
+                                    LocalStorage.setPref(LocalStorage.Pref.name, name, getActivity());
+                                    LocalStorage.setPref(LocalStorage.Pref.profile_pic, pic, getActivity());
 
-                                    checkLogin.put("fb_id", fbId);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
+                                    System.out.println(postData.toString());
 
-                                /*
-                                final NetworkCallback<JSONObject> createUserCB = new NetworkCallback<JSONObject>() {
-                                    @Override
-                                    public void onSuccess(JSONObject object) {
-                                        startMain();
-                                    }
-
-                                    @Override
-                                    public void onFailure() {
-                                        System.out.println("Failure in create user");
-                                    }
-                                };
-
-                                NetworkCallback<JSONObject> getUserCB = new NetworkCallback<JSONObject>() {
-                                    @Override
-                                    public void onSuccess(JSONObject object) {
-                                        if (object.has("success")) {
-                                            System.out.println(object.toString());
+                                    RestClient.post(getActivity(), RestClient.CREATE_USER, postData, new BaseJsonHttpResponseHandler<JSONObject>() {
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                                             try {
-                                                // if user doesn't exist
-                                                if (object.get("success") == "false") {
-                                                    new SubJSONObject(createUserCB, Endpoints.CREATE_USER, postData).execute();
-                                                } else {
-                                                    // if so, start the main activity
-                                                    startMain();
+                                                boolean exists = response.getBoolean("success");
+
+                                                if (!exists) {
+                                                    DisplayUtils.generateSnackbar(getActivity(), "Cúntas á cruthú...");
                                                 }
+
+                                                startMain();
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
                                         }
-                                        System.out.println(object.toString());
-                                    }
 
-                                    @Override
-                                    public void onFailure() {
-                                        System.out.println("Failure in get user");
-                                    }
-                                };
+                                        @Override
+                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
 
-                                new SubJSONObject(getUserCB, Endpoints.LOGIN_USER, checkLogin).execute();
-                                */
+                                        }
+
+                                        @Override
+                                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                            return new JSONObject(rawJsonData);
+                                        }
+                                    });
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
                         });
 
@@ -199,6 +184,14 @@ public class LoginFrag extends Fragment {
                 e.printStackTrace();
             }
         });
+
+        return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     public String getUsername() {
@@ -207,10 +200,5 @@ public class LoginFrag extends Fragment {
 
     public String getPassword() {
         return passwordEditText.getText().toString();
-    }
-
-    private void generateSnackbar(String message) {
-        Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-                .show();
     }
 }

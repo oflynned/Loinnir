@@ -10,19 +10,19 @@ import android.preference.PreferenceManager;
 
 public class LocalStorage {
     public enum Pref {
-        id, fb_access_token, first_name, last_name, email, gender, profile_pic
+        id, fb_access_token, first_name, last_name, email, gender, profile_pic, name
     }
 
     public static boolean isLoggedIn(Context context) {
-        return !getID(context).equals("-1");
+        return !getID(context).equals("");
     }
 
     public static String getID(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString("id", "-1");
+        return PreferenceManager.getDefaultSharedPreferences(context).getString("id", "");
     }
 
     public static String getPref(Pref key, Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(key.name(), "-1");
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(key.name(), "");
     }
 
     public static void setPref(Pref key, String value, Context context) {
@@ -32,6 +32,9 @@ public class LocalStorage {
     }
 
     public static void purgePref(Pref key, Context context) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().clear().apply();
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putString(key.name(), "")
+                .apply();
     }
 }

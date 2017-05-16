@@ -23,7 +23,6 @@ public class AuthenticationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.authentication_frag_holder);
 
-        // TODO inverted right now as login is NOT working fully
         if (FacebookUtils.hasExistingToken(this)) {
             this.finish();
             startActivity(new Intent(this, MainActivity.class));

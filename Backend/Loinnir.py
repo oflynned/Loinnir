@@ -1,6 +1,6 @@
 from flask import Flask, json, render_template, request
 from flask_pymongo import PyMongo
-from bson.json_util import dumps, loads
+from bson.json_util import dumps
 import os
 
 frontend_dir = os.path.abspath("../Frontend")
@@ -41,19 +41,20 @@ def hello_world():
 
 
 # POST {fb_id: 123456789, ...}
-# GET {success: true} / {success:false, reason: "user already exists"}
+# GET {success: true} / {success:false, reason: "User already exists"}
 @app.route('/api/v1/users/create', methods=["POST"])
 def create_user():
     users_col = mongo.db.users
-    fb_id = (json.loads(request.data))["fb_id"]
+    data = json.loads(request.data)
+    fb_id = data["fb_id"]
 
     users_found = users_col.find({"fb_id": fb_id})
-    is_existing = users_found.count() > 0
+    exists = users_found.count() > 0
 
-    if is_existing:
+    if exists:
         return dumps({"success": False, "reason": "User already exists"})
     else:
-        users_col.insert(json.loads(request.data))
+        users_col.insert(data)
         return dumps({"success": True})
 
 
@@ -69,9 +70,9 @@ def get_user():
     is_existing = user.count() > 0
 
     if is_existing:
-        return dumps(user)
+        return json.loads(user)
     else:
-        return dumps({"success": False, "reason": "fb_id doesn't exist"})
+        return json.loads({"success": False, "reason": "fb_id doesn't exist"})
 
 
 @app.route('/api/v1/users/get-all', methods=["GET"])

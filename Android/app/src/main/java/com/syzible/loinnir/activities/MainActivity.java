@@ -1,6 +1,9 @@
 package com.syzible.loinnir.activities;
 
 import android.app.Fragment;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -11,7 +14,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.ConversationsFrag;
@@ -19,9 +25,11 @@ import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.DisplayUtils;
+import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -49,8 +57,26 @@ public class MainActivity extends AppCompatActivity
 
         setFragment(new MapFrag());
 
-        DisplayUtils.generateSnackbar(this, "Fáilte romhat, a " +
-                LocalStorage.getPref(LocalStorage.Pref.first_name, this));
+        DisplayUtils.generateSnackbar(this, "Fáilte ar ais " +
+                LocalStorage.getPref(LocalStorage.Pref.name, this));
+
+        // set up nav bar header for personalisation
+        TextView userName = (TextView) findViewById(R.id.nav_header_name);
+        //userName.setText(LocalStorage.getPref(LocalStorage.Pref.name, this));
+
+        RestClient.get(LocalStorage.getPref(LocalStorage.Pref.profile_pic, this), new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                Bitmap image = BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length);
+                ImageView profilePic = (ImageView) findViewById(R.id.nav_header_pic);
+                profilePic.setImageBitmap(image);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+        });
     }
 
     @Override
@@ -101,7 +127,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_rate) {
 
         } else if (id == R.id.nav_log_out) {
-
+            FacebookUtils.deleteToken(this);
+            finish();
+            startActivity(new Intent(this, AuthenticationActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -109,23 +137,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void generateSnackbar(String message) {
-        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT)
-                .show();
-    }
-
     private void setFragment(Fragment fragment) {
         getFragmentManager().beginTransaction()
                 .replace(R.id.portal_frame, fragment)
                 .addToBackStack(null)
                 .commit();
-    }
-
-    private void openLink(String url) {
-
-    }
-
-    private void logOut() {
-
     }
 }
