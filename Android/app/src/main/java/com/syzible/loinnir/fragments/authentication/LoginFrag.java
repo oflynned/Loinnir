@@ -135,6 +135,7 @@ public class LoginFrag extends Fragment {
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                                             try {
+                                                System.out.println(response.toString());
                                                 boolean exists = response.getBoolean("success");
 
                                                 if (!exists) {
@@ -149,11 +150,12 @@ public class LoginFrag extends Fragment {
 
                                         @Override
                                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
+                                            System.out.println(rawJsonData);
                                         }
 
                                         @Override
                                         protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                            System.out.println(rawJsonData);
                                             return new JSONObject(rawJsonData);
                                         }
                                     });

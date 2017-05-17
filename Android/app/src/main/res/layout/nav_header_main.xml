@@ -17,8 +17,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:adjustViewBounds="true"
-        android:maxHeight="64dp"
-        android:maxWidth="64dp"
+        android:maxHeight="112dp"
+        android:maxWidth="112dp"
         android:src="@drawable/logo_small" />
 
     <TextView
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nav_header_pic"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:paddingTop="8dp"
         android:text="John Smith"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
