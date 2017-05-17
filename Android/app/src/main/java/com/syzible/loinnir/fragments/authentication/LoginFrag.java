@@ -4,47 +4,35 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.AuthenticationActivity;
 import com.syzible.loinnir.activities.MainActivity;
-import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.network.Endpoints;
+import com.syzible.loinnir.network.NetworkCallback;
+import com.syzible.loinnir.network.PostJSONObject;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
-
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.entity.StringEntity;
 
 /**
  * Created by ed on 08/05/2017.
@@ -129,11 +117,9 @@ public class LoginFrag extends Fragment {
                                     LocalStorage.setPref(LocalStorage.Pref.name, name, getActivity());
                                     LocalStorage.setPref(LocalStorage.Pref.profile_pic, pic, getActivity());
 
-                                    System.out.println(postData.toString());
-
-                                    RestClient.post(getActivity(), RestClient.CREATE_USER, postData, new BaseJsonHttpResponseHandler<JSONObject>() {
+                                    new PostJSONObject(new NetworkCallback<JSONObject>() {
                                         @Override
-                                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                        public void onSuccess(JSONObject response) {
                                             try {
                                                 System.out.println(response.toString());
                                                 boolean exists = response.getBoolean("success");
@@ -149,16 +135,11 @@ public class LoginFrag extends Fragment {
                                         }
 
                                         @Override
-                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                                            System.out.println(rawJsonData);
-                                        }
+                                        public void onFailure() {
 
-                                        @Override
-                                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                            System.out.println(rawJsonData);
-                                            return new JSONObject(rawJsonData);
                                         }
-                                    });
+                                    }, Endpoints.CREATE_USER).execute();
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

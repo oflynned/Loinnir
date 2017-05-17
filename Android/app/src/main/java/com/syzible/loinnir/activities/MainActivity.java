@@ -1,17 +1,15 @@
 package com.syzible.loinnir.activities;
 
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,31 +18,18 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.BaseJsonHttpResponseHandler;
-import com.loopj.android.http.BinaryHttpResponseHandler;
-import com.loopj.android.http.FileAsyncHttpResponseHandler;
-import com.squareup.picasso.OkHttpDownloader;
-import com.squareup.picasso.Picasso;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.ConversationsFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
-import com.syzible.loinnir.network.PicassoSSL;
-import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.network.NetworkCallback;
+import com.syzible.loinnir.network.ReqImage;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
+import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
-
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.io.File;
-import java.util.Arrays;
-
-import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -73,7 +58,8 @@ public class MainActivity extends AppCompatActivity
         String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
         name = name.split(" ")[0];
         DisplayUtils.generateSnackbar(this,
-                "Fáilte ar ais, a " + name + "! " + EmojiUtils.getEmoji(EmojiUtils.HAPPY_EMOJI));
+                "Fáilte romhat, a " + LanguageUtils.getVocative("Liam") + "! " +
+                        EmojiUtils.getEmoji(EmojiUtils.HAPPY));
 
         // set up nav bar header for personalisation
         View headerView = navigationView.getHeaderView(0);
@@ -82,36 +68,50 @@ public class MainActivity extends AppCompatActivity
         userName.setText(LocalStorage.getPref(LocalStorage.Pref.name, this));
 
         TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
-        localityName.setText("");
+        localityName.setText("Baile Tada");
 
         final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
         String picUrl = LocalStorage.getPref(LocalStorage.Pref.profile_pic, this);
+        System.out.println(picUrl);
 
-        Bitmap localProfilePic = BitmapFactory.decodeResource(getResources(), R.drawable.profile_pic);
-        Bitmap croppedPic = BitmapUtils.getCroppedCircle(localProfilePic);
-        profilePic.setImageBitmap(croppedPic);
-
-        // TODO SSL request not working
-        RestClient.getExternal(picUrl, new BinaryHttpResponseHandler() {
+        new ReqImage(new NetworkCallback<Bitmap>() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] binaryData) {
-                Bitmap pic = BitmapFactory.decodeByteArray(binaryData, 0, binaryData.length);
-                profilePic.setImageBitmap(BitmapUtils.getCroppedCircle(pic));
+            public void onSuccess(Bitmap pic) {
+                Bitmap croppedPic = BitmapUtils.getCroppedCircle(pic);
+                profilePic.setImageBitmap(croppedPic);
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] binaryData, Throwable error) {
-
+            public void onFailure() {
+                DisplayUtils.generateSnackbar(MainActivity.this, "Theip ar an íoslódáil");
             }
-        });
+        }, picUrl).execute();
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        // if there's only one fragment on the stack we should prevent the default
+        // popping to ask for the user's permission to close the app
         if (getFragmentManager().getBackStackEntryCount() == 1) {
-            // TODO make an alert dialog, could be annoying for the user otherwise
-            this.finish();
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("An Aip a Dhúnadh?")
+                    .setMessage("Má bhrúitear an chnaipe \"Dún\", dúnfar an aip. An bhfuil tú cinnte go bhfuil sé seo ag teastáil uait a dhéanamh?")
+                    .setPositiveButton("Dún", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            MainActivity.this.finish();
+                        }
+                    })
+                    .setNegativeButton("Ná dún", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            DisplayUtils.generateSnackbar(MainActivity.this,
+                                    "Fáilte ar ais " + EmojiUtils.getEmoji(EmojiUtils.COOL));
+                        }
+                    })
+                    .show();
         }
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {

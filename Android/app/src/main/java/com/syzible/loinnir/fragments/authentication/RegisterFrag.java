@@ -14,8 +14,11 @@ import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.AuthenticationActivity;
-import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.network.Endpoints;
+import com.syzible.loinnir.network.NetworkCallback;
+import com.syzible.loinnir.network.PostJSONObject;
 import com.syzible.loinnir.utils.DisplayUtils;
+import com.syzible.loinnir.utils.EmojiUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -132,18 +135,18 @@ public class RegisterFrag extends Fragment {
             e.printStackTrace();
         }
 
-        RestClient.post(getActivity(), RestClient.CREATE_USER, params, new BaseJsonHttpResponseHandler<JSONObject>() {
+        new PostJSONObject(new NetworkCallback<JSONObject>() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+            public void onSuccess(JSONObject response) {
                 try {
                     boolean result = response.getBoolean("success");
                     if (result) {
                         String greeting = "Fáilte romhat go dtí " +
                                 getResources().getString(R.string.app_name) +
-                                ", a " + etForename.getText() + "!";
+                                ", a " + etForename.getText() + "! " +
+                                EmojiUtils.getEmoji(EmojiUtils.COOL);
                         DisplayUtils.generateSnackbar(getActivity(), greeting);
                     } else {
-                        // TODO return reasons if user exists etc
                         String reason = response.getString("reason");
                         DisplayUtils.generateSnackbar(getActivity(), reason);
                     }
@@ -153,14 +156,9 @@ public class RegisterFrag extends Fragment {
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+            public void onFailure() {
                 DisplayUtils.generateSnackbar(getActivity(), "Tharla fadhb leis an gclárúchán. Seiceáil do rochtain idirlín.");
             }
-
-            @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
-            }
-        });
+        }, Endpoints.CREATE_USER).execute();
     }
 }
