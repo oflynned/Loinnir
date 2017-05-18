@@ -121,7 +121,7 @@ def edit_user():
 
 
 if __name__ == '__main__':
-    env = sys.argv[2]
+    env = sys.argv[1]
     if env == "prod":
         app.run(host='0.0.0.0', port=80)
     else:
