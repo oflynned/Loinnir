@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, Response
 from flask_pymongo import PyMongo
 from bson import ObjectId, json_util
 import json
-import os
+import os, sys
 
 frontend_dir = os.path.abspath("../Frontend")
 static_dir = os.path.abspath("../Frontend/static")
@@ -121,4 +121,8 @@ def edit_user():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000)
+    env = sys.argv[2]
+    if env == "prod":
+        app.run(host='0.0.0.0', port=80)
+    else:
+        app.run(host='0.0.0.0', port=3000)
