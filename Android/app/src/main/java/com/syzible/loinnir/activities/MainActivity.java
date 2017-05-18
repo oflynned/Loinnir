@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.nfc.tech.NfcA;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity
         String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
         name = name.split(" ")[0];
         DisplayUtils.generateSnackbar(this,
-                "Fáilte romhat, a " + LanguageUtils.getVocative("Liam") + "! " +
+                "Fáilte romhat, a " + LanguageUtils.getVocative(name) + "! " +
                         EmojiUtils.getEmoji(EmojiUtils.HAPPY));
 
         // set up nav bar header for personalisation
@@ -72,7 +73,6 @@ public class MainActivity extends AppCompatActivity
 
         final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
         String picUrl = LocalStorage.getPref(LocalStorage.Pref.profile_pic, this);
-        System.out.println(picUrl);
 
         new ReqImage(new NetworkCallback<Bitmap>() {
             @Override
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure() {
+                profilePic.setImageResource(R.drawable.logo_small);
                 DisplayUtils.generateSnackbar(MainActivity.this, "Theip ar an íoslódáil");
             }
         }, picUrl).execute();

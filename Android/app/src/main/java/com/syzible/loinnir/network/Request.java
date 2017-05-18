@@ -38,6 +38,7 @@ abstract class Request <T> extends AsyncTask<Object, Void, T> {
             connection.setReadTimeout(10000);
             connection.setConnectTimeout(15000);
             connection.setRequestMethod(verb);
+            connection.setInstanceFollowRedirects(true);
             connection.setRequestProperty("Content-length", "0");
             connection.setUseCaches(false);
             connection.setAllowUserInteraction(false);

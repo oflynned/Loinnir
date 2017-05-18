@@ -86,11 +86,11 @@ public class LanguageUtils {
         return mutation + strippedInput;
     }
 
-    public static String lenite(String input) {
+    private static String lenite(String input) {
         return getMutation(lenitionRules, input);
     }
 
-    public static String eclipse(String input) {
+    private static String eclipse(String input) {
         return getMutation(eclipsisRules, input);
     }
 
@@ -98,7 +98,7 @@ public class LanguageUtils {
         return letter.matches("a|e|i|o|u|á|é|í|ó|ú");
     }
 
-    private static String syncopate(String input) {
+    private static String palatalise(String input) {
         // Seán -> Seáin
         int wordLength = input.length();
         return input.substring(0, wordLength - 1) + "i" + input.substring(wordLength - 1, wordLength);
@@ -122,14 +122,12 @@ public class LanguageUtils {
         String firstLetter = String.valueOf(input.charAt(0));
         boolean hasVowel = isVowel(firstLetter.toLowerCase());
 
-        if (!hasBroadFinal) {
-            System.out.println("no broad final");
+        if (!hasBroadFinal)
             return input;
-        }
 
         if (!hasVowel)
-            return lenite(syncopate(input));
+            return lenite(palatalise(input));
 
-        return syncopate(input);
+        return palatalise(input);
     }
 }
