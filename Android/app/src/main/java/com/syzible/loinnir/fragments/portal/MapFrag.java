@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.syzible.loinnir.R;
@@ -29,15 +30,17 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.map_frag, container, false);
+        View view = inflater.inflate(R.layout.map_frag, container, false);
+
+        MapFragment mapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        //MapFragment mapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        //mapFragment.getMapAsync(this);
     }
 
     @Override

@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure() {
-                profilePic.setImageResource(R.drawable.logo_small);
                 DisplayUtils.generateSnackbar(MainActivity.this, "Theip ar an íoslódáil");
             }
         }, picUrl).execute();
