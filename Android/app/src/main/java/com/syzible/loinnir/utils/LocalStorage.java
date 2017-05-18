@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
 
 public class LocalStorage {
     public enum Pref {
-        id, fb_access_token, first_name, last_name, email, gender, profile_pic, name
+        id, fb_access_token, first_name, last_name, email, gender, profile_pic, name, first_run
     }
 
     public static boolean isLoggedIn(Context context) {
@@ -36,5 +36,10 @@ public class LocalStorage {
                 .edit()
                 .putString(key.name(), "")
                 .apply();
+    }
+
+    public static boolean isFirstRun(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(Pref.first_run.name(), true);
     }
 }

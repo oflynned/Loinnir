@@ -1,5 +1,6 @@
 package com.syzible.loinnir.network;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,13 +14,13 @@ import java.io.Writer;
  * Created by ed on 16/12/2016
  */
 
-public class ReqJSONObject extends GetRequest<JSONObject> {
-    public ReqJSONObject(NetworkCallback<JSONObject> networkCallback, String url) {
-        super(networkCallback, url);
+public class GetJSONArray extends GetRequest<JSONArray> {
+    public GetJSONArray(NetworkCallback<JSONArray> networkCallback, String url) {
+        super(networkCallback, Endpoints.getAbsoluteURL(url));
     }
 
     @Override
-    public JSONObject transferData() {
+    public JSONArray transferData() {
         try {
             Writer writer = new StringWriter();
 
@@ -33,7 +34,7 @@ public class ReqJSONObject extends GetRequest<JSONObject> {
                     while ((n = br.read(buffer)) != -1) writer.write(buffer, 0, n);
                     br.close();
 
-                    return new JSONObject(writer.toString());
+                    return new JSONArray(writer.toString());
                 case 404:
                 case 500:
                     break;
@@ -43,6 +44,11 @@ public class ReqJSONObject extends GetRequest<JSONObject> {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    @Override
+    public JSONArray transferData(JSONArray payload) {
         return null;
     }
 }

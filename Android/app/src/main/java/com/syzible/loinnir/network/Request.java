@@ -10,14 +10,20 @@ import java.net.URL;
  * Created by ed on 16/12/2016
  */
 
-abstract class Request <T> extends AsyncTask<Object, Void, T> {
+abstract class Request<T> extends AsyncTask<Object, Void, T> {
     private NetworkCallback<T> networkCallback;
     private String url, verb;
     private HttpURLConnection connection;
+    private T payload;
 
     Request(NetworkCallback<T> networkCallback, String url, String verb) {
+        this(networkCallback, null, url, verb);
+    }
+
+    Request(NetworkCallback<T> networkCallback, T payload, String url, String verb) {
         this.networkCallback = networkCallback;
         this.url = url;
+        this.payload = payload;
         this.verb = verb;
     }
 
@@ -34,15 +40,18 @@ abstract class Request <T> extends AsyncTask<Object, Void, T> {
     @Override
     protected T doInBackground(Object... objects) {
         try {
+            System.out.println(url);
             connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setReadTimeout(10000);
             connection.setConnectTimeout(15000);
             connection.setRequestMethod(verb);
             connection.setInstanceFollowRedirects(true);
-            connection.setRequestProperty("Content-length", "0");
+            if (verb.equals("POST")) setPostContent();
             connection.setUseCaches(false);
             connection.setAllowUserInteraction(false);
             connection.connect();
+
+            if (verb.equals("POST")) return transferData(payload);
 
             return transferData();
         } catch (IOException e) {
@@ -60,13 +69,22 @@ abstract class Request <T> extends AsyncTask<Object, Void, T> {
     protected void onPostExecute(T o) {
         super.onPostExecute(o);
         assert networkCallback != null;
-        if (o != null) networkCallback.onSuccess(o);
-        else networkCallback.onFailure();
+        if (o != null)
+            networkCallback.onResponse(o);
+        else
+            networkCallback.onFailure();
     }
 
     HttpURLConnection getConnection() {
         return connection;
     }
 
+    private void setPostContent() {
+        getConnection().setRequestProperty("Content-Type", "application/json");
+        getConnection().setRequestProperty("Accept", "application/json");
+    }
+
     public abstract T transferData();
+
+    public abstract T transferData(T payload);
 }

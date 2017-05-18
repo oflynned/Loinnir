@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.nfc.tech.NfcA;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,18 +18,30 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.ConversationsFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
+import com.syzible.loinnir.network.Endpoints;
+import com.syzible.loinnir.network.GetJSONArray;
+import com.syzible.loinnir.network.GetJSONObject;
 import com.syzible.loinnir.network.NetworkCallback;
-import com.syzible.loinnir.network.ReqImage;
+import com.syzible.loinnir.network.PostJSONObject;
+import com.syzible.loinnir.network.GetImage;
+import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -74,9 +85,9 @@ public class MainActivity extends AppCompatActivity
         final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
         String picUrl = LocalStorage.getPref(LocalStorage.Pref.profile_pic, this);
 
-        new ReqImage(new NetworkCallback<Bitmap>() {
+        new GetImage(new NetworkCallback<Bitmap>() {
             @Override
-            public void onSuccess(Bitmap pic) {
+            public void onResponse(Bitmap pic) {
                 Bitmap croppedPic = BitmapUtils.getCroppedCircle(pic);
                 profilePic.setImageBitmap(croppedPic);
             }
@@ -157,6 +168,47 @@ public class MainActivity extends AppCompatActivity
             FacebookUtils.deleteToken(this);
             finish();
             startActivity(new Intent(this, AuthenticationActivity.class));
+        }
+
+        // TODO DEV OPTIONS
+        else if (id == R.id.force_post) {
+            JSONObject payload = new JSONObject();
+            try {
+                payload.put("fb_id", "123456789");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Payload in force post: " + payload.toString());
+
+            RestClient.post(this, Endpoints.CREATE_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                    System.out.println(response);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                    System.out.println("Failure");
+                }
+
+                @Override
+                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                    return new JSONObject(rawJsonData);
+                }
+            });
+        } else if(id == R.id.force_get) {
+            new GetJSONArray(new NetworkCallback<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    System.out.println(response.toString());
+                }
+
+                @Override
+                public void onFailure() {
+                    System.out.println("Failure in force get JSON object?");
+                }
+            }, Endpoints.GET_ALL_USERS).execute();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

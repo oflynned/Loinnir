@@ -5,6 +5,6 @@ package com.syzible.loinnir.network;
  */
 
 public interface NetworkCallback<T> {
-    void onSuccess(T object);
+    void onResponse(T response);
     void onFailure();
 }

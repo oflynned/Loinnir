@@ -9,22 +9,26 @@ import org.json.JSONObject;
 
 public class User {
 
-    private String id;
+    private String id, fb_id;
     private float longitude, latitude;
-    private String forename, surname;
+    private String name;
     private String imageUrl;
 
     public User(JSONObject data) throws JSONException {
         this.id = data.getString("_id");
+        this.fb_id = data.getString("fb_id");
         this.longitude = (float) data.getDouble("lng");
         this.latitude = (float) data.getDouble("lat");
-        this.forename = data.getString("forename");
-        this.surname = data.getString("surname");
-        this.imageUrl = data.getString("image_url");
+        this.name = data.getString("name");
+        this.imageUrl = data.getString("profile_pic");
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getFb_id() {
+        return fb_id;
     }
 
     public float getLongitude() {
@@ -35,12 +39,8 @@ public class User {
         return latitude;
     }
 
-    public String getForename() {
-        return forename;
-    }
-
-    public String getSurname() {
-        return surname;
+    public String getName() {
+        return name;
     }
 
     public String getImageUrl() {

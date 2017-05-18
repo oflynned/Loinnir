@@ -3,9 +3,14 @@ package com.syzible.loinnir.network;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -14,28 +19,41 @@ import java.io.Writer;
  */
 
 public class PostJSONObject extends PostRequest<JSONObject> {
-    public PostJSONObject(NetworkCallback<JSONObject> networkCallback, String url) {
-        super(networkCallback, url);
+    public PostJSONObject(NetworkCallback<JSONObject> networkCallback, JSONObject payload, String url) {
+        super(networkCallback, payload, url);
     }
 
     @Override
     public JSONObject transferData() {
+        return null;
+    }
+
+    @Override
+    public JSONObject transferData(JSONObject payload) {
         try {
-            Writer writer = new StringWriter();
+
+            System.out.println("POST payload: " + payload.toString());
 
             switch (getConnection().getResponseCode()) {
                 case 200:
                 case 304:
-                    char[] buffer = new char[1024];
-                    BufferedReader br = new BufferedReader(
-                            new InputStreamReader(getConnection().getInputStream()));
-                    int n;
-                    while ((n = br.read(buffer)) != -1) writer.write(buffer, 0, n);
-                    br.close();
+                    Writer writer = new BufferedWriter(new OutputStreamWriter(getConnection().getOutputStream()));
+                    writer.write(payload.toString());
+                    writer.close();
 
-                    return new JSONObject(writer.toString());
-                case 404:
-                case 500:
+                    InputStream inputStream = getConnection().getInputStream();
+                    StringBuilder buffer = new StringBuilder();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    String inputLine;
+
+                    while ((inputLine = bufferedReader.readLine()) != null) {
+                        buffer.append(inputLine).append("\n");
+                    }
+
+                    System.out.println(buffer.toString());
+
+                    return new JSONObject(buffer.toString());
+                default:
                     break;
             }
             return null;

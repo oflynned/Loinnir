@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/nav_header_pic"
         android:paddingTop="8dp"
-        android:text="John Smith"
+        android:text="Ainm an Úsáideora"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
@@ -35,6 +35,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nav_header_name"
-        android:text="Baile Átha Cliath" />
+        android:text="Baile Reatha" />
 
 </RelativeLayout>

@@ -25,12 +25,17 @@ import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.PostJSONObject;
+import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.DisplayUtils;
+import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -110,24 +115,19 @@ public class LoginFrag extends Fragment {
 
                                     JSONObject postData = new JSONObject();
                                     postData.put("fb_id", id);
-                                    postData.put("name", name);
+                                    postData.put("name", URLEncoder.encode(name, "UTF-8"));
                                     postData.put("profile_pic", pic);
 
                                     LocalStorage.setPref(LocalStorage.Pref.id, id, getActivity());
                                     LocalStorage.setPref(LocalStorage.Pref.name, name, getActivity());
                                     LocalStorage.setPref(LocalStorage.Pref.profile_pic, pic, getActivity());
 
-                                    new PostJSONObject(new NetworkCallback<JSONObject>() {
+                                    RestClient.post(getActivity(), Endpoints.CREATE_USER, postData, new BaseJsonHttpResponseHandler<JSONObject>() {
                                         @Override
-                                        public void onSuccess(JSONObject response) {
+                                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                                             try {
-                                                System.out.println(response.toString());
+                                                System.out.println("Login response: " + response.toString());
                                                 boolean exists = response.getBoolean("success");
-
-                                                if (!exists) {
-                                                    DisplayUtils.generateSnackbar(getActivity(), "Cúntas á cruthú...");
-                                                }
-
                                                 startMain();
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -135,12 +135,20 @@ public class LoginFrag extends Fragment {
                                         }
 
                                         @Override
-                                        public void onFailure() {
-
+                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                                            DisplayUtils.generateSnackbar(getActivity(), "Thit earáid amach (" + statusCode +") " + EmojiUtils.getEmoji(EmojiUtils.SAD));
                                         }
-                                    }, Endpoints.CREATE_USER).execute();
+
+                                        @Override
+                                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                            System.out.println(rawJsonData);
+                                            return new JSONObject(rawJsonData);
+                                        }
+                                    });
 
                                 } catch (JSONException e) {
+                                    e.printStackTrace();
+                                } catch (UnsupportedEncodingException e) {
                                     e.printStackTrace();
                                 }
 

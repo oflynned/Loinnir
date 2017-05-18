@@ -137,7 +137,7 @@ public class RegisterFrag extends Fragment {
 
         new PostJSONObject(new NetworkCallback<JSONObject>() {
             @Override
-            public void onSuccess(JSONObject response) {
+            public void onResponse(JSONObject response) {
                 try {
                     boolean result = response.getBoolean("success");
                     if (result) {
@@ -159,6 +159,6 @@ public class RegisterFrag extends Fragment {
             public void onFailure() {
                 DisplayUtils.generateSnackbar(getActivity(), "Tharla fadhb leis an gclárúchán. Seiceáil do rochtain idirlín.");
             }
-        }, Endpoints.CREATE_USER).execute();
+        }, params, Endpoints.CREATE_USER).execute();
     }
 }

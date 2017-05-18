@@ -18,4 +18,8 @@ public class Endpoints {
     public static final String GET_ALL_USERS = "/users/get-all";
     public static final String GET_NEARBY_USERS = "/users/get-nearby";
     public static final String GET_RANDOM_USER = "/users/get-random";
+
+    public static String getAbsoluteURL(String endpoint) {
+        return BASE_URL + endpoint;
+    }
 }

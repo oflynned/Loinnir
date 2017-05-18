@@ -27,12 +27,11 @@ public class FacebookUtils {
         LocalStorage.setPref(LocalStorage.Pref.fb_access_token, token, context);
     }
 
-    public static String getToken(Context context) {
+    private static String getToken(Context context) {
         return LocalStorage.getPref(LocalStorage.Pref.fb_access_token, context);
     }
 
     public static boolean hasExistingToken(Context context) {
-        System.out.println("Token is: " + getToken(context));
         return !getToken(context).equals("");
     }
 
@@ -40,70 +39,9 @@ public class FacebookUtils {
         LocalStorage.purgePref(LocalStorage.Pref.fb_access_token, context);
     }
 
-    public static HashMap<String, String> getPrefs(Context context) {
-
-        String id = LocalStorage.getPref(LocalStorage.Pref.id, context);
-        String first_name = LocalStorage.getPref(LocalStorage.Pref.first_name, context);
-        String last_name = LocalStorage.getPref(LocalStorage.Pref.last_name, context);
-        String email = LocalStorage.getPref(LocalStorage.Pref.email, context);
-        String gender = LocalStorage.getPref(LocalStorage.Pref.gender, context);
-        String profile_url = LocalStorage.getPref(LocalStorage.Pref.profile_pic, context);
-
-        HashMap<String, String> details = new HashMap<>();
-        details.put(LocalStorage.Pref.id.name(), id);
-        details.put(LocalStorage.Pref.first_name.name(), first_name);
-        details.put(LocalStorage.Pref.last_name.name(), last_name);
-        details.put(LocalStorage.Pref.email.name(), email);
-        details.put(LocalStorage.Pref.gender.name(), gender);
-        details.put(LocalStorage.Pref.profile_pic.name(), profile_url);
-
-        return details;
-    }
-
-    private static void saveFacebookUserInfo(FacebookUser user, Context context) {
-        LocalStorage.setPref(LocalStorage.Pref.id, user.getId(), context);
-        LocalStorage.setPref(LocalStorage.Pref.first_name, user.getFirstName(), context);
-        LocalStorage.setPref(LocalStorage.Pref.last_name, user.getLastName(), context);
-        LocalStorage.setPref(LocalStorage.Pref.email, user.getEmail(), context);
-        LocalStorage.setPref(LocalStorage.Pref.gender, user.getGender(), context);
-        LocalStorage.setPref(LocalStorage.Pref.profile_pic, user.getProfilePicURL(), context);
-    }
-
     public static void getStoredPrefs(Context context) {
         for (LocalStorage.Pref pref : LocalStorage.Pref.values())
             System.out.println(pref.name() + ": " + LocalStorage.getPref(pref, context));
-    }
-
-    public static JSONObject getFacebookData(JSONObject object, Context context) {
-        JSONObject details = new JSONObject();
-
-        try {
-            String id = object.getString(LocalStorage.Pref.id.name());
-            URL profile_pic;
-
-            try {
-                profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?type=large");
-                details.put(LocalStorage.Pref.profile_pic.name(), profile_pic.toString());
-                details.put(LocalStorage.Pref.id.name(), id);
-                details.put(LocalStorage.Pref.name.name(), object.getString("name"));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
-            }
-
-            FacebookUser user = new FacebookUser(id,
-                    object.getString("first_name"),
-                    object.getString("last_name"),
-                    object.getString("email"),
-                    object.getString("gender"),
-                    profile_pic.toString());
-
-            saveFacebookUserInfo(user, context);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return details;
     }
 
     public static void deleteToken(Context context) {

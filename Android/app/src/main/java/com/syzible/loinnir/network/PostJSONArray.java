@@ -2,10 +2,14 @@ package com.syzible.loinnir.network;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -14,26 +18,35 @@ import java.io.Writer;
  */
 
 public class PostJSONArray extends PostRequest<JSONArray> {
-    public PostJSONArray(NetworkCallback<JSONArray> networkCallback, String url) {
-        super(networkCallback, url);
+    public PostJSONArray(NetworkCallback<JSONArray> networkCallback, JSONArray payload, String url) {
+        super(networkCallback, payload, url);
     }
 
     @Override
     public JSONArray transferData() {
+        return null;
+    }
+
+    @Override
+    public JSONArray transferData(JSONArray payload) {
         try {
-            Writer writer = new StringWriter();
 
             switch (getConnection().getResponseCode()) {
                 case 200:
                 case 304:
-                    char[] buffer = new char[1024];
-                    BufferedReader br = new BufferedReader(
-                            new InputStreamReader(getConnection().getInputStream()));
-                    int n;
-                    while ((n = br.read(buffer)) != -1) writer.write(buffer, 0, n);
-                    br.close();
+                    Writer writer = new BufferedWriter(new OutputStreamWriter(getConnection().getOutputStream()));
+                    writer.write(payload.toString());
+                    writer.close();
 
-                    return new JSONArray(writer.toString());
+                    InputStream inputStream = getConnection().getInputStream();
+                    StringBuilder buffer = new StringBuilder();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    String inputLine;
+                    while ((inputLine = bufferedReader.readLine()) != null) {
+                        buffer.append(inputLine).append("\n");
+                    }
+
+                    return new JSONArray(buffer.toString());
                 case 404:
                 case 500:
                     break;
