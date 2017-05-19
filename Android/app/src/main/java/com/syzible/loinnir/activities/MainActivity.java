@@ -23,6 +23,7 @@ import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.ConversationsFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
+import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetJSONArray;
 import com.syzible.loinnir.network.GetJSONObject;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity
         userName.setText(LocalStorage.getPref(LocalStorage.Pref.name, this));
 
         TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
-        localityName.setText("Baile Tada");
+        localityName.setText("Áth Trasna");
 
         final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
         String picUrl = LocalStorage.getPref(LocalStorage.Pref.profile_pic, this);
@@ -173,14 +174,16 @@ public class MainActivity extends AppCompatActivity
         else if (id == R.id.force_post) {
             JSONObject payload = new JSONObject();
             try {
-                payload.put("fb_id", "123456789");
+                payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
+                payload.put("lng", LocationClient.MAP_GOOSEBERRY_HILL.longitude);
+                payload.put("lat", LocationClient.MAP_GOOSEBERRY_HILL.latitude);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             System.out.println("Payload in force post: " + payload.toString());
 
-            RestClient.post(this, Endpoints.CREATE_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+            RestClient.post(this, Endpoints.UPDATE_USER_LOCATION, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                     System.out.println(response);

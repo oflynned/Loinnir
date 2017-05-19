@@ -2,10 +2,12 @@ package com.syzible.loinnir.fragments.portal;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,9 +30,21 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.location.LocationClient;
+import com.syzible.loinnir.network.Endpoints;
+import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
+import com.syzible.loinnir.utils.LocalStorage;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
+
+import static com.syzible.loinnir.location.LocationClient.MAP_GOOSEBERRY_HILL;
 
 /**
  * Created by ed on 07/05/2017.
@@ -41,8 +55,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
 
-    // TODO remove these, just in use until actual current location is polled
-    private static final LatLng MAP_CENTRE = new LatLng(53.309543, -6.218028);
     private static final float MY_LOCATION_ZOOM = 14.0f;
     private static final int USER_LOCATION_RADIUS = 250;
 
@@ -103,21 +115,59 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MAP_CENTRE, MY_LOCATION_ZOOM));
+        this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.MAP_UCD, MY_LOCATION_ZOOM));
+        getWebServerLocation(this.googleMap);
+    }
 
-        int GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
-        int r = (GREEN_500) & 0xFF;
-        int g = (GREEN_500 >> 8) & 0xFF;
-        int b = (GREEN_500 >> 16) & 0xFF;
-        int a = 128;
+    private void getWebServerLocation(final GoogleMap googleMap) {
+        final int GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
+        final int r = (GREEN_500) & 0xFF;
+        final int g = (GREEN_500 >> 8) & 0xFF;
+        final int b = (GREEN_500 >> 16) & 0xFF;
+        final int a = 128;
 
-        googleMap.addCircle(new CircleOptions()
-                .center(MAP_CENTRE)
-                .radius(250)
-                .strokeColor(GREEN_500)
-                .fillColor(Color.argb(a, r, g, b)));
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("fb_id", LocalStorage.getID(getActivity()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        DisplayUtils.generateToast(getActivity(), "Ag fanacht ar d'áit " + EmojiUtils.getEmoji(EmojiUtils.COOL));
+        RestClient.post(getActivity(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                System.out.println(rawJsonResponse);
+                LatLng location = null;
+
+                try {
+                    location = new LatLng(response.getDouble("lat"), response.getDouble("lng"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("got location!");
+
+                if (location != null) {
+                    googleMap.addCircle(new CircleOptions()
+                            .center(location)
+                            .radius(250)
+                            .strokeColor(GREEN_500)
+                            .fillColor(Color.argb(a, r, g, b)));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, MY_LOCATION_ZOOM));
+
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                System.out.println(rawJsonData);
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return (JSONObject) new JSONObject(rawJsonData).get("user");
+            }
+        });
     }
 
     @Override
@@ -128,15 +178,17 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         System.out.println("Location services connected");
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
         }
 
         googleMap.setMyLocationEnabled(true);
