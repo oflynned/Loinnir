@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, Response
 from flask_pymongo import PyMongo
-from bson import ObjectId, json_util
+from bson import json_util
 import json
 import os, sys
+from random import randint
 
 frontend_dir = os.path.abspath("../Frontend")
 static_dir = os.path.abspath("../Frontend/static")
@@ -45,7 +46,7 @@ def get_json(data):
 # TODO Backend services
 @app.route('/api/v1', methods=["GET"])
 def hello_world():
-    return get_json({"hello": "world"})
+    return get_json({"hey there": "developer ;)"})
 
 
 # POST {fb_id: 123456789, ...}
@@ -80,27 +81,47 @@ def get_user():
     is_existing = user.count() > 0
 
     if is_existing:
-        user = list(user)[0]
-        return get_json({"success": True, "user": user})
+        return get_json({"success": True, "user": list(user)[0]})
     else:
         return get_json({"success": False, "reason": "fb_id doesn't exist"})
 
 
+# POST {fb_id:123456789}
+# GET [{}]
 @app.route('/api/v1/users/get-all', methods=["GET"])
 def get_all_users():
     return get_json(mongo.db.users.find())
 
 
-# TODO
-@app.route('/api/v1/users/get-nearby', methods=["GET", "POST"])
+# POST {fb_id:123456789, locality: "Áth Trasna"}
+# GET [{...}]
+@app.route('/api/v1/users/get-nearby', methods=["POST"])
 def get_nearby_users():
-    return get_json({"success": True})
+    data = request.json
+    fb_id = str(data["fb_id"])
+    locality = str(data["locality"])
+
+    # find local users and exclude self from lookup
+    users_col = mongo.db.users
+    nearby_users = users_col.find({"fb_id": {"$ne": fb_id}, "locality": locality})
+    return get_json(nearby_users)
 
 
-# TODO
+# POST {fb_id:123456789}
+# GET [{}]
 @app.route('/api/v1/users/get-random', methods=["GET", "POST"])
 def get_random_user():
-    return get_json({"success": True})
+    data = request.json
+    fb_id = str(data["fb_id"])
+
+    # find random user and exclude self from lookup
+    # TODO need to exclude users already chatted with!
+    users_col = mongo.db.users
+    # exclude self
+    count = mongo.db.users.count() - 2
+    users = users_col.find({"fb_id": {"$ne": fb_id}})
+    user = users[randint(0, count)]
+    return get_json(user)
 
 
 # DELETE {fb_id: 123456789}
@@ -109,15 +130,23 @@ def get_random_user():
 def delete_user():
     users_col = mongo.db["users"]
     data = json.loads(request.data)
-    fb_id = data["fb_id"]
+    fb_id = str(data["fb_id"])
     users_col.remove({"fb_id": fb_id})
     return get_json({"success": True})
 
 
-# TODO edit lng, lat, etc
-@app.route('/api/v1/users/edit', methods=["PUT"])
-def edit_user():
-    pass
+@app.route('/api/v1/users/update-location', methods=["POST"])
+def update_location():
+    data = request.json
+    fb_id = str(data["fb_id"])
+
+    users_col = mongo.db.users
+    user = list(users_col.find({"fb_id": fb_id}))[0]
+    user["lat"] = data["lat"]
+    user["lng"] = data["lng"]
+
+    users_col.save(user)
+    return get_json({"success": True})
 
 
 if __name__ == '__main__':
