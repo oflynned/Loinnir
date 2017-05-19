@@ -11,14 +11,6 @@ import io.nlopez.smartlocation.SmartLocation;
  */
 
 public class LocationClient {
-    public static void getLocation(Context context) {
-        SmartLocation.with(context).location().start(new OnLocationUpdatedListener() {
-            @Override
-            public void onLocationUpdated(Location location) {
-
-            }
-        });
-    }
 
     public static void stopLocationService(Context context) {
         SmartLocation.with(context).location().stop();

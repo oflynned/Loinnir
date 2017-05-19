@@ -118,8 +118,7 @@ public class MainActivity extends AppCompatActivity
                     .setNegativeButton("Ná dún", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            DisplayUtils.generateSnackbar(MainActivity.this,
-                                    "Fáilte ar ais " + EmojiUtils.getEmoji(EmojiUtils.COOL));
+
                         }
                     })
                     .show();
