@@ -39,6 +39,7 @@ import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -133,29 +134,26 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
             e.printStackTrace();
         }
 
+        // get my locaiton and move to it on the map
         RestClient.post(getActivity(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                System.out.println(rawJsonResponse);
-                LatLng location = null;
-
                 try {
-                    location = new LatLng(response.getDouble("lat"), response.getDouble("lng"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    double lat = response.getDouble("lat");
+                    double lng = response.getDouble("lng");
+                    LatLng location = new LatLng(lat, lng);
 
-                System.out.println("got location!");
-
-                if (location != null) {
                     googleMap.addCircle(new CircleOptions()
                             .center(location)
                             .radius(250)
                             .strokeColor(GREEN_500)
                             .fillColor(Color.argb(a, r, g, b)));
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, MY_LOCATION_ZOOM));
 
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, MY_LOCATION_ZOOM));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+
             }
 
             @Override
@@ -165,7 +163,41 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
 
             @Override
             protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return (JSONObject) new JSONObject(rawJsonData).get("user");
+                return new JSONObject(rawJsonData);
+            }
+        });
+
+        // get others' locations and add to map without zooming to them
+        RestClient.post(getActivity(), Endpoints.GET_OTHER_USERS, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject user = response.getJSONObject(i);
+                        double lat = user.getDouble("lat");
+                        double lng = user.getDouble("lng");
+                        LatLng location = new LatLng(lat, lng);
+
+                        googleMap.addCircle(new CircleOptions()
+                                .center(location)
+                                .radius(250)
+                                .strokeColor(GREEN_500)
+                                .fillColor(Color.argb(a, r, g, b)));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+                System.out.println(rawJsonData);
+            }
+
+            @Override
+            protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return new JSONArray(rawJsonData);
             }
         });
     }
