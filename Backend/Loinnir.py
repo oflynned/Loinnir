@@ -81,7 +81,7 @@ def get_user():
     is_existing = user.count() > 0
 
     if is_existing:
-        return get_json({"success": True, "user": list(user)[0]})
+        return get_json(list(user)[0])
     else:
         return get_json({"success": False, "reason": "fb_id doesn't exist"})
 
@@ -91,6 +91,15 @@ def get_user():
 @app.route('/api/v1/users/get-all', methods=["GET"])
 def get_all_users():
     return get_json(mongo.db.users.find())
+
+
+# POST {fb_id:123456789}
+# GET [{}]
+@app.route('/api/v1/users/get-others', methods=["POST"])
+def get_other_users():
+    data = request.json
+    fb_id = str(data["fb_id"])
+    return get_json(mongo.db.users.find({"fb_id": {"$ne": fb_id}}))
 
 
 # POST {fb_id:123456789, locality: "Áth Trasna"}
