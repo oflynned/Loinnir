@@ -159,6 +159,6 @@ public class RegisterFrag extends Fragment {
             public void onFailure() {
                 DisplayUtils.generateSnackbar(getActivity(), "Tharla fadhb leis an gclárúchán. Seiceáil do rochtain idirlín.");
             }
-        }, params, Endpoints.CREATE_USER).execute();
+        }, params, Endpoints.CREATE_USER, false).execute();
     }
 }

@@ -5,7 +5,7 @@ package com.syzible.loinnir.network;
  */
 
 abstract class GetRequest<T> extends Request<T> {
-    GetRequest(NetworkCallback<T> networkCallback, String url) {
-        super(networkCallback, url, "GET");
+    GetRequest(NetworkCallback<T> networkCallback, String url, boolean isExternal) {
+        super(networkCallback, url, "GET", isExternal);
     }
 }

@@ -18,8 +18,8 @@ import java.io.Writer;
  */
 
 public class GetImage extends GetRequest<Bitmap> {
-    public GetImage(NetworkCallback<Bitmap> networkCallback, String url) {
-        super(networkCallback, url);
+    public GetImage(NetworkCallback<Bitmap> networkCallback, String url, boolean isExternal) {
+        super(networkCallback, url, isExternal);
     }
 
     @Override

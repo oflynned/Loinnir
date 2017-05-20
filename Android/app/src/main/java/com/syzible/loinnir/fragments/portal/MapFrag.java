@@ -2,7 +2,6 @@ package com.syzible.loinnir.fragments.portal;
 
 import android.Manifest;
 import android.app.Fragment;
-import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -26,7 +25,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -35,17 +33,16 @@ import com.syzible.loinnir.R;
 import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
-import com.syzible.loinnir.utils.DisplayUtils;
-import com.syzible.loinnir.utils.EmojiUtils;
+import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cz.msebera.android.httpclient.Header;
+import java.util.ArrayList;
 
-import static com.syzible.loinnir.location.LocationClient.MAP_GOOSEBERRY_HILL;
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by ed on 07/05/2017.
@@ -56,11 +53,14 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
 
+    private int GREEN_500;
     private static final float MY_LOCATION_ZOOM = 14.0f;
-    private static final int USER_LOCATION_RADIUS = 250;
+    private static final int USER_LOCATION_RADIUS = 500;
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private LocationRequest locationRequest;
+
+    ArrayList<User> nearbyUsers = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +75,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)
                 .setFastestInterval(1000);
+
+        GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
     }
 
     @Override
@@ -121,11 +123,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     }
 
     private void getWebServerLocation(final GoogleMap googleMap) {
-        final int GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
-        final int r = (GREEN_500) & 0xFF;
-        final int g = (GREEN_500 >> 8) & 0xFF;
-        final int b = (GREEN_500 >> 16) & 0xFF;
-        final int a = 128;
 
         JSONObject payload = new JSONObject();
         try {
@@ -134,22 +131,13 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
             e.printStackTrace();
         }
 
-        // get my locaiton and move to it on the map
+        // get my last known location and move to it on the map
         RestClient.post(getActivity(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                 try {
-                    double lat = response.getDouble("lat");
-                    double lng = response.getDouble("lng");
-                    LatLng location = new LatLng(lat, lng);
-
-                    googleMap.addCircle(new CircleOptions()
-                            .center(location)
-                            .radius(250)
-                            .strokeColor(GREEN_500)
-                            .fillColor(Color.argb(a, r, g, b)));
-
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, MY_LOCATION_ZOOM));
+                    User me = new User(response);
+                    addUserCircle(new LatLng(me.getLatitude(), me.getLongitude()), true);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -173,16 +161,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
                 for (int i = 0; i < response.length(); i++) {
                     try {
-                        JSONObject user = response.getJSONObject(i);
-                        double lat = user.getDouble("lat");
-                        double lng = user.getDouble("lng");
-                        LatLng location = new LatLng(lat, lng);
-
-                        googleMap.addCircle(new CircleOptions()
-                                .center(location)
-                                .radius(250)
-                                .strokeColor(GREEN_500)
-                                .fillColor(Color.argb(a, r, g, b)));
+                        User user = new User(response.getJSONObject(i));
+                        addUserCircle(new LatLng(user.getLatitude(), user.getLongitude()), true);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -207,6 +187,26 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         handleNewLocation(location);
     }
 
+    private int getFillColour() {
+        int r = (GREEN_500) & 0xFF;
+        int g = (GREEN_500 >> 8) & 0xFF;
+        int b = (GREEN_500 >> 16) & 0xFF;
+        int a = 128;
+
+        return Color.argb(a, r, g, b);
+    }
+
+    private void addUserCircle(LatLng latLng, boolean isMe) {
+        googleMap.addCircle(new CircleOptions()
+                .center(latLng)
+                .radius(USER_LOCATION_RADIUS)
+                .strokeColor(GREEN_500)
+                .fillColor(getFillColour()));
+
+        if (isMe)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, MY_LOCATION_ZOOM));
+    }
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         System.out.println("Location services connected");
@@ -224,11 +224,12 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         }
 
         googleMap.setMyLocationEnabled(true);
-        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        if (location == null) {
+        Location myLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        if (myLocation == null) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         } else {
-            handleNewLocation(location);
+            handleNewLocation(myLocation);
         }
     }
 
@@ -237,11 +238,11 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         double currentLongitude = location.getLongitude();
         LatLng latLng = new LatLng(currentLatitude, currentLongitude);
 
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title("I am here!");
-        googleMap.addMarker(options);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        googleMap.clear();
+        addUserCircle(latLng, true);
+
+        for (User user : nearbyUsers)
+            addUserCircle(user.getLocation(), false);
     }
 
     @Override

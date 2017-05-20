@@ -10,4 +10,5 @@
     <string name="facebook_app_id">126609207898041</string>
     <string name="fb_login_protocol_scheme">fb126609207898041</string>
     <string name="maps_api_key">AIzaSyBdsQV1GAXfIhXVjLwlAg1PrWnvCTBqW84</string>
+    <string name="places_api_key">AIzaSyCv4m-aN905IYwAEdO81CTY4CjNJfGDof4</string>
 </resources>

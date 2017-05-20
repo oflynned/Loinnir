@@ -5,7 +5,7 @@ package com.syzible.loinnir.network;
  */
 
 abstract class PostRequest<T> extends Request<T> {
-    PostRequest(NetworkCallback<T> networkCallback, T payload, String url) {
-        super(networkCallback, payload, Endpoints.getAbsoluteURL(url), "POST");
+    PostRequest(NetworkCallback<T> networkCallback, T payload, String url, boolean isExternal) {
+        super(networkCallback, payload, url, "POST", isExternal);
     }
 }

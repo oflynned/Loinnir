@@ -16,13 +16,13 @@ abstract class Request<T> extends AsyncTask<Object, Void, T> {
     private HttpURLConnection connection;
     private T payload;
 
-    Request(NetworkCallback<T> networkCallback, String url, String verb) {
-        this(networkCallback, null, url, verb);
+    Request(NetworkCallback<T> networkCallback, String url, String verb, boolean isExternal) {
+        this(networkCallback, null, url, verb, isExternal);
     }
 
-    Request(NetworkCallback<T> networkCallback, T payload, String url, String verb) {
+    Request(NetworkCallback<T> networkCallback, T payload, String url, String verb, boolean isExternal) {
         this.networkCallback = networkCallback;
-        this.url = url;
+        this.url = isExternal ? url : Endpoints.getAbsoluteURL(url);
         this.payload = payload;
         this.verb = verb;
     }

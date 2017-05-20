@@ -14,8 +14,8 @@ import java.io.Writer;
  */
 
 public class GetJSONObject extends GetRequest<JSONObject> {
-    public GetJSONObject(NetworkCallback<JSONObject> networkCallback, String url) {
-        super(networkCallback, Endpoints.getAbsoluteURL(url));
+    public GetJSONObject(NetworkCallback<JSONObject> networkCallback, String url, boolean isExternal) {
+        super(networkCallback, url, isExternal);
     }
 
     @Override

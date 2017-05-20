@@ -75,13 +75,59 @@ public class MainActivity extends AppCompatActivity
                         EmojiUtils.getEmoji(EmojiUtils.HAPPY));
 
         // set up nav bar header for personalisation
-        View headerView = navigationView.getHeaderView(0);
+        final View headerView = navigationView.getHeaderView(0);
 
         TextView userName = (TextView) headerView.findViewById(R.id.nav_header_name);
         userName.setText(LocalStorage.getPref(LocalStorage.Pref.name, this));
 
-        TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
-        localityName.setText("Áth Trasna");
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        RestClient.post(getApplicationContext(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                try {
+                    double lat = response.getDouble("lat");
+                    double lng = response.getDouble("lng");
+                    String localityUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=1&language=en&key=" +
+                            getResources().getString(R.string.places_api_key) + "&location=" + lat + "," + lng;
+
+                    new GetJSONObject(new NetworkCallback<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
+                                String locality = response.getJSONArray("results").getJSONObject(0).getString("name");
+                                localityName.setText(locality);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure() {
+
+                        }
+                    }, localityUrl, true).execute();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return new JSONObject(rawJsonData);
+            }
+        });
 
         final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
         String picUrl = LocalStorage.getPref(LocalStorage.Pref.profile_pic, this);
@@ -95,9 +141,9 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure() {
-                DisplayUtils.generateSnackbar(MainActivity.this, "Theip ar an íoslódáil");
+
             }
-        }, picUrl).execute();
+        }, picUrl, true).execute();
     }
 
     @Override
@@ -162,6 +208,8 @@ public class MainActivity extends AppCompatActivity
             setFragment(new ConversationsFrag());
         } else if (id == R.id.nav_roulette) {
             setFragment(new RouletteFrag());
+        } else if(id == R.id.nav_nearby){
+
         } else if (id == R.id.nav_rate) {
 
         } else if (id == R.id.nav_log_out) {
@@ -172,34 +220,56 @@ public class MainActivity extends AppCompatActivity
 
         // TODO DEV OPTIONS
         else if (id == R.id.force_post) {
-            JSONObject payload = new JSONObject();
-            try {
-                payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
-                payload.put("lng", LocationClient.MAP_GOOSEBERRY_HILL.longitude);
-                payload.put("lat", LocationClient.MAP_GOOSEBERRY_HILL.latitude);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
-            System.out.println("Payload in force post: " + payload.toString());
+            String localityUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=1&language=en&key=" +
+                    getResources().getString(R.string.places_api_key) + "&location=" +
+                    LocationClient.MAP_GOOSEBERRY_HILL.latitude + "," + LocationClient.MAP_GOOSEBERRY_HILL.longitude;
 
-            RestClient.post(this, Endpoints.UPDATE_USER_LOCATION, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+
+            new GetJSONObject(new NetworkCallback<JSONObject>() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                    System.out.println(response);
+                public void onResponse(JSONObject response) {
+                    try {
+                        String locality = response.getJSONArray("results").getJSONObject(0).getString("name");
+
+                        JSONObject payload = new JSONObject();
+                        try {
+                            // TODO poll from GPS
+                            payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
+                            payload.put("lng", LocationClient.MAP_GOOSEBERRY_HILL.longitude);
+                            payload.put("lat", LocationClient.MAP_GOOSEBERRY_HILL.latitude);
+                            payload.put("locality", locality);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        RestClient.post(getApplicationContext(), Endpoints.UPDATE_USER_LOCATION, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                System.out.println(response);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                                System.out.println("Failure");
+                            }
+
+                            @Override
+                            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                return new JSONObject(rawJsonData);
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                    System.out.println("Failure");
-                }
+                public void onFailure() {
 
-                @Override
-                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                    return new JSONObject(rawJsonData);
                 }
-            });
-        } else if(id == R.id.force_get) {
+            }, localityUrl, true).execute();
+        } else if (id == R.id.force_get) {
             new GetJSONArray(new NetworkCallback<JSONArray>() {
                 @Override
                 public void onResponse(JSONArray response) {
@@ -210,7 +280,7 @@ public class MainActivity extends AppCompatActivity
                 public void onFailure() {
                     System.out.println("Failure in force get JSON object?");
                 }
-            }, Endpoints.GET_ALL_USERS).execute();
+            }, Endpoints.GET_ALL_USERS, false).execute();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

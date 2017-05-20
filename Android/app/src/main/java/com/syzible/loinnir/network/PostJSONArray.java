@@ -18,8 +18,8 @@ import java.io.Writer;
  */
 
 public class PostJSONArray extends PostRequest<JSONArray> {
-    public PostJSONArray(NetworkCallback<JSONArray> networkCallback, JSONArray payload, String url) {
-        super(networkCallback, payload, url);
+    public PostJSONArray(NetworkCallback<JSONArray> networkCallback, JSONArray payload, String url, boolean isExternal) {
+        super(networkCallback, payload, url, isExternal);
     }
 
     @Override

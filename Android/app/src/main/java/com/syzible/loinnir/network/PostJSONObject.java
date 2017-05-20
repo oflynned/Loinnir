@@ -19,8 +19,8 @@ import java.io.Writer;
  */
 
 public class PostJSONObject extends PostRequest<JSONObject> {
-    public PostJSONObject(NetworkCallback<JSONObject> networkCallback, JSONObject payload, String url) {
-        super(networkCallback, payload, url);
+    public PostJSONObject(NetworkCallback<JSONObject> networkCallback, JSONObject payload, String url, boolean isExternal) {
+        super(networkCallback, payload, url, isExternal);
     }
 
     @Override

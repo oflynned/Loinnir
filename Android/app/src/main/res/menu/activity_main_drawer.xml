@@ -14,6 +14,10 @@
             android:id="@+id/nav_roulette"
             android:icon="@drawable/ic_roulette"
             android:title="Rúiléid" />
+        <item
+            android:id="@+id/nav_nearby"
+            android:icon="@drawable/ic_nearby"
+            android:title="Mo Cheantar" />
     </group>
 
     <item android:title="Dev">

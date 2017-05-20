@@ -15,8 +15,8 @@ import java.io.Writer;
  */
 
 public class GetJSONArray extends GetRequest<JSONArray> {
-    public GetJSONArray(NetworkCallback<JSONArray> networkCallback, String url) {
-        super(networkCallback, Endpoints.getAbsoluteURL(url));
+    public GetJSONArray(NetworkCallback<JSONArray> networkCallback, String url, boolean isExternal) {
+        super(networkCallback, url, isExternal);
     }
 
     @Override

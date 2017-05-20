@@ -1,5 +1,7 @@
 package com.syzible.loinnir.objects;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,6 +13,7 @@ public class User {
 
     private String id, fb_id;
     private float longitude, latitude;
+    private LatLng location;
     private String name;
     private String imageUrl;
 
@@ -19,8 +22,9 @@ public class User {
         this.fb_id = data.getString("fb_id");
         this.longitude = (float) data.getDouble("lng");
         this.latitude = (float) data.getDouble("lat");
-        this.name = data.getString("name");
-        this.imageUrl = data.getString("profile_pic");
+        this.location = new LatLng(latitude, longitude);
+        //this.name = data.getString("name");
+        //this.imageUrl = data.getString("profile_pic");
     }
 
     public String getId() {
@@ -37,6 +41,10 @@ public class User {
 
     public float getLatitude() {
         return latitude;
+    }
+
+    public LatLng getLocation() {
+        return location;
     }
 
     public String getName() {
