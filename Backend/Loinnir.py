@@ -102,17 +102,17 @@ def get_other_users():
     return get_json(mongo.db.users.find({"fb_id": {"$ne": fb_id}}))
 
 
-# POST {fb_id:123456789, locality: "Áth Trasna"}
+# POST {fb_id:123456789}
 # GET [{...}]
 @app.route('/api/v1/users/get-nearby', methods=["POST"])
 def get_nearby_users():
     data = request.json
     fb_id = str(data["fb_id"])
-    locality = str(data["locality"])
 
     # find local users and exclude self from lookup
     users_col = mongo.db.users
-    nearby_users = users_col.find({"fb_id": {"$ne": fb_id}, "locality": locality})
+    this_user = list(users_col.find({"fb_id": fb_id}))[0]
+    nearby_users = users_col.find({"fb_id": {"$ne": fb_id}, "locality": this_user["locality"]})
     return get_json(nearby_users)
 
 
@@ -144,6 +144,14 @@ def delete_user():
     return get_json({"success": True})
 
 
+# TODO get list of some sort and classify by nearest town from web service or spreadsheet
+def get_nearest_town(lng, lat):
+    pass
+
+
+# POST {fb_id:123456789,lat:0,lng:0,locality:"Place"}
+# TODO POST {fb_id:123456789,lat:0,lng:0} and automatically generate locality
+# GET {...}
 @app.route('/api/v1/users/update-location', methods=["POST"])
 def update_location():
     data = request.json
@@ -153,6 +161,7 @@ def update_location():
     user = list(users_col.find({"fb_id": fb_id}))[0]
     user["lat"] = data["lat"]
     user["lng"] = data["lng"]
+    user["locality"] = data["locality"]
 
     users_col.save(user)
     return get_json({"success": True})
