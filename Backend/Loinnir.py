@@ -239,6 +239,16 @@ def get_locality_messages():
     locality_col = mongo.db.locality_conversations
     messages = locality_col.find({"locality": locality})
 
+    # aggregate over the messages to get the fb user details
+    messages = list(messages)
+    for i, message in enumerate(messages):
+        fb_id = message["fb_id"]
+        user = mongo.db.users.find({"fb_id":fb_id})
+        user_details = list(user)[0]
+        messages[i]["user"] = dict()
+        messages[i]["user"]["name"] = user_details["name"]
+        messages[i]["user"]["profile_pic"] = user_details["profile_pic"]
+
     return get_json(list(messages))
 
 
