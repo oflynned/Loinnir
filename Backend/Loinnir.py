@@ -4,6 +4,7 @@ from bson import json_util
 import json
 import os, sys
 from random import randint
+import time
 
 frontend_dir = os.path.abspath("../Frontend")
 static_dir = os.path.abspath("../Frontend/static")
@@ -167,9 +168,82 @@ def update_location():
     return get_json({"success": True})
 
 
+# POST {from_id: ..., to_id: ..., message: "..."}
+# GET {success: true}
+@app.route('/api/v1/messages/send-partner-message', methods=["POST"])
+def send_partner_message():
+    data = request.json
+
+    message = dict()
+    message["from_id"] = str(data["from_id"])
+    message["to_id"] = str(data["to_id"])
+    message["time"] = int(round(time.time() * 1000))
+    message["message"] = str(data["message"])
+
+    partner_col = mongo.db.partner_conversations
+    partner_col.insert(message)
+    return get_json({"success": True})
+
+
+# POST {fb_id: ..., message: "..."}
+# GET {success: true}
+@app.route('/api/v1/messages/send-locality-message', methods=["POST"])
+def send_locality_message():
+    data = request.json
+
+    fb_id = str(data["fb_id"])
+    users_col = mongo.db.users
+    user = users_col.find({"fb_id": fb_id})
+    user = list(user)[0]
+    locality = user["locality"]
+
+    message = dict()
+    message["fb_id"] = str(data["fb_id"])
+    message["locality"] = str(locality)
+    message["time"] = int(round(time.time() * 1000))
+    message["message"] = str(data["message"])
+
+    locality_col = mongo.db.locality_conversations
+    locality_col.insert(message)
+
+    return get_json({"success": True})
+
+
+# get messages pertaining to chatting with an individual
+# POST {my_id: ..., partner_id: ...}
+# GET [{...},{...}]
+@app.route("/api/v1/messages/get-partner-conversation", methods=["POST"])
+def get_conversation():
+    data = request.json
+    my_id = data["my_id"]
+    partner_id = data["partner_id"]
+
+    partner_col = mongo.db.partner_conversations
+    messages = partner_col.find({"participants": [my_id, partner_id]})
+
+    return get_json(list(messages))
+
+
+# get all messages residing within the locality for the user's record provided
+# POST {fb_id: ...}
+# GET [{...},{...}]
+@app.route("/api/v1/messages/get-locality-conversation", methods=["POST"])
+def get_locality_conversation():
+    data = request.json
+    fb_id = data["fb_id"]
+    user = list(mongo.db.users.find({"fb_id": fb_id}))[0]
+    locality = user["locality"]
+
+    locality_col = mongo.db.locality_conversations
+    messages = locality_col.find({"locality": locality})
+
+    return get_json(list(messages))
+
+
 if __name__ == '__main__':
-    env = sys.argv[1]
-    if env == "prod":
-        app.run(host='0.0.0.0', port=80)
+    if len(sys.argv) > 1:
+        env = sys.argv[1]
+        if env == "prod":
+            app.run(host='0.0.0.0', port=80)
     else:
         app.run(host='0.0.0.0', port=3000)
