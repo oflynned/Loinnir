@@ -182,4 +182,13 @@ public class LanguageUtils {
 
         return noun;
     }
+
+    public static String getVirileCountForm(int number, String noun) {
+        int count = Math.abs(number) % 10;
+
+        if (count > 0 && count < 3)
+            return lenite(noun);
+
+        return noun;
+    }
 }
