@@ -259,8 +259,8 @@ def send_locality_message():
 @app.route("/api/v1/messages/get-partner-messages", methods=["POST"])
 def get_partner_messages():
     data = request.json
-    my_id = data["my_id"]
-    partner_id = data["partner_id"]
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
 
     partner_col = mongo.db.partner_conversations
     messages = partner_col.find({"participants": [my_id, partner_id]})
@@ -275,12 +275,17 @@ def get_partner_messages():
 @app.route("/api/v1/messages/get-locality-messages", methods=["POST"])
 def get_locality_messages():
     data = request.json
-    fb_id = data["fb_id"]
+    fb_id = str(data["fb_id"])
     user = list(mongo.db.users.find({"fb_id": fb_id}))[0]
-    locality = user["locality"]
+    locality = str(user["locality"])
 
     locality_col = mongo.db.locality_conversations
-    messages = locality_col.find({"locality": locality})
+
+    # don't show blocked users' messages
+    conversations_col = mongo.db.conversations
+    blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked"]
+    blocked_users.append(fb_id)
+    messages = locality_col.find({"locality": locality, "fb_id": {"$nin": blocked_users}})
 
     # aggregate over the messages to get the fb user details
     messages = list(messages)
@@ -317,8 +322,8 @@ def get_conversations():
 @app.route("/api/v1/messages/subscribe-partner", methods=["POST"])
 def subscribe_conversations():
     data = request.json
-    my_id = data["my_id"]
-    partner_id = data["partner_id"]
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
 
     conversations_col = mongo.db.conversations
     # have I ever talked to anyone before?
@@ -353,8 +358,8 @@ def subscribe_conversations():
 @app.route("/api/v1/messages/unsubscribe-partner", methods=["POST"])
 def unsubscribe_user():
     data = request.json
-    my_id = data["my_id"]
-    partner_id = data["partner_id"]
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
 
     conversations_col = mongo.db.conversations
     conversations_col.update({"fb_id": my_id}, {"$pull": {"partners": partner_id}})
@@ -365,12 +370,14 @@ def unsubscribe_user():
     return get_json({"success": True, "subscriptions": new_subscription_list})
 
 
-# POST {"my_id":..., "block_id":...}
-@app.route("/api/v1/messages/block-user", methods=["POST"])
+# POST {"my_id":..., "partner_id":...}
+@app.route("/api/v1/users/block-user", methods=["POST"])
 def block_user():
     data = request.json
-    my_id = data["my_id"]
-    partner_id = data["partner_id"]
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
+
+    print(my_id, partner_id)
 
     conversations_col = mongo.db.conversations
 
@@ -385,13 +392,27 @@ def block_user():
     return get_json({"success": True, "user": my_profile})
 
 
+# POST {fb_id: ...}
+@app.route("/api/v1/users/get-blocked-users", methods=["POST"])
+def get_blocked_users():
+    data = request.json
+    fb_id = str(data["fb_id"])
+
+    conversations_col = mongo.db.conversations
+    users = conversations_col.find({"fb_id": fb_id})
+    if users.count() == 0:
+        return get_json([])
+
+    return get_json(list(users)[0]["blocked"])
+
+
 # TODO only in dev to unblock someone?
 # POST {"my_id":..., "block_id":...}
-@app.route("/api/v1/messages/unblock-user", methods=["POST"])
+@app.route("/api/v1/users/unblock-user", methods=["POST"])
 def unblock_user():
     data = request.json
-    my_id = data["my_id"]
-    partner_id = data["partner_id"]
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
 
     conversations_col = mongo.db.conversations
 
@@ -408,9 +429,10 @@ def unblock_user():
 @app.route("/api/v1/messages/get-past-conversation-previews", methods=["POST"])
 def get_conversations_previews():
     data = request.json
-    fb_id = data["fb_id"]
+    fb_id = str(data["fb_id"])
 
     conversations_col = mongo.db.conversations
+    blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked_users"]
     conversations = list(conversations_col.find({"fb_id": fb_id}))
 
     if len(conversations) == 0:
