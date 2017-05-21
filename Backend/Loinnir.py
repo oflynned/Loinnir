@@ -137,7 +137,6 @@ def get_nearby_users():
 
 
 # POST {fb_id:123456789}
-# GET {count:...}
 @app.route('/api/v1/users/get-nearby-count', methods=["POST"])
 def get_nearby_users_count():
     data = request.json
@@ -152,7 +151,6 @@ def get_nearby_users_count():
 
 
 # POST {fb_id:123456789}
-# GET {...}
 @app.route('/api/v1/users/get-random', methods=["POST"])
 def get_random_user():
     data = request.json
@@ -183,7 +181,6 @@ def get_random_user():
 
 
 # DELETE {fb_id: 123456789}
-# GET {success: true}
 @app.route('/api/v1/users/delete', methods=["DELETE"])
 def delete_user():
     users_col = mongo.db["users"]
@@ -200,7 +197,6 @@ def get_nearest_town(lng, lat):
 
 # POST {fb_id:123456789,lat:0,lng:0,locality:"Place"}
 # TODO POST {fb_id:123456789,lat:0,lng:0} and automatically generate locality
-# GET {...}
 @app.route('/api/v1/users/update-location', methods=["POST"])
 def update_location():
     data = request.json
@@ -234,7 +230,6 @@ def send_partner_message():
 
 
 # POST {fb_id: ..., message: "..."}
-# GET {success: true}
 @app.route('/api/v1/messages/send-locality-message', methods=["POST"])
 def send_locality_message():
     data = request.json
@@ -305,8 +300,21 @@ def get_locality_messages():
     return get_json(list(messages))
 
 
+# POST {fb_id: ...}
+# GET [partner_id_1, partner_id_2, ...]
+@app.route("/api/v1/messages/get-partner-ids", methods=["POST"])
+def get_conversations():
+    data = request.json
+    fb_id = str(data["fb_id"])
+
+    conversations_col = mongo.db.conversations
+    conversations = conversations_col.find({"fb_id": fb_id})
+
+    return get_json(list(conversations)[0]["partners"])
+
+
 # POST {my_id: ..., partner_id: ...}
-@app.route("/api/v1/messages/subscribe-partner-conversation", methods=["POST"])
+@app.route("/api/v1/messages/subscribe-partner", methods=["POST"])
 def subscribe_conversations():
     data = request.json
     my_id = data["my_id"]
@@ -324,6 +332,7 @@ def subscribe_conversations():
         else:
             # never talked to you before, just add the id to the list
             conversations_col.update({"fb_id": my_id}, {"$push": {"partners": partner_id}})
+            conversations_col.update({"fb_id": partner_id}, {"$push": {"partners": my_id}})
             return get_json({"success": True, "action": "added new partner to list"})
     else:
         # first conversation ever, update both fb_id and partner list
@@ -331,24 +340,16 @@ def subscribe_conversations():
         conversation["fb_id"] = my_id
         conversation["partners"] = [partner_id]
         conversations_col.insert(conversation)
+
+        conversation = dict()
+        conversation["fb_id"] = partner_id
+        conversation["partners"] = [my_id]
+        conversations_col.insert(conversation)
+
         return get_json({"success": True, "action": "created first ever conversation and subscribed partner"})
 
 
-# POST {fb_id: ...}
-# GET [partner_id_1, partner_id_2, ...]
-@app.route("/api/v1/messages/get-partner-ids", methods=["POST"])
-def get_conversations():
-    data = request.json
-    fb_id = str(data["fb_id"])
-
-    conversations_col = mongo.db.conversations
-    conversations = conversations_col.find({"fb_id": fb_id})
-
-    return get_json(list(conversations)[0]["partners"])
-
-
 # POST {"my_id":..., "partner_id":...}
-# GET {"success":true}
 @app.route("/api/v1/messages/unsubscribe-partner", methods=["POST"])
 def unsubscribe_user():
     data = request.json
@@ -364,10 +365,41 @@ def unsubscribe_user():
     return get_json({"success": True, "subscriptions": new_subscription_list})
 
 
-# TODO
-@app.route("/api/v1/users/block-user")
+# POST {"my_id":..., "block_id":...}
+@app.route("/api/v1/messages/block-user", methods=["POST"])
 def block_user():
-    pass
+    data = request.json
+    my_id = data["my_id"]
+    partner_id = data["partner_id"]
+
+    conversations_col = mongo.db.conversations
+
+    # first unsubscribe both users
+    conversations_col.update({"fb_id": my_id}, {"$pull": {"partners": partner_id}})
+    conversations_col.update({"fb_id": partner_id}, {"$pull": {"partners": my_id}})
+
+    # now add the partner's id to this user's blocked list
+    conversations_col.update({"fb_id": my_id}, {"$push": {"blocked": partner_id}})
+    my_profile = list(conversations_col.find({"fb_id": my_id}))[0]
+
+    return get_json({"success": True, "user": my_profile})
+
+
+# TODO only in dev to unblock someone?
+# POST {"my_id":..., "block_id":...}
+@app.route("/api/v1/messages/unblock-user", methods=["POST"])
+def unblock_user():
+    data = request.json
+    my_id = data["my_id"]
+    partner_id = data["partner_id"]
+
+    conversations_col = mongo.db.conversations
+
+    # now add the partner's id to this user's blocked list
+    conversations_col.update({"fb_id": my_id}, {"$pull": {"blocked": partner_id}})
+    my_profile = list(conversations_col.find({"fb_id": my_id}))[0]
+
+    return get_json({"success": True, "user": my_profile})
 
 
 # TODO get all previews of last message sent to all partners
