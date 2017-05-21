@@ -146,8 +146,9 @@ def get_nearby_users_count():
     # find local users and exclude self from lookup
     users_col = mongo.db.users
     this_user = list(users_col.find({"fb_id": fb_id}))[0]
-    nearby_users = users_col.find({"fb_id": {"$ne": fb_id}, "locality": this_user["locality"]})
-    return get_json({"count": nearby_users.count()})
+    locality = this_user["locality"]
+    nearby_users = users_col.find({"fb_id": {"$ne": fb_id}, "locality": locality})
+    return get_json({"count": nearby_users.count(), "locality": locality})
 
 
 # POST {fb_id:123456789}
