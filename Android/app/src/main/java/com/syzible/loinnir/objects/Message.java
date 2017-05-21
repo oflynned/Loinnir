@@ -1,34 +1,44 @@
 package com.syzible.loinnir.objects;
 
+import com.stfalcon.chatkit.commons.models.IMessage;
+import com.stfalcon.chatkit.commons.models.IUser;
+
+import java.util.Date;
+
 /**
  * Created by ed on 07/05/2017.
  */
 
-public class Message {
-    private User sender, recipient;
+public class Message implements IMessage {
+    private String id;
+    private User sender;
     private long time;
     private String contents;
 
-    public Message(User sender, User recipient, long time, String contents) {
+    public Message(String id, User sender, long time, String contents) {
+        this.id = id;
         this.sender = sender;
-        this.recipient = recipient;
         this.time = time;
         this.contents = contents;
     }
 
-    public User getSender() {
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getText() {
+        return contents;
+    }
+
+    @Override
+    public IUser getUser() {
         return sender;
     }
 
-    public User getRecipient() {
-        return recipient;
-    }
-
-    public long getTime() {
-        return time;
-    }
-
-    public String getContents() {
-        return contents;
+    @Override
+    public Date getCreatedAt() {
+        return new Date(time);
     }
 }

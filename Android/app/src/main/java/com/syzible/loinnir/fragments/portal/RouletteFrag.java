@@ -17,6 +17,9 @@ public class RouletteFrag extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.roulette_frag, container, false);
+        View view = inflater.inflate(R.layout.roulette_frag, container, false);
+        getActivity().setTitle(getResources().getString(R.string.app_name));
+
+        return view;
     }
 }

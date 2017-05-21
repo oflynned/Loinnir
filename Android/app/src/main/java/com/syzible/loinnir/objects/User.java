@@ -1,6 +1,7 @@
 package com.syzible.loinnir.objects;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.stfalcon.chatkit.commons.models.IUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,13 +10,13 @@ import org.json.JSONObject;
  * Created by ed on 07/05/2017.
  */
 
-public class User {
+public class User implements IUser {
 
     private String id, fb_id;
     private float longitude, latitude;
     private LatLng location;
     private String name;
-    private String imageUrl;
+    private String avatar;
 
     public User(JSONObject data) throws JSONException {
         this.id = data.getString("_id");
@@ -23,10 +24,11 @@ public class User {
         this.longitude = (float) data.getDouble("lng");
         this.latitude = (float) data.getDouble("lat");
         this.location = new LatLng(latitude, longitude);
-        //this.name = data.getString("name");
-        //this.imageUrl = data.getString("profile_pic");
+        this.name = data.getString("name");
+        this.avatar = data.getString("profile_pic");
     }
 
+    @Override
     public String getId() {
         return id;
     }
@@ -47,11 +49,13 @@ public class User {
         return location;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    @Override
+    public String getAvatar() {
+        return avatar;
     }
 }

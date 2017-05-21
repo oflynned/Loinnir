@@ -15,6 +15,7 @@ public class Endpoints {
     public static final String DELETE_USER = "/users/delete";
 
     public static final String UPDATE_USER_LOCATION = "/users/update-location";
+    public static final String GET_NEARBY_COUNT = "/users/get-nearby-count";
 
     public static final String GET_USER = "/users/get";
     public static final String GET_ALL_USERS = "/users/get-all";

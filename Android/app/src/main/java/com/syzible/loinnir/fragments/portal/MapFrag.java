@@ -81,6 +81,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
                 .setFastestInterval(1000);
 
         GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
+
+        getActivity().setTitle(getResources().getString(R.string.app_name));
     }
 
     @Override
