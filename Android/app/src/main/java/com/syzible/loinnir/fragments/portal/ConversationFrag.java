@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.stfalcon.chatkit.commons.ImageLoader;
@@ -20,6 +19,8 @@ import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Message;
+import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONArray;
@@ -29,6 +30,8 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -38,15 +41,23 @@ import cz.msebera.android.httpclient.Header;
 
 public class ConversationFrag extends Fragment {
 
+    private Date lastLoadedDate;
+    private int loadedCount;
+    private JSONObject payload;
+
+    private MessagesList messagesList;
+    private MessagesListAdapter<Message> adapter;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.conversation_frag, container, false);
-        MessagesList messagesList = (MessagesList) view.findViewById(R.id.messagesList);
-        MessagesListAdapter<Message> adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
+
+        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
+        messagesList = (MessagesList) view.findViewById(R.id.messages_list);
         messagesList.setAdapter(adapter);
 
-        JSONObject payload = new JSONObject();
+        payload = new JSONObject();
         try {
             payload.put("fb_id", LocalStorage.getID(getActivity()));
         } catch (JSONException e) {
@@ -60,7 +71,6 @@ public class ConversationFrag extends Fragment {
                     String localityName = response.getString("locality");
                     int nearbyUsers = response.getInt("count") + 1;
                     String title = localityName + " (" + nearbyUsers + " anseo)";
-
                     getActivity().setTitle(title);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -78,21 +88,34 @@ public class ConversationFrag extends Fragment {
             }
         });
 
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
         RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                ArrayList<Message> messages = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject userMessage = response.getJSONObject(i);
-                        String message = userMessage.getString("message");
-                        String sender = URLDecoder.decode(userMessage.getJSONObject("user").getString("name"), "UTF-8");
-                        String profilePic = userMessage.getJSONObject("user").getString("profile_pic");
+                        String id = userMessage.getString("_id");
+                        String messageContent = userMessage.getString("message");
                         long timeSent = userMessage.getLong("time");
 
-                    } catch (JSONException | UnsupportedEncodingException e) {
+                        User user = new User(userMessage.getJSONObject("user"));
+                        Message message = new Message(id, user, timeSent, messageContent);
+                        messages.add(message);
+
+                        System.out.println(message.getText() + " (" + user.getName() + ")");
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
+                adapter.addToEnd(messages, true);
             }
 
             @Override
@@ -105,8 +128,6 @@ public class ConversationFrag extends Fragment {
                 return new JSONArray(rawJsonData);
             }
         });
-
-        return view;
     }
 
     private ImageLoader loadImage() {

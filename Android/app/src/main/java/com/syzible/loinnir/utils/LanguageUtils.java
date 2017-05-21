@@ -130,4 +130,56 @@ public class LanguageUtils {
 
         return palatalise(input);
     }
+
+    public static String getCountForm(int number, String noun) {
+        // -1 bhád
+        int count = Math.abs(number);
+
+        // exception
+        if (noun.toLowerCase().equals("bliain")) {
+            if (count == 10) {
+                String depalatalised = noun.substring(0, noun.length() - 2) +
+                        noun.substring(noun.length() - 1) + "a";
+                return eclipse(depalatalised);
+            }
+
+            if (count % 10 == 0)
+                return noun;
+
+            count = count % 10;
+
+            // 1 bhliain
+            if (count > 0 && count < 3)
+                return lenite(noun);
+            // 3 bliana
+            if (count > 2 && count < 7) {
+                // bliain -> bliana
+                return noun.substring(0, noun.length() - 2) + noun.substring(noun.length() - 1) + "a";
+            }
+            // 7 mbliana
+            if (count > 6 && count < 10) {
+                String depalatalised = noun.substring(0, noun.length() - 2) +
+                        noun.substring(noun.length() - 1) + "a";
+                return eclipse(depalatalised);
+            }
+        } else {
+            if (count == 10)
+                return eclipse(noun);
+            // 20, 30, 40...
+            if (count % 10 == 0)
+                return noun;
+
+            count = count % 10;
+
+            // 1 bhád, 2 bhád...
+            if (count > 0 && count < 7)
+                return lenite(noun);
+
+            // 7 mbád, 8 mbád...
+            if (count > 6 && count < 10)
+                return eclipse(noun);
+        }
+
+        return noun;
+    }
 }

@@ -67,7 +67,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
 
-        setFragment(new MapFrag());
+        // TODO reset to MapFrag()
+        setFragment(new ConversationFrag());
 
         String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
         name = name.split(" ")[0];
