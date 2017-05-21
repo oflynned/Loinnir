@@ -209,11 +209,12 @@ def send_locality_message():
     return get_json({"success": True})
 
 
+# TODO order by time
 # get messages pertaining to chatting with an individual
 # POST {my_id: ..., partner_id: ...}
 # GET [{...},{...}]
-@app.route("/api/v1/messages/get-partner-conversation", methods=["POST"])
-def get_conversation():
+@app.route("/api/v1/messages/get-partner-messages", methods=["POST"])
+def get_partner_messages():
     data = request.json
     my_id = data["my_id"]
     partner_id = data["partner_id"]
@@ -224,11 +225,12 @@ def get_conversation():
     return get_json(list(messages))
 
 
+# TODO order by time
 # get all messages residing within the locality for the user's record provided
 # POST {fb_id: ...}
 # GET [{...},{...}]
-@app.route("/api/v1/messages/get-locality-conversation", methods=["POST"])
-def get_locality_conversation():
+@app.route("/api/v1/messages/get-locality-messages", methods=["POST"])
+def get_locality_messages():
     data = request.json
     fb_id = data["fb_id"]
     user = list(mongo.db.users.find({"fb_id": fb_id}))[0]
@@ -238,6 +240,48 @@ def get_locality_conversation():
     messages = locality_col.find({"locality": locality})
 
     return get_json(list(messages))
+
+
+# POST {my_id: ..., partner_id: ...}
+@app.route("/api/v1/messages/subscribe-partner-conversation", methods=["POST"])
+def subscribe_conversations():
+    data = request.json
+    my_id = data["my_id"]
+    partner_id = data["partner_id"]
+
+    conversations_col = mongo.db.conversations
+    # have I ever talked to anyone before?
+    conversation = conversations_col.find({"fb_id": my_id})
+    if conversation.count() > 0:
+        # okay cool, I've talked to someone before, I just have to check the partner id now
+        conversation = conversations_col.find({"fb_id": my_id, "partners": partner_id})
+        if conversation.count() > 0:
+            # I've talked to you before, nothing else to do?
+            return get_json({"success": True, "action": "already subscribed to partner"})
+        else:
+            # never talked to you before, just add the id to the list
+            conversations_col.update({"fb_id": my_id}, {"$push": {"partners": partner_id}})
+            return get_json({"success": True, "action": "added new partner to list"})
+    else:
+        # first conversation ever, update both fb_id and partner list
+        conversation = dict()
+        conversation["fb_id"] = my_id
+        conversation["partners"] = [partner_id]
+        conversations_col.insert(conversation)
+        return get_json({"success": True, "action": "created first ever conversation and subscribed partner"})
+
+
+# POST {fb_id: ...}
+# GET [partner_id_1, partner_id_2, ...]
+@app.route("/api/v1/messages/get-partner-conversations", methods=["POST"])
+def get_conversations():
+    data = request.json
+    fb_id = data["fb_id"]
+
+    conversations_col = mongo.db.conversations
+    conversations = conversations_col.find({"fb_id": fb_id})
+    return get_json(list(conversations)[0]["partners"])
+
 
 
 if __name__ == '__main__':
