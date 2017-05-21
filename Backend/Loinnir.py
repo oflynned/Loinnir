@@ -69,6 +69,25 @@ def create_user():
         return get_json({"success": True})
 
 
+# POST {fb_id: ..., ...}
+# GET {success:true}
+@app.route("/api/v1/users/edit", methods=["POST"])
+def edit_user():
+    users_col = mongo.db.users
+    data = request.json
+    fb_id = str(data["fb_id"])
+
+    user = users_col.find({"fb_id": fb_id})
+    user = list(user)[0]
+
+    for key in dict(data):
+        user[key] = data[key]
+
+    users_col.save(user)
+
+    return get_json({"success": True, "updated_data": user})
+
+
 # POST {fb_id: 123456789}
 # GET {_id: ..., forename: ..., ...}
 # get random person, get me, get individuals for map, get user info for chat, get people in locality
@@ -118,20 +137,45 @@ def get_nearby_users():
 
 
 # POST {fb_id:123456789}
-# GET [{}]
-@app.route('/api/v1/users/get-random', methods=["GET", "POST"])
+# GET {count:...}
+@app.route('/api/v1/users/get-nearby-count', methods=["POST"])
+def get_nearby_users_count():
+    data = request.json
+    fb_id = str(data["fb_id"])
+
+    # find local users and exclude self from lookup
+    users_col = mongo.db.users
+    this_user = list(users_col.find({"fb_id": fb_id}))[0]
+    nearby_users = users_col.find({"fb_id": {"$ne": fb_id}, "locality": this_user["locality"]})
+    return get_json({"count": nearby_users.count()})
+
+
+# POST {fb_id:123456789}
+# GET {...}
+@app.route('/api/v1/users/get-random', methods=["POST"])
 def get_random_user():
     data = request.json
     fb_id = str(data["fb_id"])
 
-    # find random user and exclude self from lookup
-    # TODO need to exclude users already chatted with!
+    # exclude self and others chatted to already in partners list
     users_col = mongo.db.users
-    # exclude self
-    count = mongo.db.users.count() - 2
-    users = users_col.find({"fb_id": {"$ne": fb_id}})
-    user = users[randint(0, count)]
-    return get_json(user)
+    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))
+
+    if len(partners_met) == 0:
+        users = users_col.find({"fb_id": {"$ne": fb_id}})
+        count = mongo.db.users.count() - 2
+        user = users[randint(0, count)]
+        return get_json(user)
+
+    else:
+        # append self too to exclude self matching
+        partners_met = list(partners_met)[0]["partners"]
+        partners_met.append(fb_id)
+        users = users_col.find({"fb_id": {"$nin": partners_met}})
+
+        count = mongo.db.users.count() - 2
+        user = users[randint(0, count)]
+        return get_json(user)
 
 
 # DELETE {fb_id: 123456789}
@@ -243,7 +287,7 @@ def get_locality_messages():
     messages = list(messages)
     for i, message in enumerate(messages):
         fb_id = message["fb_id"]
-        user = mongo.db.users.find({"fb_id":fb_id})
+        user = mongo.db.users.find({"fb_id": fb_id})
         user_details = list(user)[0]
         messages[i]["user"] = dict()
         messages[i]["user"]["name"] = user_details["name"]
@@ -283,15 +327,18 @@ def subscribe_conversations():
 
 # POST {fb_id: ...}
 # GET [partner_id_1, partner_id_2, ...]
-@app.route("/api/v1/messages/get-partner-conversations", methods=["POST"])
+@app.route("/api/v1/messages/get-partner-ids", methods=["POST"])
 def get_conversations():
     data = request.json
     fb_id = data["fb_id"]
 
     conversations_col = mongo.db.conversations
-    conversations = conversations_col.find({"fb_id": fb_id})
-    return get_json(list(conversations)[0]["partners"])
+    conversations = list(conversations_col.find({"fb_id": fb_id}))
 
+    if len(conversations) == 0:
+        return get_json([])
+
+    return get_json(list(conversations)[0]["partners"])
 
 
 if __name__ == '__main__':
