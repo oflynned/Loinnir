@@ -174,6 +174,9 @@ def get_random_user():
         partners_met.append(fb_id)
         users = users_col.find({"fb_id": {"$nin": partners_met}})
 
+        if users.count() == 0:
+            return get_json({"success": False, "reason": "Out of new users"})
+
         count = mongo.db.users.count() - 2
         user = users[randint(0, count)]
         return get_json(user)
@@ -290,9 +293,14 @@ def get_locality_messages():
         fb_id = message["fb_id"]
         user = mongo.db.users.find({"fb_id": fb_id})
         user_details = list(user)[0]
+        messages[i]["user"] = user_details
+
+        # temp disable this as I'm not sure how much info I need to provide for messages
+        """
         messages[i]["user"] = dict()
         messages[i]["user"]["name"] = user_details["name"]
         messages[i]["user"]["profile_pic"] = user_details["profile_pic"]
+        """
 
     return get_json(list(messages))
 
@@ -331,6 +339,43 @@ def subscribe_conversations():
 @app.route("/api/v1/messages/get-partner-ids", methods=["POST"])
 def get_conversations():
     data = request.json
+    fb_id = str(data["fb_id"])
+
+    conversations_col = mongo.db.conversations
+    conversations = conversations_col.find({"fb_id": fb_id})
+
+    return get_json(list(conversations)[0]["partners"])
+
+
+# POST {"my_id":..., "partner_id":...}
+# GET {"success":true}
+@app.route("/api/v1/messages/unsubscribe-partner", methods=["POST"])
+def unsubscribe_user():
+    data = request.json
+    my_id = data["my_id"]
+    partner_id = data["partner_id"]
+
+    conversations_col = mongo.db.conversations
+    conversations_col.update({"fb_id": my_id}, {"$pull": {"partners": partner_id}})
+    conversations_col.update({"fb_id": partner_id}, {"$pull": {"partners": my_id}})
+
+    new_subscription_list = conversations_col.find({"fb_id": my_id})
+
+    return get_json({"success": True, "subscriptions": new_subscription_list})
+
+
+# TODO
+@app.route("/api/v1/users/block-user")
+def block_user():
+    pass
+
+
+# TODO get all previews of last message sent to all partners
+# POST {fb_id: ...}
+# GET [{fb_id:..., last_message_time:..., last_message_content:...}]
+@app.route("/api/v1/messages/get-past-conversation-previews", methods=["POST"])
+def get_conversations_previews():
+    data = request.json
     fb_id = data["fb_id"]
 
     conversations_col = mongo.db.conversations
@@ -339,7 +384,14 @@ def get_conversations():
     if len(conversations) == 0:
         return get_json([])
 
-    return get_json(list(conversations)[0]["partners"])
+    # else get a list of partners that have ONLY been chatted to
+    partners = list(conversations)[0]["partners"]
+    previews = list()
+
+    for partner_id in partners:
+        print(partner_id)
+
+    return get_json({"partners": partners})
 
 
 if __name__ == '__main__':
