@@ -12,14 +12,13 @@ import org.json.JSONObject;
 
 public class User implements IUser {
 
-    private String id, fb_id;
+    private String fb_id;
     private float longitude, latitude;
     private LatLng location;
     private String name;
     private String avatar;
 
     public User(JSONObject data) throws JSONException {
-        this.id = data.getString("_id");
         this.fb_id = data.getString("fb_id");
         this.longitude = (float) data.getDouble("lng");
         this.latitude = (float) data.getDouble("lat");
@@ -30,10 +29,6 @@ public class User implements IUser {
 
     @Override
     public String getId() {
-        return id;
-    }
-
-    public String getFb_id() {
         return fb_id;
     }
 

@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().getItem(0).setChecked(true);
 
         // TODO reset to MapFrag()
-        setFragment(new ConversationFrag());
+        setFragment(new RouletteFrag());
 
         String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
         name = name.split(" ")[0];

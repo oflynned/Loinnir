@@ -28,6 +28,10 @@ public class Endpoints {
     public static final String SEND_PARTNER_MESSAGE = "/messages/send-partner-message";
     public static final String SEND_LOCALITY_MESSAGE = "/messages/send-locality-message";
 
+    public static final String GET_PARTNER_IDS = "/messages/get-partner-ids";
+    public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner-conversation";
+    public static final String GET_PAST_CONVERSATION_PREVIEWS = "/messages/get-past-conversation-previews";
+
     public static String getAbsoluteURL(String endpoint) {
         return BASE_URL + endpoint;
     }

@@ -15,11 +15,8 @@ public class BitmapUtils {
         final Bitmap outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         final Path path = new Path();
-        path.addCircle(
-                (float)(width / 2)
-                , (float)(height / 2)
-                , (float) Math.min(width, (height / 2))
-                , Path.Direction.CCW);
+        path.addCircle((float) (width / 2), (float) (height / 2),
+                (float) Math.min(width, (height / 2)), Path.Direction.CCW);
 
         final Canvas canvas = new Canvas(outputBitmap);
         canvas.clipPath(path);

@@ -109,8 +109,6 @@ public class ConversationFrag extends Fragment {
                         User user = new User(userMessage.getJSONObject("user"));
                         Message message = new Message(id, user, timeSent, messageContent);
                         messages.add(message);
-
-                        System.out.println(message.getText() + " (" + user.getName() + ")");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -133,16 +131,18 @@ public class ConversationFrag extends Fragment {
     private ImageLoader loadImage() {
         return new ImageLoader() {
             @Override
-            public void loadImage(final ImageView imageView, String url) {
+            public void loadImage(final ImageView imageView, final String url) {
+                imageView.setImageResource(R.mipmap.ic_launcher);
                 new GetImage(new NetworkCallback<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap response) {
+                        System.out.println(url);
                         imageView.setImageBitmap(response);
                     }
 
                     @Override
                     public void onFailure() {
-
+                        System.out.println("dl failure on chat pic");
                     }
                 }, url, true);
             }

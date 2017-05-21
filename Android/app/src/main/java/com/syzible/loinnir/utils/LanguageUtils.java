@@ -106,7 +106,7 @@ public class LanguageUtils {
 
     public static String getVocative(String input) {
         // check exceptions
-        if (input.equals("Micheál"))
+        if (input.equals("Mícheál"))
             return "Mhíchíl";
 
         if (input.equals("Liam"))
