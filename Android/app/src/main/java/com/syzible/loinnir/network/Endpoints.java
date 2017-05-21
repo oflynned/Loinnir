@@ -22,6 +22,11 @@ public class Endpoints {
     public static final String GET_NEARBY_USERS = "/users/get-nearby";
     public static final String GET_RANDOM_USER = "/users/get-random";
 
+    public static final String GET_PARTNER_MESSAGES = "/messages/get-partner-messages";
+    public static final String GET_LOCALITY_MESSAGES = "/messages/get-locality-messages";
+    public static final String SEND_PARTNER_MESSAGE = "/messages/send-partner-message";
+    public static final String SEND_LOCALITY_MESSAGE = "/messages/send-locality-message";
+
     public static String getAbsoluteURL(String endpoint) {
         return BASE_URL + endpoint;
     }

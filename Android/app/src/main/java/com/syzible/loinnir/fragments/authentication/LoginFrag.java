@@ -125,30 +125,21 @@ public class LoginFrag extends Fragment {
                                     RestClient.post(getActivity(), Endpoints.CREATE_USER, postData, new BaseJsonHttpResponseHandler<JSONObject>() {
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                                            try {
-                                                System.out.println("Login response: " + response.toString());
-                                                boolean exists = response.getBoolean("success");
-                                                startMain();
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
+                                            startMain();
                                         }
 
                                         @Override
                                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                                            DisplayUtils.generateSnackbar(getActivity(), "Thit earáid amach (" + statusCode +") " + EmojiUtils.getEmoji(EmojiUtils.SAD));
+                                            DisplayUtils.generateSnackbar(getActivity(), "Thit earáid amach (" + statusCode + ") " + EmojiUtils.getEmoji(EmojiUtils.SAD));
                                         }
 
                                         @Override
                                         protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                            System.out.println(rawJsonData);
                                             return new JSONObject(rawJsonData);
                                         }
                                     });
 
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                } catch (UnsupportedEncodingException e) {
+                                } catch (JSONException | UnsupportedEncodingException e) {
                                     e.printStackTrace();
                                 }
 

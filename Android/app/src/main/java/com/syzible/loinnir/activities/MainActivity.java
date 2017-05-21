@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity
 
             String localityUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=1&language=en&key=" +
                     getResources().getString(R.string.places_api_key) + "&location=" +
-                    LocationClient.MAP_GOOSEBERRY_HILL.latitude + "," + LocationClient.MAP_GOOSEBERRY_HILL.longitude;
+                    LocationClient.GOOSEBERRY_HILL.latitude + "," + LocationClient.GOOSEBERRY_HILL.longitude;
 
 
             new GetJSONObject(new NetworkCallback<JSONObject>() {
@@ -236,8 +236,8 @@ public class MainActivity extends AppCompatActivity
                         try {
                             // TODO poll from GPS
                             payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
-                            payload.put("lng", LocationClient.MAP_GOOSEBERRY_HILL.longitude);
-                            payload.put("lat", LocationClient.MAP_GOOSEBERRY_HILL.latitude);
+                            payload.put("lng", LocationClient.GOOSEBERRY_HILL.longitude);
+                            payload.put("lat", LocationClient.GOOSEBERRY_HILL.latitude);
                             payload.put("locality", locality);
                         } catch (JSONException e) {
                             e.printStackTrace();

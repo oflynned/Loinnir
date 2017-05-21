@@ -54,8 +54,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     private GoogleApiClient googleApiClient;
 
     private int GREEN_500;
-    private static final float MY_LOCATION_ZOOM = 14.0f;
-    private static final int USER_LOCATION_RADIUS = 500;
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private LocationRequest locationRequest;
@@ -118,7 +116,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.MAP_UCD, MY_LOCATION_ZOOM));
+        this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
         getWebServerLocation(this.googleMap);
     }
 
@@ -162,7 +160,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         User user = new User(response.getJSONObject(i));
-                        addUserCircle(new LatLng(user.getLatitude(), user.getLongitude()), true);
+                        addUserCircle(new LatLng(user.getLatitude(), user.getLongitude()), false);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -199,12 +197,14 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     private void addUserCircle(LatLng latLng, boolean isMe) {
         googleMap.addCircle(new CircleOptions()
                 .center(latLng)
-                .radius(USER_LOCATION_RADIUS)
+                .radius(LocationClient.USER_LOCATION_RADIUS)
                 .strokeColor(GREEN_500)
                 .fillColor(getFillColour()));
 
-        if (isMe)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, MY_LOCATION_ZOOM));
+        if (isMe) {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, LocationClient.MY_LOCATION_ZOOM));
+            //googleMap.moveCamera();
+        }
     }
 
     @Override
