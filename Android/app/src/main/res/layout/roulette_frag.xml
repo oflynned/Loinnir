@@ -12,7 +12,7 @@
         android:layout_centerInParent="true"
         android:minHeight="128dp"
         android:minWidth="128dp"
-        android:src="@drawable/ic_roulette_yellow" />
+        android:src="@drawable/ic_roulette" />
 
     <TextView
         android:id="@+id/information_text_roulette"
