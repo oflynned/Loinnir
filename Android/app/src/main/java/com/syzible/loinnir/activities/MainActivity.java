@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.fragments.portal.ConversationFrag;
 import com.syzible.loinnir.fragments.portal.ConversationsFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
@@ -209,7 +210,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_roulette) {
             setFragment(new RouletteFrag());
         } else if(id == R.id.nav_nearby){
-
+            setFragment(new ConversationFrag());
         } else if (id == R.id.nav_rate) {
 
         } else if (id == R.id.nav_log_out) {

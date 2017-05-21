@@ -18,7 +18,7 @@ public class LocationClient {
     public static final LatLng UCD = new LatLng(53.309543, -6.218028);
     public static final LatLng GOOSEBERRY_HILL = new LatLng(52.252133, -8.969127);
 
-    public static final float INITIAL_LOCATION_ZOOM = 8.0f;
+    public static final float INITIAL_LOCATION_ZOOM = 6.0f;
     public static final float MY_LOCATION_ZOOM = 14.0f;
     public static final int USER_LOCATION_RADIUS = 500;
 
