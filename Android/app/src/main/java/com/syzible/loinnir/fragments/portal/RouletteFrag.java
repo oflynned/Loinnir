@@ -6,19 +6,16 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
-import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONException;
@@ -58,12 +55,17 @@ public class RouletteFrag extends Fragment {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         try {
+                            System.out.println(response);
+
                             if (response.has("success")) {
-                                DisplayUtils.generateSnackbar(getActivity(), "Níl aon úsáideoirí nua ann le nascadh " + EmojiUtils.getEmoji(EmojiUtils.SAD));
+                                DisplayUtils.generateSnackbar(getActivity(),
+                                        "Níl aon úsáideoirí nua ann le nasc a dhéanamh " +
+                                                EmojiUtils.getEmoji(EmojiUtils.SAD));
                             } else {
-                                String name = response.getString("name").split(" ")[0];
-                                DisplayUtils.generateSnackbar(getActivity(), "Haigh, a " + LanguageUtils.getVocative(name) + "! Nascadh thú leis an úsáideoir seo " + EmojiUtils.getEmoji(EmojiUtils.HAPPY));
-                                matchPartner(new User(response));
+                                User partner = new User(response);
+                                RouletteLoadingFrag loadingFrag = new RouletteLoadingFrag()
+                                        .setPartner(partner);
+                                MainActivity.setFragment(getFragmentManager(), loadingFrag);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -86,30 +88,5 @@ public class RouletteFrag extends Fragment {
         return view;
     }
 
-    private void matchPartner(User partner) {
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("my_id", LocalStorage.getID(getActivity()));
-            payload.put("partner_id", partner.getId());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-        RestClient.post(getActivity(), Endpoints.SUBSCRIBE_TO_PARTNER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                System.out.println(rawJsonResponse);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-            }
-
-            @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
-            }
-        });
-    }
 }

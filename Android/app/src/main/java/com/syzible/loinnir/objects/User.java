@@ -17,6 +17,7 @@ public class User implements IUser {
     private LatLng location;
     private String name;
     private String avatar;
+    private String locality;
 
     public User(JSONObject data) throws JSONException {
         this.fb_id = data.getString("fb_id");
@@ -25,11 +26,22 @@ public class User implements IUser {
         this.location = new LatLng(latitude, longitude);
         this.name = data.getString("name");
         this.avatar = data.getString("profile_pic");
+        this.locality = data.getString("locality");
     }
 
     @Override
     public String getId() {
         return fb_id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getAvatar() {
+        return avatar;
     }
 
     public float getLongitude() {
@@ -44,13 +56,7 @@ public class User implements IUser {
         return location;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getAvatar() {
-        return avatar;
+    public String getLocality() {
+        return locality;
     }
 }

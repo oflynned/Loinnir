@@ -53,7 +53,7 @@
         </activity>
 
         <activity
-            android:name="com.syzible.loinnir.activities.Settings"
+            android:name="com.syzible.loinnir.activities.SettingsActivity"
             android:label="@string/app_name"
             android:orientation="vertical"
             android:theme="@style/AppTheme.NoActionBar">

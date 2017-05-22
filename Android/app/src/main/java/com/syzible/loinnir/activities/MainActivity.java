@@ -1,6 +1,7 @@
 package com.syzible.loinnir.activities;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,6 +34,7 @@ import com.syzible.loinnir.network.PostJSONObject;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.BitmapUtils;
+import com.syzible.loinnir.utils.Constants;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().getItem(0).setChecked(true);
 
         // TODO reset to MapFrag()
-        setFragment(new RouletteFrag());
+        setFragment(getFragmentManager(), new RouletteFrag());
 
         String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
         name = name.split(" ")[0];
@@ -152,31 +154,31 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        // if there's only one fragment on the stack we should prevent the default
-        // popping to ask for the user's permission to close the app
-        if (getFragmentManager().getBackStackEntryCount() == 1) {
-            new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("An Aip a Dhúnadh?")
-                    .setMessage("Má bhrúitear an chnaipe \"Dún\", dúnfar an aip. An bhfuil tú cinnte go bhfuil sé seo ag teastáil uait a dhéanamh?")
-                    .setPositiveButton("Dún", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            MainActivity.this.finish();
-                        }
-                    })
-                    .setNegativeButton("Ná dún", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .show();
-        }
-
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            // if there's only one fragment on the stack we should prevent the default
+            // popping to ask for the user's permission to close the app
+            if (getFragmentManager().getBackStackEntryCount() == 1) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("An Aip a Dhúnadh?")
+                        .setMessage("Má bhrúitear an chnaipe \"Dún\", dúnfar an aip. An bhfuil tú cinnte go bhfuil sé seo ag teastáil uait a dhéanamh?")
+                        .setPositiveButton("Dún", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                MainActivity.this.finish();
+                            }
+                        })
+                        .setNegativeButton("Ná dún", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .show();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -192,7 +194,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            return true;
+            startActivity(new Intent(this, SettingsActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -205,13 +207,13 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_around_me) {
-            setFragment(new MapFrag());
+            setFragment(getFragmentManager(), new MapFrag());
         } else if (id == R.id.nav_conversations) {
-            setFragment(new ConversationsFrag());
+            setFragment(getFragmentManager(), new ConversationsFrag());
         } else if (id == R.id.nav_roulette) {
-            setFragment(new RouletteFrag());
-        } else if(id == R.id.nav_nearby){
-            setFragment(new ConversationFrag());
+            setFragment(getFragmentManager(), new RouletteFrag());
+        } else if (id == R.id.nav_nearby) {
+            setFragment(getFragmentManager(), new ConversationFrag());
         } else if (id == R.id.nav_rate) {
 
         } else if (id == R.id.nav_log_out) {
@@ -290,10 +292,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void setFragment(Fragment fragment) {
-        getFragmentManager().beginTransaction()
+    public static void setFragment(FragmentManager fragmentManager, Fragment fragment) {
+        fragmentManager.beginTransaction()
                 .replace(R.id.portal_frame, fragment)
-                .addToBackStack(null)
+                .addToBackStack(fragment.getClass().getName())
                 .commit();
+    }
+
+    public static void removeFragment(FragmentManager fragmentManager) {
+        fragmentManager.popBackStack();
     }
 }
