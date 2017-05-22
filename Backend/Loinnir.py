@@ -284,7 +284,6 @@ def get_locality_messages():
     # don't show blocked users' messages
     conversations_col = mongo.db.conversations
     blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked"]
-    blocked_users.append(fb_id)
     messages = locality_col.find({"locality": locality, "fb_id": {"$nin": blocked_users}})
 
     # aggregate over the messages to get the fb user details
