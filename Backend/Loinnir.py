@@ -414,8 +414,6 @@ def block_user():
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
 
-    print(my_id, partner_id)
-
     conversations_col = mongo.db.conversations
 
     # first unsubscribe both users

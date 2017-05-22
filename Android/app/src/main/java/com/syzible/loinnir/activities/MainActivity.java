@@ -24,6 +24,7 @@ import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.LocalityConversationFrag;
 import com.syzible.loinnir.fragments.portal.ConversationsListFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
+import com.syzible.loinnir.fragments.portal.PartnerConversationFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
 import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
@@ -32,6 +33,9 @@ import com.syzible.loinnir.network.GetJSONObject;
 import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.objects.Message;
+import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.services.NotificationUtils;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
@@ -66,9 +70,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
-
-        // TODO reset to MapFrag()
-        setFragment(getFragmentManager(), new RouletteFrag());
 
         String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
         name = name.split(" ")[0];
@@ -146,6 +147,51 @@ public class MainActivity extends AppCompatActivity
 
             }
         }, picUrl, true).execute();
+
+        // check for invocation by notification
+        String invocationType = getIntent().getStringExtra("invoker");
+        if (invocationType != null) {
+            switch (invocationType) {
+                case "notification":
+                    String partnerId = getIntent().getStringExtra("user");
+                    JSONObject chatPayload = new JSONObject();
+                    try {
+                        chatPayload.put("fb_id", partnerId);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    // get partner details and then open the chat fragment
+                    // TODO poll messages automatically on opening from partner
+                    RestClient.post(this, Endpoints.GET_USER, chatPayload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                            try {
+                                User partner = new User(response);
+                                PartnerConversationFrag frag = new PartnerConversationFrag()
+                                        .setPartner(partner);
+                                MainActivity.clearBackstack(getFragmentManager());
+                                MainActivity.setFragment(getFragmentManager(), frag);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                        }
+
+                        @Override
+                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                            return new JSONObject(rawJsonData);
+                        }
+                    });
+            }
+        } else {
+            // TODO reset to MapFrag()
+            setFragment(getFragmentManager(), new RouletteFrag());
+        }
     }
 
     @Override
@@ -276,17 +322,35 @@ public class MainActivity extends AppCompatActivity
                 }
             }, localityUrl, true).execute();
         } else if (id == R.id.force_get) {
-            new GetJSONArray(new NetworkCallback<JSONArray>() {
+            JSONObject getUserPayload = new JSONObject();
+            try {
+                getUserPayload.put("fb_id", LocalStorage.getID(this));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            RestClient.post(this, Endpoints.GET_USER, getUserPayload, new BaseJsonHttpResponseHandler<JSONObject>() {
                 @Override
-                public void onResponse(JSONArray response) {
-                    System.out.println(response.toString());
+                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                    try {
+                        User user = new User(response);
+                        Message message = new Message("0", user, System.currentTimeMillis(), "Haigh!");
+                        NotificationUtils.generateMessageNotification(MainActivity.this, user, message);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
-                public void onFailure() {
-                    System.out.println("Failure in force get JSON object?");
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
                 }
-            }, Endpoints.GET_ALL_USERS, false).execute();
+
+                @Override
+                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                    return new JSONObject(rawJsonData);
+                }
+            });
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

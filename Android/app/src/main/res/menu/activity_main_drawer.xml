@@ -29,7 +29,7 @@
             <item
                 android:id="@+id/force_get"
                 android:icon="@mipmap/ic_launcher"
-                android:title="Force GET" />
+                android:title="Generate Notification" />
         </menu>
     </item>
 

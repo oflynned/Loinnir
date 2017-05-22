@@ -2,9 +2,12 @@ package com.syzible.loinnir.objects;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.stfalcon.chatkit.commons.models.IUser;
+import com.syzible.loinnir.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.nio.charset.CharsetDecoder;
 
 /**
  * Created by ed on 07/05/2017.

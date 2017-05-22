@@ -33,7 +33,6 @@ public class GetJSONObject extends GetRequest<JSONObject> {
                     while ((n = br.read(buffer)) != -1) writer.write(buffer, 0, n);
                     br.close();
 
-                    System.out.println(writer.toString());
                     return new JSONObject(writer.toString());
                 case 404:
                 case 500:
