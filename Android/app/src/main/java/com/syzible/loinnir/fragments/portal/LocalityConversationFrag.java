@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.stfalcon.chatkit.commons.ImageLoader;
+import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 import com.syzible.loinnir.R;
@@ -34,12 +35,13 @@ import java.util.Date;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.util.EncodingUtils;
 
 /**
  * Created by ed on 07/05/2017.
  */
 
-public class ConversationFrag extends Fragment {
+public class LocalityConversationFrag extends Fragment {
 
     private Date lastLoadedDate;
     private int loadedCount;
@@ -47,15 +49,12 @@ public class ConversationFrag extends Fragment {
 
     private MessagesList messagesList;
     private MessagesListAdapter<Message> adapter;
+    private MessageInput messageInput;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.conversation_frag, container, false);
-
-        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
-        messagesList = (MessagesList) view.findViewById(R.id.messages_list);
-        messagesList.setAdapter(adapter);
 
         payload = new JSONObject();
         try {
@@ -63,6 +62,66 @@ public class ConversationFrag extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
+        messagesList = (MessagesList) view.findViewById(R.id.messages_list);
+        messagesList.setAdapter(adapter);
+
+        messageInput = (MessageInput) view.findViewById(R.id.message_input);
+        messageInput.setInputListener(new MessageInput.InputListener() {
+            @Override
+            public boolean onSubmit(final CharSequence input) {
+                RestClient.post(getActivity(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                        try {
+                            final User me = new User(response);
+                            String messageContent = input.toString();
+
+                            Message message = new Message(LocalStorage.getID(getActivity()), me, System.currentTimeMillis(), messageContent);
+                            adapter.addToStart(message, true);
+
+                            // send to server
+                            JSONObject messagePayload = new JSONObject();
+                            messagePayload.put("fb_id", LocalStorage.getID(getActivity()));
+                            messagePayload.put("message", message.getText());
+
+                            RestClient.post(getActivity(), Endpoints.SEND_LOCALITY_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                    System.out.println("Message submitted to locality (" + me.getLocality() + ")");
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                                }
+
+                                @Override
+                                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                    return new JSONObject(rawJsonData);
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                    }
+
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONObject(rawJsonData);
+                    }
+                });
+
+                return true;
+            }
+        });
+
 
         RestClient.post(getActivity(), Endpoints.GET_NEARBY_COUNT, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
@@ -132,7 +191,6 @@ public class ConversationFrag extends Fragment {
         return new ImageLoader() {
             @Override
             public void loadImage(final ImageView imageView, final String url) {
-                imageView.setImageResource(R.mipmap.ic_launcher);
                 new GetImage(new NetworkCallback<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap response) {

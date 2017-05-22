@@ -21,8 +21,4 @@ public class LocationClient {
     public static final float INITIAL_LOCATION_ZOOM = 6.0f;
     public static final float MY_LOCATION_ZOOM = 14.0f;
     public static final int USER_LOCATION_RADIUS = 500;
-
-    public static void stopLocationService(Context context) {
-        SmartLocation.with(context).location().stop();
-    }
 }

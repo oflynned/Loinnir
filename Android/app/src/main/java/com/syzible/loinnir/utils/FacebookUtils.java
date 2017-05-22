@@ -1,21 +1,8 @@
 package com.syzible.loinnir.utils;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
 import com.facebook.login.LoginManager;
-import com.syzible.loinnir.objects.FacebookUser;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
 
 /**
  * Created by ed on 12/05/2017.

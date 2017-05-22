@@ -25,4 +25,16 @@
         android:layout_marginRight="16dp"
         android:gravity="center_horizontal"
         android:text="Gliogáil ar an gcnaipe thíos chun nascadh le duine nua!" />
+
+    <TextView
+        android:id="@+id/unmatched_count_roulette"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/roulette_spinner_button"
+        android:layout_marginTop="64dp"
+        android:layout_marginBottom="64dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="center_horizontal"
+        android:text="x úsáideoir"/>
 </RelativeLayout>

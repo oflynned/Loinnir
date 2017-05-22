@@ -85,8 +85,11 @@
             android:layout_weight="0.5"
             android:text="Tosaigh comhrá"
             fancy:fb_borderWidth="1dp"
+            fancy:fb_textColor="@color/green500"
+            fancy:fb_borderColor="@color/green500"
             fancy:fb_defaultColor="@color/green500"
             fancy:fb_focusColor="@color/green700"
+            fancy:fb_ghost="true"
             fancy:fb_radius="32dp" />
     </LinearLayout>
 

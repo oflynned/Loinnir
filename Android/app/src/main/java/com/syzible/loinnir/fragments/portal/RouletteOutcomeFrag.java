@@ -2,13 +2,11 @@ package com.syzible.loinnir.fragments.portal;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,8 +19,6 @@ import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.utils.BitmapUtils;
-import com.syzible.loinnir.utils.DisplayUtils;
-import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONException;
@@ -67,9 +63,10 @@ public class RouletteOutcomeFrag extends Fragment {
         startConversationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                matchPartner(partner);
-                MainActivity.removeFragment(getFragmentManager());
-                DisplayUtils.generateSnackbar(getActivity(), "Start convo");
+                PartnerConversationFrag frag = new PartnerConversationFrag().setPartner(partner);
+
+                MainActivity.clearBackstack(getFragmentManager());
+                MainActivity.setFragment(getFragmentManager(), frag);
             }
         });
 
@@ -100,32 +97,5 @@ public class RouletteOutcomeFrag extends Fragment {
     public RouletteOutcomeFrag setBitmap(Bitmap profilePic) {
         this.profilePic = profilePic;
         return this;
-    }
-
-    private void matchPartner(User partner) {
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("my_id", LocalStorage.getID(getActivity()));
-            payload.put("partner_id", partner.getId());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        RestClient.post(getActivity(), Endpoints.SUBSCRIBE_TO_PARTNER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                System.out.println(rawJsonResponse);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-            }
-
-            @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
-            }
-        });
     }
 }

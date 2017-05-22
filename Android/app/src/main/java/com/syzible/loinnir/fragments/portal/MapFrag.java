@@ -160,7 +160,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
-                System.out.println(rawJsonData);
+
             }
 
             @Override
@@ -184,7 +184,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                System.out.println(rawJsonData);
+
             }
 
             @Override

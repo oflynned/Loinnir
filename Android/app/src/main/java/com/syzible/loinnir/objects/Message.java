@@ -3,6 +3,8 @@ package com.syzible.loinnir.objects;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 
+import org.json.JSONObject;
+
 import java.util.Date;
 
 /**

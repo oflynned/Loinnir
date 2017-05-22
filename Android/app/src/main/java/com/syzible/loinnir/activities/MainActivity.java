@@ -21,8 +21,8 @@ import android.widget.TextView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
-import com.syzible.loinnir.fragments.portal.ConversationFrag;
-import com.syzible.loinnir.fragments.portal.ConversationsFrag;
+import com.syzible.loinnir.fragments.portal.LocalityConversationFrag;
+import com.syzible.loinnir.fragments.portal.ConversationsListFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
 import com.syzible.loinnir.location.LocationClient;
@@ -30,11 +30,9 @@ import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetJSONArray;
 import com.syzible.loinnir.network.GetJSONObject;
 import com.syzible.loinnir.network.NetworkCallback;
-import com.syzible.loinnir.network.PostJSONObject;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.BitmapUtils;
-import com.syzible.loinnir.utils.Constants;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
@@ -211,13 +209,13 @@ public class MainActivity extends AppCompatActivity
             setFragment(getFragmentManager(), new MapFrag());
         } else if (id == R.id.nav_conversations) {
             clearBackstack(getFragmentManager());
-            setFragment(getFragmentManager(), new ConversationsFrag());
+            setFragment(getFragmentManager(), new ConversationsListFrag());
         } else if (id == R.id.nav_roulette) {
             clearBackstack(getFragmentManager());
             setFragment(getFragmentManager(), new RouletteFrag());
         } else if (id == R.id.nav_nearby) {
             clearBackstack(getFragmentManager());
-            setFragment(getFragmentManager(), new ConversationFrag());
+            setFragment(getFragmentManager(), new LocalityConversationFrag());
         } else if (id == R.id.nav_rate) {
 
         } else if (id == R.id.nav_log_out) {

@@ -181,6 +181,19 @@ def get_random_user():
             return get_json(user)
 
 
+# POST {fb_id:...}
+# GET {count:...}
+@app.route("/api/v1/users/get-unmatched-count", methods=["POST"])
+def get_unmatched_user_count():
+    data = request.json
+    fb_id = str(data["fb_id"])
+    users_col = mongo.db.users
+    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]["partners"]
+    partners_met.append(fb_id)
+    users = users_col.find({"fb_id": {"$nin": partners_met}})
+    return get_json({"count": users.count()})
+
+
 # DELETE {fb_id: 123456789}
 @app.route('/api/v1/users/delete', methods=["DELETE"])
 def delete_user():
@@ -269,6 +282,27 @@ def get_partner_messages():
     return get_json(list(messages))
 
 
+# POST {my_id: ..., partner_id: ...}
+# GET [{...},{...}]
+@app.route("/api/v1/messages/get-partner-messages-count", methods=["POST"])
+def get_partner_messages_count():
+    data = request.json
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
+
+    partner_col = mongo.db.partner_conversations
+    messages = list(partner_col.find({"participants": [my_id, partner_id]}))
+
+    return get_json({"count": len(messages)})
+
+
+# TODO dev
+@app.route("/api/v1/messages/get-messages", methods=["GET"])
+def get_all_messages():
+    messages = list(mongo.db.conversations.find())
+    return get_json(messages)
+
+
 # TODO order by time
 # get all messages residing within the locality for the user's record provided
 # POST {fb_id: ...}
@@ -282,13 +316,17 @@ def get_locality_messages():
 
     locality_col = mongo.db.locality_conversations
 
+    # get user doc under conversations to see if it's been generated from sending a message yet
+    blocked_users = list(mongo.db.conversations.find({"fb_id": fb_id}))
+
     # don't show blocked users' messages
-    conversations_col = mongo.db.conversations
-    blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked"]
-    messages = locality_col.find({"locality": locality, "fb_id": {"$nin": blocked_users}})
+    if len(blocked_users) > 0:
+        blocked_users = blocked_users[0]["blocked"]
 
     # aggregate over the messages to get the fb user details
+    messages = locality_col.find({"locality": locality, "fb_id": {"$nin": blocked_users}})
     messages = list(messages)
+
     for i, message in enumerate(messages):
         fb_id = message["fb_id"]
         user = mongo.db.users.find({"fb_id": fb_id})
@@ -296,11 +334,10 @@ def get_locality_messages():
         messages[i]["user"] = user_details
 
         # temp disable this as I'm not sure how much info I need to provide for messages
-        """
-        messages[i]["user"] = dict()
-        messages[i]["user"]["name"] = user_details["name"]
-        messages[i]["user"]["profile_pic"] = user_details["profile_pic"]
-        """
+
+        # messages[i]["user"] = dict()
+        # messages[i]["user"]["name"] = user_details["name"]
+        # messages[i]["user"]["profile_pic"] = user_details["profile_pic"]
 
     return get_json(list(messages))
 
@@ -404,6 +441,7 @@ def get_blocked_users():
         return get_json([])
 
     return get_json(list(users)[0]["blocked"])
+
 
 # POST {"my_id":..., "block_id":...}
 @app.route("/api/v1/users/unblock-user", methods=["POST"])

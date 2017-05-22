@@ -23,11 +23,13 @@ public class Endpoints {
     public static final String GET_NEARBY_USERS = "/users/get-nearby";
     public static final String GET_RANDOM_USER = "/users/get-random";
 
+    public static final String GET_UNMATCHED_COUNT = "/users/get-unmatched-count";
     public static final String GET_BLOCKED_USERS = "/users/get-blocked-users";
     public static final String BLOCK_USER = "/users/block-user";
     public static final String UNBLOCK_USER = "/users/unblock-user";
 
     public static final String GET_PARTNER_MESSAGES = "/messages/get-partner-messages";
+    public static final String GET_PARTNER_MESSAGES_COUNT = "/messages/get-partner-messages-count";
     public static final String GET_LOCALITY_MESSAGES = "/messages/get-locality-messages";
     public static final String SEND_PARTNER_MESSAGE = "/messages/send-partner-message";
     public static final String SEND_LOCALITY_MESSAGE = "/messages/send-locality-message";
