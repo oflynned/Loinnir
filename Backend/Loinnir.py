@@ -174,10 +174,11 @@ def get_random_user():
 
         if users.count() == 0:
             return get_json({"success": False, "reason": "Out of new users"})
-
-        count = mongo.db.users.count() - 2
-        user = users[randint(0, count)]
-        return get_json(user)
+        elif users.count() == 1:
+            return get_json(list(users)[0])
+        else:
+            user = users[randint(0, users.count() - 1)]
+            return get_json(user)
 
 
 # DELETE {fb_id: 123456789}
@@ -404,8 +405,6 @@ def get_blocked_users():
 
     return get_json(list(users)[0]["blocked"])
 
-
-# TODO only in dev to unblock someone?
 # POST {"my_id":..., "block_id":...}
 @app.route("/api/v1/users/unblock-user", methods=["POST"])
 def unblock_user():
