@@ -65,7 +65,7 @@ public class RouletteFrag extends Fragment {
                                 User partner = new User(response);
                                 RouletteLoadingFrag loadingFrag = new RouletteLoadingFrag()
                                         .setPartner(partner);
-                                MainActivity.setFragment(getFragmentManager(), loadingFrag);
+                                MainActivity.setFragmentBackstack(getFragmentManager(), loadingFrag);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

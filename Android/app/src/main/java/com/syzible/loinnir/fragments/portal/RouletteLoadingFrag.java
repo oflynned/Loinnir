@@ -3,15 +3,19 @@ package com.syzible.loinnir.fragments.portal;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.MainActivity;
+import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
@@ -39,7 +43,7 @@ public class RouletteLoadingFrag extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.roulette_frag, container, false);
+        View view = inflater.inflate(R.layout.roulette_loading_frag, container, false);
         getActivity().setTitle(getResources().getString(R.string.app_name));
 
         rouletteButton = (ImageView) view.findViewById(R.id.roulette_spinner_button);
@@ -49,12 +53,18 @@ public class RouletteLoadingFrag extends Fragment {
 
         new GetImage(new NetworkCallback<Bitmap>() {
             @Override
-            public void onResponse(Bitmap response) {
-                RouletteOutcomeFrag matchFrag = new RouletteOutcomeFrag()
-                        .setPartner(partner)
-                        .setBitmap(response);
-                MainActivity.removeFragment(getFragmentManager());
-                MainActivity.setFragment(getFragmentManager(), matchFrag);
+            public void onResponse(final Bitmap response) {
+                // show loading screen for at least one second
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        RouletteOutcomeFrag matchFrag = new RouletteOutcomeFrag()
+                                .setPartner(partner)
+                                .setBitmap(response);
+                        MainActivity.removeFragment(getFragmentManager());
+                        MainActivity.setFragment(getFragmentManager(), matchFrag);
+                    }
+                }, 1000);
             }
 
             @Override

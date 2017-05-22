@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
+import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
  * Created by ed on 07/05/2017.
@@ -38,7 +39,7 @@ public class RouletteOutcomeFrag extends Fragment {
 
     private ImageView profilePictureImageView;
     private TextView usernameTextView, countyTextView;
-    private Button backToRouletteButton, startConversationButton;
+    private FancyButton backToRouletteButton, startConversationButton;
 
     private User partner;
     private Bitmap profilePic;
@@ -53,7 +54,7 @@ public class RouletteOutcomeFrag extends Fragment {
         usernameTextView = (TextView) view.findViewById(R.id.name_text_roulette);
         countyTextView = (TextView) view.findViewById(R.id.county_text_roulette);
 
-        backToRouletteButton = (Button) view.findViewById(R.id.back_to_roulette_btn);
+        backToRouletteButton = (FancyButton) view.findViewById(R.id.back_to_roulette_btn);
         backToRouletteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,7 +63,7 @@ public class RouletteOutcomeFrag extends Fragment {
             }
         });
 
-        startConversationButton = (Button) view.findViewById(R.id.start_conversation_btn);
+        startConversationButton = (FancyButton) view.findViewById(R.id.start_conversation_btn);
         startConversationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

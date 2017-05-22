@@ -38,4 +38,5 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'io.nlopez.smartlocation:library:3.3.1'
     compile 'com.github.stfalcon:chatkit:0.2.1'
+    compile 'com.github.medyo:fancybuttons:1.8.3'
 }

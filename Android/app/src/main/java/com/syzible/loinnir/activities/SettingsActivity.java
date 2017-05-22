@@ -87,7 +87,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         Preference locationSettings = new SwitchPreference(context);
         locationSettings.setTitle("Taispeáin do Cheantar");
-        locationSettings.setSummary("Muna bhfuil an rogha cumasaithe, ní bheidh tú in ann ceantair garbha na n-úsáideoirí eile a fheiceáil");
+        locationSettings.setSummary("Muna bhfuil an rogha cumasaithe, ní bheidh tú in ann ceantair gharbha na n-úsáideoirí eile a fheiceáil");
         appSettings.addPreference(locationSettings);
 
         // blocked users

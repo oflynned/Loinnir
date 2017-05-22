@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             // if there's only one fragment on the stack we should prevent the default
             // popping to ask for the user's permission to close the app
-            if (getFragmentManager().getBackStackEntryCount() == 1) {
+            if (getFragmentManager().getBackStackEntryCount() == 0) {
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("An Aip a Dhúnadh?")
                         .setMessage("Má bhrúitear an chnaipe \"Dún\", dúnfar an aip. An bhfuil tú cinnte go bhfuil sé seo ag teastáil uait a dhéanamh?")
@@ -207,12 +207,16 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_around_me) {
+            clearBackstack(getFragmentManager());
             setFragment(getFragmentManager(), new MapFrag());
         } else if (id == R.id.nav_conversations) {
+            clearBackstack(getFragmentManager());
             setFragment(getFragmentManager(), new ConversationsFrag());
         } else if (id == R.id.nav_roulette) {
+            clearBackstack(getFragmentManager());
             setFragment(getFragmentManager(), new RouletteFrag());
         } else if (id == R.id.nav_nearby) {
+            clearBackstack(getFragmentManager());
             setFragment(getFragmentManager(), new ConversationFrag());
         } else if (id == R.id.nav_rate) {
 
@@ -295,11 +299,21 @@ public class MainActivity extends AppCompatActivity
     public static void setFragment(FragmentManager fragmentManager, Fragment fragment) {
         fragmentManager.beginTransaction()
                 .replace(R.id.portal_frame, fragment)
+                .commit();
+    }
+
+    public static void setFragmentBackstack(FragmentManager fragmentManager, Fragment fragment) {
+        fragmentManager.beginTransaction()
+                .replace(R.id.portal_frame, fragment)
                 .addToBackStack(fragment.getClass().getName())
                 .commit();
     }
 
     public static void removeFragment(FragmentManager fragmentManager) {
         fragmentManager.popBackStack();
+    }
+
+    public static void clearBackstack(FragmentManager fragmentManager) {
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 }
