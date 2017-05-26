@@ -44,10 +44,18 @@ def get_json(data):
     )
 
 
-# TODO Backend services
-@app.route('/api/v1', methods=["GET"])
+@app.route('/api/v1', methods=["GET", "POST"])
 def hello_world():
-    return get_json({"hey there": "developer ;)"})
+    return get_json({"response": "hello world!"})
+
+
+@app.route('/api/v1/get-array', methods=["GET", "POST"])
+def hello_world_array():
+    response = []
+    for i in range(0, 10):
+        response.append({"response": i})
+
+    return get_json(response)
 
 
 # POST {fb_id: 123456789, ...}
@@ -469,15 +477,15 @@ def get_conversations_previews():
     blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked_users"]
     conversations = list(conversations_col.find({"fb_id": fb_id}))
 
+    return get_json(list(conversations))
+
     if len(conversations) == 0:
         return get_json([])
 
     # else get a list of partners that have ONLY been chatted to
     partners = list(conversations)[0]["partners"]
-    previews = list()
 
-    for partner_id in partners:
-        print(partner_id)
+    previews = list()
 
     return get_json({"partners": partners})
 
