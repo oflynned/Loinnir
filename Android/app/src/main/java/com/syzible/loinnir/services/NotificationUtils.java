@@ -5,9 +5,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.ContextCompat;
 
+import com.google.firebase.messaging.RemoteMessage;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.MainActivity;
@@ -29,6 +32,32 @@ import cz.msebera.android.httpclient.Header;
  */
 
 public class NotificationUtils {
+
+    public static void generateNotification(Context context, RemoteMessage remoteMessage) {
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(context)
+                        .setLargeIcon(icon)
+                        .setContentTitle(remoteMessage.getNotification().getTitle())
+                        .setContentText(remoteMessage.getNotification().getBody());
+
+        Intent resultingIntent = new Intent(context, MainActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultingIntent);
+
+        PendingIntent resultingPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        notificationBuilder.setContentIntent(resultingPendingIntent);
+
+        NotificationManager manager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        manager.notify(0, notificationBuilder.build());
+    }
 
     public static void generateMessageNotification(final Context context, final User user,
                                                    final Message message) throws JSONException {
@@ -63,7 +92,7 @@ public class NotificationUtils {
 
                 // TODO all facebook ids seem to be too big to be integers?
                 // TODO crashes notification as it's greater than Integer.MAX_VALUE
-                manager.notify(0, notificationBuilder.build());
+                manager.notify(1, notificationBuilder.build());
             }
 
             @Override

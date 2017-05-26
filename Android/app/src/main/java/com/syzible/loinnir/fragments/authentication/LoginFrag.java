@@ -23,9 +23,8 @@ import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.AuthenticationActivity;
 import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
-import com.syzible.loinnir.network.NetworkCallback;
-import com.syzible.loinnir.network.PostJSONObject;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.services.TokenService;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
@@ -121,6 +120,9 @@ public class LoginFrag extends Fragment {
                                     LocalStorage.setPref(LocalStorage.Pref.id, id, getActivity());
                                     LocalStorage.setPref(LocalStorage.Pref.name, name, getActivity());
                                     LocalStorage.setPref(LocalStorage.Pref.profile_pic, pic, getActivity());
+
+                                    Intent startFCMTokenService = new Intent(getActivity(), TokenService.class);
+                                    getActivity().startService(startFCMTokenService);
 
                                     RestClient.post(getActivity(), Endpoints.CREATE_USER, postData, new BaseJsonHttpResponseHandler<JSONObject>() {
                                         @Override

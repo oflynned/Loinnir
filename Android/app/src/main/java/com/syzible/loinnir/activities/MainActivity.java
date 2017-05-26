@@ -52,8 +52,6 @@ import cz.msebera.android.httpclient.Header;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    // TODO consider using emojis in the snackbars to make it look more fun
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -334,7 +332,7 @@ public class MainActivity extends AppCompatActivity
                 public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                     try {
                         User user = new User(response);
-                        Message message = new Message("0", user, System.currentTimeMillis(), "Haigh!");
+                        Message message = new Message("0", user, System.currentTimeMillis(), "Dia dhuit! Conas atá tú? " + EmojiUtils.getEmoji(EmojiUtils.HAPPY));
                         NotificationUtils.generateMessageNotification(MainActivity.this, user, message);
                     } catch (JSONException e) {
                         e.printStackTrace();

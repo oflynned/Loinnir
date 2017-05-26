@@ -1,9 +1,11 @@
 package com.syzible.loinnir.network;
 
 import android.content.Context;
+import android.os.Looper;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.SyncHttpClient;
 
 import org.json.JSONObject;
 
@@ -16,23 +18,24 @@ import cz.msebera.android.httpclient.entity.StringEntity;
  */
 
 public class RestClient {
-    private static AsyncHttpClient client = new AsyncHttpClient();
+    private static AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+    private static SyncHttpClient syncHttpClient = new SyncHttpClient();
 
     private RestClient() {
     }
 
     public static void get(String url, AsyncHttpResponseHandler responseHandler) {
-        client.get(Endpoints.getAbsoluteURL(url), null, responseHandler);
+        getClient().get(Endpoints.getAbsoluteURL(url), null, responseHandler);
     }
 
     public static void getExternal(String url, AsyncHttpResponseHandler responseHandler) {
-        client.setEnableRedirects(true);
-        client.get(url, null, responseHandler);
+        getClient().setEnableRedirects(true);
+        getClient().get(url, null, responseHandler);
     }
 
     public static void post(Context context, String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
         try {
-            client.post(context, Endpoints.getAbsoluteURL(url), new StringEntity(data.toString()), "application/json", responseHandler);
+            getClient().post(context, Endpoints.getAbsoluteURL(url), new StringEntity(data.toString()), "application/json", responseHandler);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -40,9 +43,16 @@ public class RestClient {
 
     public static void delete(Context context, String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
         try {
-            client.delete(context, Endpoints.getAbsoluteURL(url), new StringEntity(data.toString()), "application/json", responseHandler);
+            getClient().delete(context, Endpoints.getAbsoluteURL(url), new StringEntity(data.toString()), "application/json", responseHandler);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+
+    // prevents throwing synchronous looper exception in service thread
+    private static AsyncHttpClient getClient() {
+        if (Looper.myLooper() == null)
+            return syncHttpClient;
+        return asyncHttpClient;
     }
 }

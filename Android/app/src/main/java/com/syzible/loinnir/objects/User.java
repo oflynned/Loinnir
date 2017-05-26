@@ -7,6 +7,9 @@ import com.syzible.loinnir.utils.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.CharsetDecoder;
 
 /**
@@ -27,7 +30,11 @@ public class User implements IUser {
         this.longitude = (float) data.getDouble("lng");
         this.latitude = (float) data.getDouble("lat");
         this.location = new LatLng(latitude, longitude);
-        this.name = data.getString("name");
+        try {
+            this.name = URLDecoder.decode(data.getString("name"), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         this.avatar = data.getString("profile_pic");
         this.locality = data.getString("locality");
     }
