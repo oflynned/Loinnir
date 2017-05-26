@@ -5,6 +5,10 @@ import json
 import os, sys
 from random import randint
 import time
+from flask_pyfcm import FCM
+import math
+
+from Helper import Helper
 
 frontend_dir = os.path.abspath("../Frontend")
 static_dir = os.path.abspath("../Frontend/static")
@@ -13,7 +17,14 @@ app = Flask(__name__, template_folder=frontend_dir, static_folder=static_dir)
 app.config["MONGO_DBNAME"] = "loinnir"
 app.config["MONGO_URI"] = "mongodb://localhost:27017/loinnir"
 app.debug = True
+
+# persistence
 mongo = PyMongo(app)
+
+# real time messaging
+app.config["FCM_API_KEY"] = Helper.get_fcm_api_key()
+fcm = FCM()
+fcm.init_app(app)
 
 
 # TODO static serving of frontend -- move to blueprint soon
@@ -212,9 +223,66 @@ def delete_user():
     return get_json({"success": True})
 
 
-# TODO get list of some sort and classify by nearest town from web service or spreadsheet
-def get_nearest_town(lng, lat):
-    pass
+@app.route("/api/v1/services/get-nearest-town", methods=["GET", "POST"])
+def get_nearest_town():
+    data = request.json
+
+    if data is not None:
+        lat = data["lat"]
+        lng = data["lng"]
+    else:
+        lat = 53.309543
+        lng = -6.218028
+
+    return get_json({"locality": get_locality(lat, lng)})
+
+
+def groom_population_dataset():
+    dataset = Helper.get_populated_areas()
+    groomed_set = []
+
+    for item in dataset:
+        town = item["properties"]["NAMN1"]
+        town_lng = item["geometry"]["coordinates"][0]
+        town_lat = item["geometry"]["coordinates"][1]
+        groomed_set.append({"town": town, "lat": town_lat, "lng": town_lng})
+
+    return groomed_set
+
+
+def get_distance(my_lat, my_lng, town_lat, town_lng):
+    return math.fabs(math.sqrt((town_lat - my_lat) ** 2 + (town_lng - my_lng) ** 2))
+
+
+def get_locality(lat, lng):
+    dataset = Helper.get_groomed_populated_areas()
+
+    nearest_town = 0
+    shortest_distance = 0
+
+    for i, town in enumerate(dataset):
+        town_lat = town["lat"]
+        town_lng = town["lng"]
+        distance = get_distance(lat, lng, town_lat, town_lng)
+
+        if i == 0:
+            shortest_distance = distance
+            nearest_town = town["town"]
+
+        if distance < shortest_distance:
+            shortest_distance = distance
+            nearest_town = town["town"]
+
+
+    # too macro or micro -- gonna switch to smallest distance to nearest town as the crow flies?
+    """
+    url = "https://maps.googleapis.com/maps/api/geocode/json?radius=1&language=en&key=" + str(
+        Helper.get_places_api_key()) + "&location=" + str(lat) + "," + str(lng)
+    data = requests.get(url).json()
+    place = data["results"][0]["name"]
+    """
+
+    return nearest_town
 
 
 # POST {fb_id:123456789,lat:0,lng:0,locality:"Place"}
@@ -488,6 +556,11 @@ def get_conversations_previews():
     previews = list()
 
     return get_json({"partners": partners})
+
+
+@app.route("/api/v1/services/create-individual-notification", methods=["POST"])
+def generate_notification():
+    data = request.json
 
 
 if __name__ == '__main__':
