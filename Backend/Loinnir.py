@@ -223,16 +223,13 @@ def delete_user():
     return get_json({"success": True})
 
 
-@app.route("/api/v1/services/get-nearest-town", methods=["GET", "POST"])
+# POST {lat: ..., lng: ...}
+# GET {locality: ...}
+@app.route("/api/v1/services/get-nearest-town", methods=["POST"])
 def get_nearest_town():
     data = request.json
-
-    if data is not None:
-        lat = data["lat"]
-        lng = data["lng"]
-    else:
-        lat = 53.309543
-        lng = -6.218028
+    lat = data["lat"]
+    lng = data["lng"]
 
     return get_json({"locality": get_locality(lat, lng)})
 
@@ -273,20 +270,10 @@ def get_locality(lat, lng):
             shortest_distance = distance
             nearest_town = town["town"]
 
-
-    # too macro or micro -- gonna switch to smallest distance to nearest town as the crow flies?
-    """
-    url = "https://maps.googleapis.com/maps/api/geocode/json?radius=1&language=en&key=" + str(
-        Helper.get_places_api_key()) + "&location=" + str(lat) + "," + str(lng)
-    data = requests.get(url).json()
-    place = data["results"][0]["name"]
-    """
-
     return nearest_town
 
 
-# POST {fb_id:123456789,lat:0,lng:0,locality:"Place"}
-# TODO POST {fb_id:123456789,lat:0,lng:0} and automatically generate locality
+# POST {fb_id: 123456789, lat: ..., lng: ...}
 @app.route('/api/v1/users/update-location', methods=["POST"])
 def update_location():
     data = request.json
@@ -296,7 +283,7 @@ def update_location():
     user = list(users_col.find({"fb_id": fb_id}))[0]
     user["lat"] = data["lat"]
     user["lng"] = data["lng"]
-    user["locality"] = data["locality"]
+    user["locality"] = get_locality(data["lat"], data["lng"])
 
     users_col.save(user)
     return get_json({"success": True})
