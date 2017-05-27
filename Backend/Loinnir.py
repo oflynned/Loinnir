@@ -296,7 +296,7 @@ def update_location():
     user["locality"] = get_locality(data["lat"], data["lng"])
 
     users_col.save(user)
-    return get_json({"success": True})
+    return get_json({"success": True, "user": user})
 
 
 # POST {from_id: ..., to_id: ..., message: "..."}
@@ -313,7 +313,7 @@ def send_partner_message():
 
     partner_col = mongo.db.partner_conversations
     partner_col.insert(message)
-    return get_json({"success": True})
+    return get_json({"success": True, "message": message})
 
 
 # POST {fb_id: ..., message: "..."}
@@ -339,8 +339,7 @@ def send_locality_message():
     return get_json({"success": True})
 
 
-# TODO order by time
-# get messages pertaining to chatting with an individual
+# get messages between partners that have matched via roulette
 # POST {my_id: ..., partner_id: ...}
 # GET [{...},{...}]
 @app.route("/api/v1/messages/get-partner-messages", methods=["POST"])
@@ -350,7 +349,9 @@ def get_partner_messages():
     partner_id = str(data["partner_id"])
 
     partner_col = mongo.db.partner_conversations
-    messages = partner_col.find({"participants": [my_id, partner_id]})
+    participants = [my_id, partner_id]
+    query = {"from_id": {"$in": participants}, "to_id": {"$in": participants}}
+    messages = partner_col.find(query).sort("time", -1)
 
     return get_json(list(messages))
 
@@ -539,13 +540,12 @@ def get_conversations_previews():
     fb_id = str(data["fb_id"])
 
     conversations_col = mongo.db.conversations
-    blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked_users"]
-    conversations = list(conversations_col.find({"fb_id": fb_id}))
+    blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked"]
+
+    messages_col = mongo.db.partner_conversations
+    conversations = list(messages_col.find({"my_id": fb_id}))
 
     return get_json(list(conversations))
-
-    if len(conversations) == 0:
-        return get_json([])
 
     # else get a list of partners that have ONLY been chatted to
     partners = list(conversations)[0]["partners"]
