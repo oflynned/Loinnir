@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
+import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.LocalStorage;
@@ -31,8 +32,10 @@ public class UpdateLocationService extends IntentService {
 
             try {
                 payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
-                payload.put("lng", 0);
-                payload.put("lat", 0);
+
+                // TODO poll for real location
+                payload.put("lng", LocationClient.ATHLONE.longitude);
+                payload.put("lat", LocationClient.ATHLONE.latitude);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

@@ -38,6 +38,7 @@ import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.utils.Constants;
+import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONArray;
@@ -136,62 +137,57 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
 
     private void getWebServerLocation(final GoogleMap googleMap) {
 
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("fb_id", LocalStorage.getID(getActivity()));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
         // get others' locations and add to map without zooming to them
-        RestClient.post(getActivity(), Endpoints.GET_OTHER_USERS, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        User user = new User(response.getJSONObject(i));
-                        addUserCircle(new LatLng(user.getLatitude(), user.getLongitude()), false);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+        RestClient.post(getActivity(), Endpoints.GET_OTHER_USERS, JSONUtils.getIdPayload(getActivity()),
+                new BaseJsonHttpResponseHandler<JSONArray>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                User user = new User(response.getJSONObject(i));
+                                addUserCircle(new LatLng(user.getLatitude(), user.getLongitude()), false);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
-                }
 
-            }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+                    }
 
-            }
-
-            @Override
-            protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONArray(rawJsonData);
-            }
-        });
+                    @Override
+                    protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONArray(rawJsonData);
+                    }
+                });
 
         // get my last known location and move to it on the map
-        RestClient.post(getActivity(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                try {
-                    User me = new User(response);
-                    addUserCircle(new LatLng(me.getLatitude(), me.getLongitude()), true);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        RestClient.post(getActivity(), Endpoints.GET_USER, JSONUtils.getIdPayload(getActivity()),
+                new BaseJsonHttpResponseHandler<JSONObject>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                        try {
+                            User me = new User(response);
+                            addUserCircle(new LatLng(me.getLatitude(), me.getLongitude()), true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
-            }
+                    }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
 
-            }
+                    }
 
-            @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
-            }
-        });
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONObject(rawJsonData);
+                    }
+                });
     }
 
     @Override
@@ -229,6 +225,9 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        // TODO what the fuck is this? I have no idea how to handle Android M permission checks
+        // TODO put this into its own function to call
+
         System.out.println("Location services connected");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

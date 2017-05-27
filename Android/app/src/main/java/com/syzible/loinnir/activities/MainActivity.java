@@ -2,6 +2,7 @@ package com.syzible.loinnir.activities;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,6 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +42,7 @@ import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
+import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
@@ -51,6 +54,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private View headerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,44 +80,18 @@ public class MainActivity extends AppCompatActivity
                         EmojiUtils.getEmoji(EmojiUtils.HAPPY));
 
         // set up nav bar header for personalisation
-        final View headerView = navigationView.getHeaderView(0);
+        headerView = navigationView.getHeaderView(0);
 
         TextView userName = (TextView) headerView.findViewById(R.id.nav_header_name);
         userName.setText(LocalStorage.getPref(LocalStorage.Pref.name, this));
 
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        RestClient.post(getApplicationContext(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+        RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this), new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                 try {
-                    double lat = response.getDouble("lat");
-                    double lng = response.getDouble("lng");
-                    String localityUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=1&language=en&key=" +
-                            getResources().getString(R.string.places_api_key) + "&location=" + lat + "," + lng;
-
-                    new GetJSONObject(new NetworkCallback<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
-                                String locality = response.getJSONArray("results").getJSONObject(0).getString("name");
-                                localityName.setText(locality);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure() {
-
-                        }
-                    }, localityUrl, true).execute();
+                    TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
+                    String locality = response.getString("locality");
+                    localityName.setText(locality);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -187,8 +165,7 @@ public class MainActivity extends AppCompatActivity
                     });
             }
         } else {
-            // TODO reset to MapFrag()
-            setFragment(getFragmentManager(), new RouletteFrag());
+            setFragment(getFragmentManager(), new MapFrag());
         }
     }
 
@@ -266,93 +243,65 @@ public class MainActivity extends AppCompatActivity
             FacebookUtils.deleteToken(this);
             finish();
             startActivity(new Intent(this, AuthenticationActivity.class));
+        } else if (id == R.id.force_post) {
+
         }
 
-        // TODO DEV OPTIONS
-        else if (id == R.id.force_post) {
+        // force generate a notification
+        else if (id == R.id.force_get) {
 
-            String localityUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?radius=1&language=en&key=" +
-                    getResources().getString(R.string.places_api_key) + "&location=" +
-                    LocationClient.GOOSEBERRY_HILL.latitude + "," + LocationClient.GOOSEBERRY_HILL.longitude;
-
-
-            new GetJSONObject(new NetworkCallback<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        String locality = response.getJSONArray("results").getJSONObject(0).getString("name");
-
-                        JSONObject payload = new JSONObject();
-                        try {
-                            // TODO poll from GPS
-                            payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
-                            payload.put("lng", LocationClient.GOOSEBERRY_HILL.longitude);
-                            payload.put("lat", LocationClient.GOOSEBERRY_HILL.latitude);
-                            payload.put("locality", locality);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+            RestClient.post(this, Endpoints.GET_USER, JSONUtils.getIdPayload(this),
+                    new BaseJsonHttpResponseHandler<JSONObject>() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                            try {
+                                User user = new User(response);
+                                Message message = new Message("0", user, System.currentTimeMillis(), "Dia dhuit! Conas atá tú? " + EmojiUtils.getEmoji(EmojiUtils.HAPPY));
+                                NotificationUtils.generateMessageNotification(MainActivity.this, user, message);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
 
-                        RestClient.post(getApplicationContext(), Endpoints.UPDATE_USER_LOCATION, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
-                            @Override
-                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                                System.out.println(response);
-                            }
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
 
-                            @Override
-                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                                System.out.println("Failure");
-                            }
+                        }
 
-                            @Override
-                            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                return new JSONObject(rawJsonData);
-                            }
-                        });
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFailure() {
-
-                }
-            }, localityUrl, true).execute();
-        } else if (id == R.id.force_get) {
-            JSONObject getUserPayload = new JSONObject();
-            try {
-                getUserPayload.put("fb_id", LocalStorage.getID(this));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            RestClient.post(this, Endpoints.GET_USER, getUserPayload, new BaseJsonHttpResponseHandler<JSONObject>() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                    try {
-                        User user = new User(response);
-                        Message message = new Message("0", user, System.currentTimeMillis(), "Dia dhuit! Conas atá tú? " + EmojiUtils.getEmoji(EmojiUtils.HAPPY));
-                        NotificationUtils.generateMessageNotification(MainActivity.this, user, message);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-                }
-
-                @Override
-                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                    return new JSONObject(rawJsonData);
-                }
-            });
+                        @Override
+                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                            return new JSONObject(rawJsonData);
+                        }
+                    });
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
+        RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this),
+                new BaseJsonHttpResponseHandler<JSONObject>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                        try {
+                            TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
+                            String locality = response.getString("locality");
+                            localityName.setText(locality);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                    }
+
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONObject(rawJsonData);
+                    }
+                });
+
         return true;
     }
 

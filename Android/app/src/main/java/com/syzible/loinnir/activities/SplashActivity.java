@@ -13,6 +13,8 @@ public class SplashActivity extends AppCompatActivity {
     // TODO what needs to be polled during this for the app to function?
     // TODO is this needed?
 
+    // last known location, new messages since last sync
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

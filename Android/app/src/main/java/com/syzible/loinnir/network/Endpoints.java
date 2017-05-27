@@ -23,6 +23,8 @@ public class Endpoints {
     public static final String GET_NEARBY_USERS = "/users/get-nearby";
     public static final String GET_RANDOM_USER = "/users/get-random";
 
+    public static final String GET_NEAREST_TOWN = "/services/get-nearest-town";
+
     public static final String GET_UNMATCHED_COUNT = "/users/get-unmatched-count";
     public static final String GET_BLOCKED_USERS = "/users/get-blocked-users";
     public static final String BLOCK_USER = "/users/block-user";
@@ -33,11 +35,11 @@ public class Endpoints {
     public static final String GET_LOCALITY_MESSAGES = "/messages/get-locality-messages";
     public static final String SEND_PARTNER_MESSAGE = "/messages/send-partner-message";
     public static final String SEND_LOCALITY_MESSAGE = "/messages/send-locality-message";
+    public static final String GET_PAST_CONVERSATION_PREVIEWS = "/messages/get-past-conversation-previews";
 
     public static final String GET_PARTNER_IDS = "/messages/get-partner-ids";
     public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner";
     public static final String UNSUBSCRIBE_PARTNER = "/messages/unsubscribe-partner";
-    public static final String GET_PAST_CONVERSATION_PREVIEWS = "/messages/get-past-conversation-previews";
 
     public static String getAbsoluteURL(String endpoint) {
         return BASE_URL + endpoint;

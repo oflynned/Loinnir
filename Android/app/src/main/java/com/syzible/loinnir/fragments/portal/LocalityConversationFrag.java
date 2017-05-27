@@ -21,6 +21,7 @@ import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
@@ -45,7 +46,6 @@ public class LocalityConversationFrag extends Fragment {
 
     private Date lastLoadedDate;
     private int loadedCount;
-    private JSONObject payload;
 
     private MessagesList messagesList;
     private MessagesListAdapter<Message> adapter;
@@ -56,13 +56,6 @@ public class LocalityConversationFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.conversation_frag, container, false);
 
-        payload = new JSONObject();
-        try {
-            payload.put("fb_id", LocalStorage.getID(getActivity()));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
         adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
         messagesList = (MessagesList) view.findViewById(R.id.messages_list);
         messagesList.setAdapter(adapter);
@@ -71,37 +64,68 @@ public class LocalityConversationFrag extends Fragment {
         messageInput.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(final CharSequence input) {
-                RestClient.post(getActivity(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                RestClient.post(getActivity(), Endpoints.GET_USER, JSONUtils.getIdPayload(getActivity()),
+                        new BaseJsonHttpResponseHandler<JSONObject>() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                try {
+                                    final User me = new User(response);
+                                    String messageContent = input.toString();
+
+                                    Message message = new Message(LocalStorage.getID(getActivity()), me, System.currentTimeMillis(), messageContent);
+                                    adapter.addToStart(message, true);
+
+                                    // send to server
+                                    JSONObject messagePayload = new JSONObject();
+                                    messagePayload.put("fb_id", LocalStorage.getID(getActivity()));
+                                    messagePayload.put("message", message.getText());
+
+                                    RestClient.post(getActivity(), Endpoints.SEND_LOCALITY_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                            System.out.println("Message submitted to locality (" + me.getLocality() + ")");
+                                        }
+
+                                        @Override
+                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                                        }
+
+                                        @Override
+                                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                            return new JSONObject(rawJsonData);
+                                        }
+                                    });
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                            }
+
+                            @Override
+                            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                return new JSONObject(rawJsonData);
+                            }
+                        });
+
+                return true;
+            }
+        });
+
+
+        RestClient.post(getActivity(), Endpoints.GET_NEARBY_COUNT, JSONUtils.getIdPayload(getActivity()),
+                new BaseJsonHttpResponseHandler<JSONObject>() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         try {
-                            final User me = new User(response);
-                            String messageContent = input.toString();
-
-                            Message message = new Message(LocalStorage.getID(getActivity()), me, System.currentTimeMillis(), messageContent);
-                            adapter.addToStart(message, true);
-
-                            // send to server
-                            JSONObject messagePayload = new JSONObject();
-                            messagePayload.put("fb_id", LocalStorage.getID(getActivity()));
-                            messagePayload.put("message", message.getText());
-
-                            RestClient.post(getActivity(), Endpoints.SEND_LOCALITY_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                                    System.out.println("Message submitted to locality (" + me.getLocality() + ")");
-                                }
-
-                                @Override
-                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-                                }
-
-                                @Override
-                                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                    return new JSONObject(rawJsonData);
-                                }
-                            });
+                            String localityName = response.getString("locality");
+                            int nearbyUsers = response.getInt("count") + 1;
+                            String title = localityName + " (" + nearbyUsers + " anseo)";
+                            getActivity().setTitle(title);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -118,35 +142,6 @@ public class LocalityConversationFrag extends Fragment {
                     }
                 });
 
-                return true;
-            }
-        });
-
-
-        RestClient.post(getActivity(), Endpoints.GET_NEARBY_COUNT, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                try {
-                    String localityName = response.getString("locality");
-                    int nearbyUsers = response.getInt("count") + 1;
-                    String title = localityName + " (" + nearbyUsers + " anseo)";
-                    getActivity().setTitle(title);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-            }
-
-            @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
-            }
-        });
-
         return view;
     }
 
@@ -154,37 +149,38 @@ public class LocalityConversationFrag extends Fragment {
     public void onStart() {
         super.onStart();
 
-        RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
-                ArrayList<Message> messages = new ArrayList<>();
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject userMessage = response.getJSONObject(i);
-                        String id = userMessage.getString("_id");
-                        String messageContent = userMessage.getString("message");
-                        long timeSent = userMessage.getLong("time");
+        RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, JSONUtils.getIdPayload(getActivity()),
+                new BaseJsonHttpResponseHandler<JSONArray>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                        ArrayList<Message> messages = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                JSONObject userMessage = response.getJSONObject(i);
+                                String id = userMessage.getString("_id");
+                                String messageContent = userMessage.getString("message");
+                                long timeSent = userMessage.getLong("time");
 
-                        User user = new User(userMessage.getJSONObject("user"));
-                        Message message = new Message(id, user, timeSent, messageContent);
-                        messages.add(message);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                                User user = new User(userMessage.getJSONObject("user"));
+                                Message message = new Message(id, user, timeSent, messageContent);
+                                messages.add(message);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        adapter.addToEnd(messages, true);
                     }
-                }
-                adapter.addToEnd(messages, true);
-            }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
-                System.out.println("failed?");
-            }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+                        System.out.println("failed?");
+                    }
 
-            @Override
-            protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONArray(rawJsonData);
-            }
-        });
+                    @Override
+                    protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONArray(rawJsonData);
+                    }
+                });
     }
 
     private ImageLoader loadImage() {
