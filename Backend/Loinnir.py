@@ -1,12 +1,9 @@
 from flask import Flask, render_template, request, Response
 from flask_pymongo import PyMongo
 from bson import json_util
-import json
-import os, sys
 from random import randint
-import time
 from flask_pyfcm import FCM
-import math
+import json, os, sys, time, math
 
 from Helper import Helper
 
@@ -26,8 +23,21 @@ app.config["FCM_API_KEY"] = Helper.get_fcm_api_key()
 fcm = FCM()
 fcm.init_app(app)
 
+# TODO
+"""
+    unread/read messages
+    dispatch notifications
+    past conversations preview
+    notify individuals via fcm
+    implement fcm server
+    account deletion
+    reporting? when should an auto ban occur?
+    auto generate password to protect public api by tokens
+    
+    refactor by moving to blueprints, this is getting too long to comfortably code
+"""
 
-# TODO static serving of frontend -- move to blueprint soon
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
