@@ -21,7 +21,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class UpdateLocationService extends IntentService {
     public UpdateLocationService() {
-        super("SyncService");
+        super(UpdateLocationService.class.getName());
     }
 
     @Override
