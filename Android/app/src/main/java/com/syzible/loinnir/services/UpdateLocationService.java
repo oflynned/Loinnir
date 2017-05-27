@@ -40,15 +40,16 @@ public class UpdateLocationService extends IntentService {
                 e.printStackTrace();
             }
 
+            // don't care about response on user side
             RestClient.post(getApplicationContext(), Endpoints.UPDATE_USER_LOCATION, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                    System.out.println("Success: " + rawJsonResponse);
+
                 }
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                    System.out.println("Failure: " + "(" + errorResponse + ")" + rawJsonData);
+
                 }
 
                 @Override
