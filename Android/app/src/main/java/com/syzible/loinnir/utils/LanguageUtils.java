@@ -86,11 +86,11 @@ public class LanguageUtils {
         return mutation + strippedInput;
     }
 
-    private static String lenite(String input) {
+    public static String lenite(String input) {
         return getMutation(lenitionRules, input);
     }
 
-    private static String eclipse(String input) {
+    public static String eclipse(String input) {
         return getMutation(eclipsisRules, input);
     }
 

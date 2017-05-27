@@ -1,6 +1,8 @@
 package com.syzible.loinnir.fragments.portal;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +16,7 @@ import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.dialogs.DialogsList;
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter;
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
@@ -21,15 +24,16 @@ import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Conversation;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.JSONUtils;
+import com.syzible.loinnir.utils.LanguageUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -37,7 +41,9 @@ import cz.msebera.android.httpclient.Header;
  * Created by ed on 07/05/2017.
  */
 
-public class ConversationsListFrag extends Fragment {
+public class ConversationsListFrag extends Fragment implements
+        DialogsListAdapter.OnDialogClickListener<Conversation>,
+        DialogsListAdapter.OnDialogLongClickListener<Conversation> {
 
     private ArrayList<Conversation> conversations = new ArrayList<>();
     private DialogsListAdapter<Conversation> dialogsListAdapter;
@@ -58,7 +64,7 @@ public class ConversationsListFrag extends Fragment {
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
-                        for (int i=0; i<response.length(); i++) {
+                        for (int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject o = response.getJSONObject(i);
                                 User sender = new User(o.getJSONObject("user"));
@@ -72,6 +78,8 @@ public class ConversationsListFrag extends Fragment {
                         }
 
                         dialogsListAdapter.addItems(conversations);
+                        dialogsListAdapter.setOnDialogClickListener(ConversationsListFrag.this);
+                        dialogsListAdapter.setOnDialogLongClickListener(ConversationsListFrag.this);
                         dialogsList.setAdapter(dialogsListAdapter);
                     }
 
@@ -87,6 +95,33 @@ public class ConversationsListFrag extends Fragment {
                 }
         );
         return view;
+    }
+
+    @Override
+    public void onDialogClick(Conversation conversation) {
+        User partner = (User) conversation.getUsers().get(0);
+        PartnerConversationFrag frag = new PartnerConversationFrag().setPartner(partner);
+        MainActivity.setFragment(getFragmentManager(), frag);
+    }
+
+    @Override
+    public void onDialogLongClick(final Conversation conversation) {
+        final String blockee = conversation.getDialogName().split(" ")[0];
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Cosc a Chur ar " + LanguageUtils.lenite(conversation.getDialogName()) + "?")
+                .setMessage("Má chuireann tú cosc ar úsáideoir araile, ní féidir leat nó le " + blockee + " dul i dteagmháil lena chéile. " +
+                        "Bain úsáid as seo amháin go bhfuil tú cinnte nach dteastaíonn uait faic a chloisteáil a thuilleadh ón úsáideoir seo. " +
+                        "Cur cosc ar dhuine má imrítear bulaíocht ort, nó mura dteastaíonn uait tuilleadh teagmhála. " +
+                        "Má athraíonn tú do mheabhair, téigh chuig socruithe agus bainistigh cé atá faoi chosc.")
+                .setPositiveButton("Cur cosc i bhfeidhm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc ar " + LanguageUtils.lenite(blockee) + ".");
+                    }
+                })
+                .setNegativeButton("Ná cur", null)
+                .show();
     }
 
     private void onNewMessage(String dialogId, Message message) {
