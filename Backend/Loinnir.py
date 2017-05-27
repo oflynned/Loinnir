@@ -531,7 +531,6 @@ def unblock_user():
     return get_json({"success": True, "user": my_profile})
 
 
-# TODO get all previews of last message sent to all partners
 # POST {fb_id: ...}
 # GET [{fb_id:..., last_message_time:..., last_message_content:...}]
 @app.route("/api/v1/messages/get-past-conversation-previews", methods=["POST"])
@@ -539,20 +538,27 @@ def get_conversations_previews():
     data = request.json
     fb_id = str(data["fb_id"])
 
+    # first find users and ergo conversations that we want to hide from the user as they're blocked and irrelevant
     conversations_col = mongo.db.conversations
     blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked"]
+    partners = list(conversations_col.find({"fb_id": fb_id}))[0]["partners"]
 
     messages_col = mongo.db.partner_conversations
-    conversations = list(messages_col.find({"my_id": fb_id}))
+    messages_preview = []
 
-    return get_json(list(conversations))
+    for partner in partners:
+        # probably overkill to explicitly ignore blocked users as they should be removed already as partners
+        # but just in case it's probably best to make sure no blocked users show up
+        query = {"$or": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}],
+                 "$and": [{"to_id": {"$nin": blocked_users}}, {"from_id": {"$nin": blocked_users}}]}
+        last_message_in_chat = list(messages_col.find(query).sort("time", -1).limit(1))[0]
+        user_details = list(mongo.db.users.find({"fb_id": partner}))[0]
+        messages_preview.append({"message": last_message_in_chat, "user": user_details})
 
-    # else get a list of partners that have ONLY been chatted to
-    partners = list(conversations)[0]["partners"]
+    # sort list by last sent time of the message fragments
+    sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=True)
 
-    previews = list()
-
-    return get_json({"partners": partners})
+    return get_json(sorted_list)
 
 
 @app.route("/api/v1/services/create-individual-notification", methods=["POST"])
