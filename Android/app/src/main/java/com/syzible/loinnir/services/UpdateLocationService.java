@@ -34,8 +34,8 @@ public class UpdateLocationService extends IntentService {
                 payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
 
                 // TODO poll for real location
-                payload.put("lng", LocationClient.ATHLONE.longitude);
-                payload.put("lat", LocationClient.ATHLONE.latitude);
+                payload.put("lng", LocationClient.GOOSEBERRY_HILL.longitude);
+                payload.put("lat", LocationClient.GOOSEBERRY_HILL.latitude);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

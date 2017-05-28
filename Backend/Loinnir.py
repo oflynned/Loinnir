@@ -547,16 +547,11 @@ def get_conversations_previews():
     data = request.json
     fb_id = str(data["fb_id"])
 
-    # first find users and ergo conversations that we want to hide from the user as they're blocked and irrelevant
     conversations_col = mongo.db.conversations
-    blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked"]
     partners = list(conversations_col.find({"fb_id": fb_id}))[0]["partners"]
-
     messages_preview = []
 
     for partner in partners:
-        # probably overkill to explicitly ignore blocked users as they should be removed already as partners
-        # but just in case it's probably best to make sure no blocked users show up
         query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}
         messages_col = mongo.db.partner_conversations
         last_message_in_chat = list(messages_col.find(query).sort("time", -1).limit(1))[0]

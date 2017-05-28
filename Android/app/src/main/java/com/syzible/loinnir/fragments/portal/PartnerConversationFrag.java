@@ -21,6 +21,7 @@ import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
@@ -195,14 +196,14 @@ public class PartnerConversationFrag extends Fragment {
                 new GetImage(new NetworkCallback<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap response) {
-                        imageView.setImageBitmap(response);
+                        imageView.setImageBitmap(BitmapUtils.getCroppedCircle(response));
                     }
 
                     @Override
                     public void onFailure() {
                         System.out.println("dl failure on chat pic");
                     }
-                }, url, true);
+                }, url, true).execute();
             }
         };
     }

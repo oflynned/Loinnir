@@ -24,6 +24,7 @@ import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Conversation;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LanguageUtils;
@@ -32,7 +33,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -54,6 +54,7 @@ public class ConversationsListFrag extends Fragment implements
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.conversations_list_frag, container, false);
 
+        conversations.clear();
         dialogsList = (DialogsList) view.findViewById(R.id.conversations_list);
         dialogsListAdapter = new DialogsListAdapter<>(loadImage());
 
@@ -112,7 +113,7 @@ public class ConversationsListFrag extends Fragment implements
                 .setTitle("Cosc a Chur ar " + LanguageUtils.lenite(conversation.getDialogName()) + "?")
                 .setMessage("Má chuireann tú cosc ar úsáideoir araile, ní féidir leat nó le " + blockee + " dul i dteagmháil lena chéile. " +
                         "Bain úsáid as seo amháin go bhfuil tú cinnte nach dteastaíonn uait faic a chloisteáil a thuilleadh ón úsáideoir seo. " +
-                        "Cur cosc ar dhuine má imrítear bulaíocht ort, nó mura dteastaíonn uait tuilleadh teagmhála. " +
+                        "Cur cosc ar dhuine má imrítear bulaíocht ort, nó mura dteastaíonn tuilleadh teagmhála uait. " +
                         "Má athraíonn tú do mheabhair, téigh chuig socruithe agus bainistigh cé atá faoi chosc.")
                 .setPositiveButton("Cur cosc i bhfeidhm", new DialogInterface.OnClickListener() {
                     @Override
@@ -144,14 +145,14 @@ public class ConversationsListFrag extends Fragment implements
                 new GetImage(new NetworkCallback<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap response) {
-                        imageView.setImageBitmap(response);
+                        imageView.setImageBitmap(BitmapUtils.getCroppedCircle(response));
                     }
 
                     @Override
                     public void onFailure() {
                         System.out.println("dl failure on chat pic");
                     }
-                }, url, true);
+                }, url, true).execute();
             }
         };
     }
