@@ -359,7 +359,10 @@ def get_partner_messages():
         user = list(mongo.db.users.find({"fb_id": message["from_id"]}))[0]
         returned_messages.append({"message": message, "user": user})
 
-    return get_json(returned_messages)
+    # sort by descending time
+    sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
+
+    return get_json(sorted_list)
 
 
 # POST {my_id: ..., partner_id: ...}
