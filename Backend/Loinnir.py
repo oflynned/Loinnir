@@ -351,9 +351,15 @@ def get_partner_messages():
     partner_col = mongo.db.partner_conversations
     participants = [my_id, partner_id]
     query = {"from_id": {"$in": participants}, "to_id": {"$in": participants}}
-    messages = partner_col.find(query).sort("time", -1)
+    messages = list(partner_col.find(query).sort("time", -1))
 
-    return get_json(list(messages))
+    returned_messages = []
+
+    for message in messages:
+        user = list(mongo.db.users.find({"fb_id": message["from_id"]}))[0]
+        returned_messages.append({"message": message, "user": user})
+
+    return get_json(returned_messages)
 
 
 # POST {my_id: ..., partner_id: ...}
@@ -543,7 +549,6 @@ def get_conversations_previews():
     blocked_users = list(conversations_col.find({"fb_id": fb_id}))[0]["blocked"]
     partners = list(conversations_col.find({"fb_id": fb_id}))[0]["partners"]
 
-    messages_col = mongo.db.partner_conversations
     messages_preview = []
 
     for partner in partners:
@@ -551,7 +556,10 @@ def get_conversations_previews():
         # but just in case it's probably best to make sure no blocked users show up
         query = {"$or": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}],
                  "$and": [{"to_id": {"$nin": blocked_users}}, {"from_id": {"$nin": blocked_users}}]}
+
+        messages_col = mongo.db.partner_conversations
         last_message_in_chat = list(messages_col.find(query).sort("time", -1).limit(1))[0]
+        print(last_message_in_chat)
         user_details = list(mongo.db.users.find({"fb_id": partner}))[0]
         messages_preview.append({"message": last_message_in_chat, "user": user_details})
 
