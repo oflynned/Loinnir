@@ -554,17 +554,14 @@ def get_conversations_previews():
     for partner in partners:
         # probably overkill to explicitly ignore blocked users as they should be removed already as partners
         # but just in case it's probably best to make sure no blocked users show up
-        query = {"$or": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}],
-                 "$and": [{"to_id": {"$nin": blocked_users}}, {"from_id": {"$nin": blocked_users}}]}
-
+        query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}
         messages_col = mongo.db.partner_conversations
         last_message_in_chat = list(messages_col.find(query).sort("time", -1).limit(1))[0]
-        print(last_message_in_chat)
         user_details = list(mongo.db.users.find({"fb_id": partner}))[0]
         messages_preview.append({"message": last_message_in_chat, "user": user_details})
 
     # sort list by last sent time of the message fragments
-    sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=True)
+    sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=False)
 
     return get_json(sorted_list)
 
