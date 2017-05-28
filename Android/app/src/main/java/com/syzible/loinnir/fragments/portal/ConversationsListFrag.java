@@ -101,7 +101,7 @@ public class ConversationsListFrag extends Fragment implements
     public void onDialogClick(Conversation conversation) {
         User partner = (User) conversation.getUsers().get(0);
         PartnerConversationFrag frag = new PartnerConversationFrag().setPartner(partner);
-        MainActivity.setFragment(getFragmentManager(), frag);
+        MainActivity.setFragmentBackstack(getFragmentManager(), frag);
     }
 
     @Override

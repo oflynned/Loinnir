@@ -42,10 +42,7 @@ public class PartnerConversationFrag extends Fragment {
     private Date lastLoadedDate;
     private int loadedCount;
 
-    private MessagesList messagesList;
     private MessagesListAdapter<Message> adapter;
-    private MessageInput messageInput;
-
     private User partner;
 
     @Nullable
@@ -54,10 +51,10 @@ public class PartnerConversationFrag extends Fragment {
         View view = inflater.inflate(R.layout.conversation_frag, container, false);
 
         adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
-        messagesList = (MessagesList) view.findViewById(R.id.messages_list);
+        MessagesList messagesList = (MessagesList) view.findViewById(R.id.messages_list);
         messagesList.setAdapter(adapter);
 
-        messageInput = (MessageInput) view.findViewById(R.id.message_input);
+        MessageInput messageInput = (MessageInput) view.findViewById(R.id.message_input);
         messageInput.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(final CharSequence input) {
@@ -141,19 +138,6 @@ public class PartnerConversationFrag extends Fragment {
             }
         });
 
-        getActivity().setTitle(partner.getName());
-
-        return view;
-    }
-
-    public PartnerConversationFrag setPartner(User partner) {
-        this.partner = partner;
-        return this;
-    }
-
-    @Override
-    public void onStart() {
-
         RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES,
                 JSONUtils.getPartnerInteractionPayload(partner, getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
@@ -162,13 +146,14 @@ public class PartnerConversationFrag extends Fragment {
                         ArrayList<Message> messages = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
                             try {
-                                JSONObject userMessage = response.getJSONObject(i);
-                                String id = userMessage.getString("_id");
-                                String messageContent = userMessage.getString("message");
-                                long timeSent = userMessage.getLong("time");
+                                System.out.println(response.getJSONObject(i));
 
-                                User user = new User(userMessage.getJSONObject("user"));
-                                Message message = new Message(id, user, timeSent, messageContent);
+                                JSONObject d = response.getJSONObject(i);
+
+                                JSONObject m = d.getJSONObject("message");
+                                User sender = new User(d.getJSONObject("user"));
+                                Message message = new Message(sender, m);
+
                                 messages.add(message);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -188,6 +173,18 @@ public class PartnerConversationFrag extends Fragment {
                     }
                 });
 
+        getActivity().setTitle(partner.getName());
+
+        return view;
+    }
+
+    public PartnerConversationFrag setPartner(User partner) {
+        this.partner = partner;
+        return this;
+    }
+
+    @Override
+    public void onStart() {
         super.onStart();
     }
 
