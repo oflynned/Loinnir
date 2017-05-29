@@ -25,3 +25,15 @@ class Helper:
     def get_groomed_populated_areas():
         with open("./groomed_populated_areas_localised.json", "r") as f:
             return json.loads(f.read())
+
+    @staticmethod
+    def generate_fake_users():
+        for i in range(100):
+            area = ""
+            name = ""
+            lat = ""
+            lng = ""
+            profile_pic = ""
+
+            # get random town from json
+            # add/subtract random value on lat & lng up to 10km

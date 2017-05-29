@@ -570,9 +570,27 @@ def get_conversations_previews():
     messages_preview = []
 
     for partner in partners:
-        query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}
+        # check if only one message exists in the conversation
         messages_col = mongo.db.partner_conversations
-        last_message_in_chat = list(messages_col.find(query).sort("time", -1).limit(1))[0]
+        # query = {"or": [{"$and": [{"from_id": {"$in": [fb_id]}}, {"to_id": {"$in": [partner]}}]},
+        # {"$and": [{"from_id": {"$in": [partner]}}, {"to_id": {"$in": [fb_id]}}]}]}
+        my_messages_query = {"$and": [{"from_id": {"$in": [fb_id]}}, {"to_id": {"$in": [partner]}}]}
+        partner_messages_query = {"$and": [{"from_id": {"$in": [partner]}}, {"to_id": {"$in": [fb_id]}}]}
+
+        messages_from_me = messages_col.find(my_messages_query)
+        messages_from_partner = messages_col.find(partner_messages_query)
+
+        if messages_from_me.count() > 0 and messages_from_partner == 0:
+            # I sent messages but no replies were sent back
+            last_message_in_chat = list(messages_from_me.sort("time", -1).limit(1))
+        elif messages_from_me == 0 and messages_from_partner > 0:
+            # partner sent me messages and I haven't replied
+            last_message_in_chat = list(messages_from_partner.sort("time", -1).limit(1))
+        else:
+            # both parties have communicated with each other
+            query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}
+            last_message_in_chat = list(messages_col.find(query).sort("time", -1).limit(1))[0]
+
         user_details = list(mongo.db.users.find({"fb_id": partner}))[0]
         messages_preview.append({"message": last_message_in_chat, "user": user_details})
 
