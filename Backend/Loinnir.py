@@ -223,6 +223,16 @@ def get_unmatched_user_count():
     return get_json({"count": users.count()})
 
 
+# POST {fb_id:...}
+# GET {count:...}
+@app.route("/api/v1/users/get-matched-count", methods=["POST"])
+def get_matched_user_count():
+    data = request.json
+    fb_id = str(data["fb_id"])
+    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]["partners"]
+    return get_json({"count": len(partners_met)})
+
+
 # DELETE {fb_id: 123456789}
 @app.route('/api/v1/users/delete', methods=["DELETE"])
 def delete_user():
