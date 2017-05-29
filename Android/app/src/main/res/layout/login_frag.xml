@@ -14,125 +14,55 @@
         android:layout_margin="16dp"
         android:src="@drawable/logo_small" />
 
-    <RelativeLayout
-        android:id="@+id/login_self_account_login"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/login_tip_1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/iv_login_app_logo"
-        android:layout_centerInParent="true"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp">
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/login_et_login_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColorHint="@color/white">
-
-            <EditText
-                android:id="@+id/et_login_email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:hint="Ríomhphost"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
-                app:backgroundTint="@color/white" />
-
-        </android.support.design.widget.TextInputLayout>
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="64dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:text="Logáil isteach le do chúntas Facebook chun bualadh le daoine nua níos éasca trí sheirbhísí Loinnir."
+        android:textColor="@color/white" />
 
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/login_et_login_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/login_et_login_email"
-            android:textColorHint="@color/white"
-            app:passwordToggleEnabled="true">
-
-            <EditText
-                android:id="@+id/et_login_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Pasfhocal"
-                android:inputType="textPassword"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
-                app:backgroundTint="@color/white" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <Button
-            android:id="@+id/btn_login_login"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/login_et_login_password"
-            android:layout_marginBottom="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/white"
-            android:text="Logáil Isteach" />
-
-        <View
-            android:id="@+id/view_login_1"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/btn_login_login"
-            android:layout_marginTop="8dp"
-            android:background="@color/white" />
-
-        <TextView
-            android:id="@+id/tv_login_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/view_login_1"
-            android:layout_marginTop="8dp"
-            android:gravity="center_horizontal"
-            android:text="Easpa chúntais? Cláraigh le gliogáil anseo"
-            android:textColor="@android:color/white" />
-
-        <View
-            android:id="@+id/view_login_2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/tv_login_register"
-            android:layout_marginTop="8dp"
-            android:background="@color/white" />
-
-        <TextView
-            android:id="@+id/tv_login_forgotten_details"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/view_login_2"
-            android:layout_marginTop="8dp"
-            android:gravity="center_horizontal"
-            android:text="Dearmad déanta ar shonraí do chúntais?"
-            android:textColor="@android:color/white" />
-
-        <View
-            android:id="@+id/view_login_3"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/tv_login_forgotten_details"
-            android:layout_marginTop="8dp"
-            android:background="@color/white" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/login_social_login_options"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/login_tip_2"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/login_self_account_login">
+        android:layout_below="@+id/login_tip_1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="64dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:text="Buail le daoine nua ar fud an domhain a bhfuil Gaeilge á labhairt acu."
+        android:textColor="@color/white" />
 
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/login_fb_login_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="32dp"
-            android:gravity="center_horizontal" />
-    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/login_tip_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/login_tip_2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="64dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:text="Fionn agus aimsigh pobal i do thimpeall a bhfuil Gaeilge labhartha aige."
+        android:textColor="@color/white" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_fb_login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/login_tip_3"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="32dp"
+        android:gravity="center_horizontal" />
 </RelativeLayout>

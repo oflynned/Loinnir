@@ -29,6 +29,7 @@ import cz.msebera.android.httpclient.Header;
  * Created by ed on 08/05/2017.
  */
 
+// TODO unused
 public class RegisterFrag extends Fragment {
     private EditText etForename, etSurname, etEmail, etPassword, etConfirmPassword;
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="locationUpdateFrequencyHeadings">
+        <item>15 nóiméad</item>
+        <item>30 nóiméad</item>
+        <item>1 uair</item>
+        <item>3 uair</item>
+    </string-array>
+
+    <string-array name="locationUpdateFrequencyValues">
+        <item>15_min</item>
+        <item>30_min</item>
+        <item>1_hr</item>
+        <item>3_hr</item>
+    </string-array>
+</resources>

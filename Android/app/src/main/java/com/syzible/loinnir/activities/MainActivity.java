@@ -143,7 +143,6 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     // get partner details and then open the chat fragment
-                    // TODO poll messages automatically on opening from partner
                     RestClient.post(this, Endpoints.GET_USER, chatPayload, new BaseJsonHttpResponseHandler<JSONObject>() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {

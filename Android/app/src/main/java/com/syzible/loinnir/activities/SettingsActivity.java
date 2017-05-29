@@ -1,139 +1,186 @@
 package com.syzible.loinnir.activities;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
+import android.view.ContextThemeWrapper;
+import android.widget.Toast;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
-import com.syzible.loinnir.utils.EmojiUtils;
+import com.syzible.loinnir.utils.DisplayUtils;
+import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by ed on 16/05/2017.
- */
+import cz.msebera.android.httpclient.Header;
 
 public class SettingsActivity extends PreferenceActivity {
 
+    private Activity context = SettingsActivity.this;
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new PreferenceFragment() {
-            @Override
-            public void onCreate(@Nullable Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                setTheme(R.style.DarkerAppTheme);
-                createSettings();
-            }
-        }).commit();
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
     }
 
-    private void createSettings() {
-        Context context = SettingsActivity.this;
-        PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(context);
+    private class SettingsFragment extends PreferenceFragment {
 
-        PreferenceCategory accountSettings, appSettings, blockedUsersSettings, aboutAppInfo;
+        Preference updateProfilePic, locationUpdateFrequency, shouldShareLocation;
+        Preference manageBlockedUsers, shareApp, aboutLoinnir, visitWebsite;
+        Preference appVersion, licences, privacyPolicy, termsOfService;
+        Preference logOut, cleanAccount, deleteAccount;
 
-        accountSettings = new PreferenceCategory(context);
-        accountSettings.setTitle("Socruithe Cúntais");
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.settings_preferences);
 
-        appSettings = new PreferenceCategory(context);
-        appSettings.setTitle("Socruithe na hAipe");
+            initialisePreferences();
 
-        blockedUsersSettings = new PreferenceCategory(context);
-        blockedUsersSettings.setTitle("Úsáideoirí ar Cosc");
+            setListenerLogOut();
+            setListenerCleanAccount();
+            setListenerDeleteAccount();
 
-        aboutAppInfo = new PreferenceCategory(context);
-        aboutAppInfo.setTitle("Faoin Aip");
-
-        preferenceScreen.addPreference(accountSettings);
-        preferenceScreen.addPreference(appSettings);
-        preferenceScreen.addPreference(blockedUsersSettings);
-        preferenceScreen.addPreference(aboutAppInfo);
-
-        // account settings
-        Preference profilePicture = new Preference(context);
-        profilePicture.setTitle("Nuashonraigh an Pictiúr Próifíle");
-        profilePicture.setSummary("Gheofar do phictiúr próifíle reatha ó Facebook");
-        accountSettings.addPreference(profilePicture);
-
-        Preference shareApp = new Preference(context);
-        shareApp.setTitle("Roinn Loinnir ar Léibheann Sóisialta");
-        shareApp.setSummary("Taispeáin do leantóirí nó chairde an chéad aip shóisialta don Ghaeilge " + EmojiUtils.getEmoji(EmojiUtils.COOL));
-        accountSettings.addPreference(shareApp);
-
-        Preference deleteAccount = new Preference(context);
-        deleteAccount.setTitle("Scrios do Cúntas Loinnir");
-        deleteAccount.setSummary("Rabhadh! Scriosfar na sonraí ar fad gan a bheith in ann aisdul.");
-        accountSettings.addPreference(deleteAccount);
-
-        // app settings
-        Preference notificationFrequency = new Preference(context);
-        notificationFrequency.setTitle("Minicíocht Fhograí");
-        notificationFrequency.setSummary("Sioncronú cumasaithe ar gach aon 15 nóiméad");
-        appSettings.addPreference(notificationFrequency);
-
-        Preference locationSettings = new SwitchPreference(context);
-        locationSettings.setTitle("Taispeáin do Cheantar");
-        locationSettings.setSummary("Muna bhfuil an rogha cumasaithe, ní bheidh tú in ann ceantair gharbha na n-úsáideoirí eile a fheiceáil");
-        appSettings.addPreference(locationSettings);
-
-        // blocked users
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("fb_id", LocalStorage.getID(context));
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
-        final Preference viewBlockedUsers = new Preference(context);
-        viewBlockedUsers.setTitle("Bainistigh Úsáideoirí");
-        RestClient.post(context, Endpoints.GET_BLOCKED_USERS, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
-            @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String rawJsonResponse, JSONArray response) {
-                viewBlockedUsers.setSummary(response.length() + " úsáideoir ar cosc faoi láthair");
+        private void initialisePreferences() {
+            updateProfilePic = findPreference("pref_update_profile_picture");
+            locationUpdateFrequency = findPreference("pref_location_update_frequency");
+            shouldShareLocation = findPreference("pref_should_share_location");
+            manageBlockedUsers = findPreference("pref_manage_blocked_users");
+            shareApp = findPreference("pref_share_app");
+            aboutLoinnir = findPreference("pref_about_loinnir");
+            visitWebsite = findPreference("pref_visit_website");
+            appVersion = findPreference("pref_app_version");
+            licences = findPreference("pref_licences");
+            privacyPolicy = findPreference("pref_privacy_policy");
+            termsOfService = findPreference("pref_tos");
+            logOut = findPreference("pref_log_out");
+            cleanAccount = findPreference("pref_clean_account");
+            deleteAccount = findPreference("pref_delete_account");
+        }
+
+        private void setListenerLogOut() {
+            final String accountName = LocalStorage.getPref(LocalStorage.Pref.name, context);
+            logOut.setSummary("Cúntas reatha: " + accountName);
+
+            logOut.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new AlertDialog.Builder(context)
+                            .setTitle("Logáil Amach?")
+                            .setMessage("Éireoidh tú logáilte amach de do chuid chúntais (" + accountName + "). Beidh tú in ann logáil isteach leis an gcúntas seo arís, nó le h-aon chúntas Facebook eile.")
+                            .setPositiveButton("Logáil Amach", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    DisplayUtils.generateToast(context, "Logáil tú amach");
+                                }
+                            })
+                            .setNegativeButton("Ná Logáil Amach", null)
+                            .create()
+                            .show();
+                    return false;
+                }
+            });
+        }
+
+        private void setListenerCleanAccount() {
+
+            // TODO set to matched count; need to make this endpoint lel
+            RestClient.post(context, Endpoints.GET_UNMATCHED_COUNT, JSONUtils.getIdPayload(context),
+                    new BaseJsonHttpResponseHandler<JSONObject>() {
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String rawJsonResponse, JSONObject response) {
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                }
+
+                @Override
+                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                    return new JSONObject(rawJsonData);
+                }
+            });
+
+            cleanAccount.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    return false;
+                }
+            });
+        }
+
+        private void setListenerDeleteAccount() {
+            deleteAccount.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.DangerAppTheme))
+                            .setTitle("Do Chúntas Loinnir a Scriosadh?")
+                            .setMessage("Tá brón orainn go dteastaíonn uait imeacht! Má ghlacann tú le do chúntas a scriosadh, bainfear do shonraí ar fad ónar bhfreastalaithe, agus ní bheidh tú in ann do chuid chúntais a rochtain gan cúntas eile a chruthú arís.")
+                            .setPositiveButton("Deimhnigh an Scriosadh", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    DisplayUtils.generateToast(context, "Scriosadh do chúntas");
+                                }
+                            })
+                            .setNegativeButton("Ná Scrios!", null)
+                            .create()
+                            .show();
+                    return false;
+                }
+            });
+        }
+
+
+        @Override
+        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+
+            switch (preference.getKey()) {
+                case "pref_update_profile_picture":
+                    break;
+                case "pref_location_update_frequency":
+                    break;
+                case "pref_should_share_location":
+                    break;
+                case "pref_manage_blocked_users":
+                    break;
+                case "pref_share_app":
+                    break;
+                case "pref_about_loinnir":
+                    break;
+                case "pref_visit_website":
+                    break;
+                case "pref_app_version":
+                    break;
+                case "pref_licences":
+                    break;
+                case "pref_privacy_policy":
+                    break;
+                case "pref_tos":
+                    break;
+                case "pref_log_out":
+                    break;
+                case "pref_delete_account":
+                    break;
             }
 
-            @Override
-            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
-
-            }
-
-            @Override
-            protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONArray(rawJsonData);
-            }
-        });
-        blockedUsersSettings.addPreference(viewBlockedUsers);
-
-        // about the app
-        Preference aboutLoinnir = new Preference(context);
-        aboutLoinnir.setTitle("Faoi Loinnir");
-        aboutLoinnir.setSummary("Níos mó eolais i dtaobh na h-aipe");
-        aboutAppInfo.addPreference(aboutLoinnir);
-
-        Preference visitWebsite = new Preference(context);
-        visitWebsite.setTitle("Tabhair Cuairt Dúinn!");
-        visitWebsite.setSummary("Téigh chuig Loinnir.ie as níos mó eolais");
-        aboutAppInfo.addPreference(visitWebsite);
-
-        Preference version = new Preference(context);
-        version.setTitle("Leagan Aipe");
-        version.setSummary(getResources().getString(R.string.app_version) + " " + EmojiUtils.getEmoji(EmojiUtils.HEART_EYES));
-        aboutAppInfo.addPreference(version);
-
-        setPreferenceScreen(preferenceScreen);
+            return super.onPreferenceTreeClick(preferenceScreen, preference);
+        }
     }
+
 }

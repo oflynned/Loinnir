@@ -1,9 +1,12 @@
 package com.syzible.loinnir.fragments.authentication;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,15 +46,39 @@ import cz.msebera.android.httpclient.Header;
  */
 
 public class LoginFrag extends Fragment {
-    private EditText usernameEditText, passwordEditText;
-    private View view;
 
-    CallbackManager callbackManager;
-    LoginButton facebookLoginButton;
+    private CallbackManager callbackManager;
+    private LoginButton facebookLoginButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // the user has to agree to terms and conditions of the use of the app first
+        if (!LocalStorage.getBooleanPref(LocalStorage.Pref.first_run, getActivity())) {
+            ContextThemeWrapper darkTheme = new ContextThemeWrapper(getActivity(), R.style.DarkerAppTheme);
+            new AlertDialog.Builder(darkTheme)
+                    .setTitle("Fan Soicind Led' Thoil")
+                    .setMessage("Sula dtosaíonn tú ag baint úsáide as seirbhísí Loinnir, an nglacann tú leis na coinníollacha a ghabhann le h-úsáid na h-aipe seo? " + EmojiUtils.getEmoji(EmojiUtils.HAPPY))
+                    .setPositiveButton("Glacaim leo", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            LocalStorage.setBooleanPref(LocalStorage.Pref.first_run, true, getActivity());
+                            DisplayUtils.generateSnackbar(getActivity(), "Is féidir tuilleadh a léamh faoi na coinníollacha seirbhíse sna socruithe " + EmojiUtils.getEmoji(EmojiUtils.COOL));
+                        }
+                    })
+                    .setNegativeButton("Ní ghlacaim leo", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            DisplayUtils.generateToast(getActivity(), "Ní féidir leat an aip seo a úsáid gan glacadh leis na coinníollacha úsáide");
+                            getActivity().finish();
+                        }
+                    })
+                    .setCancelable(false)
+                    .create()
+                    .show();
+        }
+
         callbackManager = CallbackManager.Factory.create();
     }
 
@@ -63,47 +90,23 @@ public class LoginFrag extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.login_frag, container, false);
-
-        Button loginBtn = (Button) view.findViewById(R.id.btn_login_login);
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().finish();
-                startActivity(new Intent(getActivity(), MainActivity.class));
-            }
-        });
-
-        TextView registerTextView = (TextView) view.findViewById(R.id.tv_login_register);
-        registerTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AuthenticationActivity.setFragment(getFragmentManager(), new RegisterFrag());
-            }
-        });
-
-        TextView resetTextView = (TextView) view.findViewById(R.id.tv_login_forgotten_details);
-        resetTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AuthenticationActivity.setFragment(getFragmentManager(), new ForgottenDetailsFrag());
-            }
-        });
-
+        View view = inflater.inflate(R.layout.login_frag, container, false);
         facebookLoginButton = (LoginButton) view.findViewById(R.id.login_fb_login_button);
         facebookLoginButton.setFragment(this);
         facebookLoginButton.setReadPermissions("public_profile");
+        registerFacebookCallback();
 
-        usernameEditText = (EditText) view.findViewById(R.id.et_login_email);
-        passwordEditText = (EditText) view.findViewById(R.id.et_login_password);
+        return view;
+    }
 
+    private void registerFacebookCallback() {
         facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 String accessToken = loginResult.getAccessToken().getToken();
                 FacebookUtils.saveToken(accessToken, getActivity());
 
-                final GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
+                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
                         new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(JSONObject o, GraphResponse response) {
@@ -152,37 +155,25 @@ public class LoginFrag extends Fragment {
                 parameters.putString("Fields", "id,first_name,last_name,email,gender");
                 request.setParameters(parameters);
                 request.executeAsync();
-
-                System.out.println("Login successful");
             }
 
             @Override
             public void onCancel() {
-                System.out.println("Login cancelled");
+                DisplayUtils.generateSnackbar(getActivity(), "Cuireadh an logáil isteach le Facebook ar ceal " + EmojiUtils.getEmoji(EmojiUtils.TONGUE));
             }
 
             @Override
             public void onError(FacebookException e) {
-                System.out.println("Login error");
+                DisplayUtils.generateSnackbar(getActivity(), "Thit earáid amach leis an logáil isteach " + EmojiUtils.getEmoji(EmojiUtils.SAD));
                 FacebookUtils.deleteToken(getActivity());
                 e.printStackTrace();
             }
         });
-
-        return view;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
-    public String getUsername() {
-        return usernameEditText.getText().toString();
-    }
-
-    public String getPassword() {
-        return passwordEditText.getText().toString();
     }
 }

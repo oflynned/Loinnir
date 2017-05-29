@@ -8,7 +8,7 @@ public class Endpoints {
     private static final int API_VERSION = 1;
     private static final String LOCAL_ENDPOINT = "http://10.0.2.2:3000";
     private static final String REMOTE_ENDPOINT = "http://13.94.249.94";
-    private static final String BASE_URL = LOCAL_ENDPOINT + "/api/v" + API_VERSION;
+    private static final String BASE_URL = REMOTE_ENDPOINT + "/api/v" + API_VERSION;
 
     public static final String CREATE_USER = "/users/create";
     public static final String EDIT_USER = "/users/edit";

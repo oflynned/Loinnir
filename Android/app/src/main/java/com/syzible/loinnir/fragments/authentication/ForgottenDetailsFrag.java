@@ -16,6 +16,7 @@ import com.syzible.loinnir.utils.DisplayUtils;
  * Created by ed on 08/05/2017.
  */
 
+// TODO unused
 public class ForgottenDetailsFrag extends Fragment {
     @Nullable
     @Override

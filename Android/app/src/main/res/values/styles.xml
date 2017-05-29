@@ -8,11 +8,13 @@
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
     </style>
 
-    <style name="DarkerAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <style name="DarkerAppTheme" parent="AppTheme">
         <item name="colorAccent">@color/green500</item>
-        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+    </style>
+
+
+    <style name="DangerAppTheme" parent="AppTheme">
+        <item name="colorAccent">@color/red500</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
