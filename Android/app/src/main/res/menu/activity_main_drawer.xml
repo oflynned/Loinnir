@@ -20,19 +20,6 @@
             android:title="Mo Cheantar" />
     </group>
 
-    <item android:title="Dev">
-        <menu>
-            <item
-                android:id="@+id/force_post"
-                android:icon="@mipmap/ic_launcher"
-                android:title="Force POST" />
-            <item
-                android:id="@+id/force_get"
-                android:icon="@mipmap/ic_launcher"
-                android:title="Generate Notification" />
-        </menu>
-    </item>
-
     <item android:title="Tuilleadh">
         <menu>
             <item

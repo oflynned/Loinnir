@@ -263,36 +263,6 @@ public class MainActivity extends AppCompatActivity
             FacebookUtils.deleteToken(this);
             finish();
             startActivity(new Intent(this, AuthenticationActivity.class));
-        } else if (id == R.id.force_post) {
-
-        }
-
-        // force generate a notification
-        else if (id == R.id.force_get) {
-
-            RestClient.post(this, Endpoints.GET_USER, JSONUtils.getIdPayload(this),
-                    new BaseJsonHttpResponseHandler<JSONObject>() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                            try {
-                                User user = new User(response);
-                                Message message = new Message("0", user, System.currentTimeMillis(), "Dia dhuit! Conas atá tú? " + EmojiUtils.getEmoji(EmojiUtils.HAPPY));
-                                NotificationUtils.generateMessageNotification(MainActivity.this, user, message);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-                        }
-
-                        @Override
-                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                            return new JSONObject(rawJsonData);
-                        }
-                    });
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

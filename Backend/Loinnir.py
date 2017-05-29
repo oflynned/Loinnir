@@ -235,7 +235,7 @@ def get_matched_user_count():
     partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))
     if len(partners_met) > 0:
         partners_met = partners_met[0]["partners"]
-        
+
     return get_json({"count": len(partners_met)})
 
 
@@ -564,7 +564,9 @@ def get_conversations_previews():
     fb_id = str(data["fb_id"])
 
     conversations_col = mongo.db.conversations
-    partners = list(conversations_col.find({"fb_id": fb_id}))[0]["partners"]
+    partners = list(conversations_col.find({"fb_id": fb_id}))
+    if len(partners) > 0:
+        partners = partners[0]["partners"]
     messages_preview = []
 
     for partner in partners:
