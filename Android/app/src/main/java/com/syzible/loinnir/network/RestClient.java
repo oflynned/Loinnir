@@ -25,7 +25,7 @@ public class RestClient {
     }
 
     public static void get(String url, AsyncHttpResponseHandler responseHandler) {
-        getClient().get(Endpoints.getAbsoluteURL(url), null, responseHandler);
+        getClient().get(Endpoints.getApiURL(url), null, responseHandler);
     }
 
     public static void getExternal(String url, AsyncHttpResponseHandler responseHandler) {
@@ -35,7 +35,7 @@ public class RestClient {
 
     public static void post(Context context, String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
         try {
-            getClient().post(context, Endpoints.getAbsoluteURL(url), new StringEntity(data.toString()), "application/json", responseHandler);
+            getClient().post(context, Endpoints.getApiURL(url), new StringEntity(data.toString()), "application/json", responseHandler);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -43,7 +43,7 @@ public class RestClient {
 
     public static void delete(Context context, String url, JSONObject data, AsyncHttpResponseHandler responseHandler) {
         try {
-            getClient().delete(context, Endpoints.getAbsoluteURL(url), new StringEntity(data.toString()), "application/json", responseHandler);
+            getClient().delete(context, Endpoints.getApiURL(url), new StringEntity(data.toString()), "application/json", responseHandler);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

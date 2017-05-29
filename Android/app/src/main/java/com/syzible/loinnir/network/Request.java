@@ -22,7 +22,7 @@ abstract class Request<T> extends AsyncTask<Object, Void, T> {
 
     Request(NetworkCallback<T> networkCallback, T payload, String url, String verb, boolean isExternal) {
         this.networkCallback = networkCallback;
-        this.url = isExternal ? url : Endpoints.getAbsoluteURL(url);
+        this.url = isExternal ? url : Endpoints.getApiURL(url);
         this.payload = payload;
         this.verb = verb;
     }

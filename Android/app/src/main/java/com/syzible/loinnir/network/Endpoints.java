@@ -1,5 +1,9 @@
 package com.syzible.loinnir.network;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+
 /**
  * Created by ed on 17/05/2017.
  */
@@ -8,7 +12,8 @@ public class Endpoints {
     private static final int API_VERSION = 1;
     private static final String LOCAL_ENDPOINT = "http://10.0.2.2:3000";
     private static final String REMOTE_ENDPOINT = "http://13.94.249.94";
-    private static final String BASE_URL = REMOTE_ENDPOINT + "/api/v" + API_VERSION;
+    private static final String STEM_URL = REMOTE_ENDPOINT;
+    private static final String API_URL = STEM_URL + "/api/v" + API_VERSION;
 
     public static final String CREATE_USER = "/users/create";
     public static final String EDIT_USER = "/users/edit";
@@ -25,6 +30,7 @@ public class Endpoints {
 
     public static final String GET_NEAREST_TOWN = "/services/get-nearest-town";
 
+    public static final String GET_MATCHED_COUNT = "/users/get-matched-count";
     public static final String GET_UNMATCHED_COUNT = "/users/get-unmatched-count";
     public static final String GET_BLOCKED_USERS = "/users/get-blocked-users";
     public static final String BLOCK_USER = "/users/block-user";
@@ -41,7 +47,19 @@ public class Endpoints {
     public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner";
     public static final String UNSUBSCRIBE_PARTNER = "/messages/unsubscribe-partner";
 
-    public static String getAbsoluteURL(String endpoint) {
-        return BASE_URL + endpoint;
+    public static final String LICENCES = "/licences";
+    public static final String PRIVACY_POLICIES = "/priobhaideacht";
+    public static final String TERMS_OF_SERVICE = "/tos";
+
+    public static String getApiURL(String endpoint) {
+        return API_URL + endpoint;
+    }
+    public static String getFrontendURL(String endpoint) {
+        return STEM_URL + endpoint;
+    }
+
+    public static void openLink(Context context, String url) {
+        Intent openLink = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        context.startActivity(openLink);
     }
 }

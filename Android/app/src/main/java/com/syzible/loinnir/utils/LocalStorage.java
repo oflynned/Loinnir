@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
 
 public class LocalStorage {
     public enum Pref {
-        id, fb_access_token, profile_pic, name, first_run
+        id, fb_access_token, profile_pic, name, first_run, should_share_location, location_update_frequency
     }
 
     public static boolean isLoggedIn(Context context) {

@@ -7,7 +7,7 @@
             android:title="Nuashonraigh an Pictiúr Próifíle" />
 
         <ListPreference
-            android:defaultValue="15"
+            android:defaultValue="15_mins"
             android:entries="@array/locationUpdateFrequencyHeadings"
             android:entryValues="@array/locationUpdateFrequencyValues"
             android:key="pref_location_update_frequency"
