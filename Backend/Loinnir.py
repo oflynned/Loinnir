@@ -86,6 +86,7 @@ def create_user():
     users_col = mongo.db.users
     data = request.json
     data["fb_id"] = str(data["fb_id"])
+    data["locality"] = get_locality(float(data["lat"]), float(data["lng"]))
     fb_id = data["fb_id"]
 
     users_found = users_col.find({"fb_id": str(fb_id)})
@@ -580,10 +581,16 @@ def get_conversations_previews():
         messages_from_me = messages_col.find(my_messages_query)
         messages_from_partner = messages_col.find(partner_messages_query)
 
-        if messages_from_me.count() > 0 and messages_from_partner == 0:
+        my_messages_count = messages_from_me.count()
+        partner_messages_count = messages_from_partner.count()
+
+        # remember that a connection is only made on sending a message
+        # both being 0 shouldn't be possible if they're partners
+
+        if my_messages_count > 0 and partner_messages_count == 0:
             # I sent messages but no replies were sent back
             last_message_in_chat = list(messages_from_me.sort("time", -1).limit(1))
-        elif messages_from_me == 0 and messages_from_partner > 0:
+        elif my_messages_count == 0 and partner_messages_count > 0:
             # partner sent me messages and I haven't replied
             last_message_in_chat = list(messages_from_partner.sort("time", -1).limit(1))
         else:

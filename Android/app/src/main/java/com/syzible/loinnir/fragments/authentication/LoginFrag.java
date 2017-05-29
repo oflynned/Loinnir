@@ -25,6 +25,7 @@ import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.AuthenticationActivity;
 import com.syzible.loinnir.activities.MainActivity;
+import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.services.TokenService;
@@ -122,6 +123,8 @@ public class LoginFrag extends Fragment {
                                     postData.put("fb_id", id);
                                     postData.put("name", URLEncoder.encode(name, "UTF-8"));
                                     postData.put("profile_pic", pic);
+                                    postData.put("lat", LocationClient.GOOSEBERRY_HILL.latitude);
+                                    postData.put("lng", LocationClient.GOOSEBERRY_HILL.longitude);
 
                                     LocalStorage.setPref(LocalStorage.Pref.id, id, getActivity());
                                     LocalStorage.setPref(LocalStorage.Pref.name, name, getActivity());

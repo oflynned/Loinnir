@@ -33,10 +33,6 @@ import mehdi.sakout.fancybuttons.FancyButton;
 
 public class RouletteOutcomeFrag extends Fragment {
 
-    private ImageView profilePictureImageView;
-    private TextView usernameTextView, countyTextView;
-    private FancyButton backToRouletteButton, startConversationButton;
-
     private User partner;
     private Bitmap profilePic;
 
@@ -46,11 +42,11 @@ public class RouletteOutcomeFrag extends Fragment {
         View view = inflater.inflate(R.layout.roulette_outcome_frag, container, false);
         getActivity().setTitle(getResources().getString(R.string.app_name));
 
-        profilePictureImageView = (ImageView) view.findViewById(R.id.roulette_partner_profile_pic);
-        usernameTextView = (TextView) view.findViewById(R.id.name_text_roulette);
-        countyTextView = (TextView) view.findViewById(R.id.county_text_roulette);
+        ImageView profilePictureImageView = (ImageView) view.findViewById(R.id.roulette_partner_profile_pic);
+        TextView usernameTextView = (TextView) view.findViewById(R.id.name_text_roulette);
+        TextView countyTextView = (TextView) view.findViewById(R.id.county_text_roulette);
 
-        backToRouletteButton = (FancyButton) view.findViewById(R.id.back_to_roulette_btn);
+        FancyButton backToRouletteButton = (FancyButton) view.findViewById(R.id.back_to_roulette_btn);
         backToRouletteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,7 +55,7 @@ public class RouletteOutcomeFrag extends Fragment {
             }
         });
 
-        startConversationButton = (FancyButton) view.findViewById(R.id.start_conversation_btn);
+        FancyButton startConversationButton = (FancyButton) view.findViewById(R.id.start_conversation_btn);
         startConversationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,18 +66,7 @@ public class RouletteOutcomeFrag extends Fragment {
             }
         });
 
-        new GetImage(new NetworkCallback<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap response) {
-                Bitmap croppedBitmap = BitmapUtils.getCroppedCircle(response);
-                profilePictureImageView.setImageBitmap(croppedBitmap);
-            }
-
-            @Override
-            public void onFailure() {
-
-            }
-        }, partner.getAvatar(), true).execute();
+        profilePictureImageView.setImageBitmap(BitmapUtils.getCroppedCircle(profilePic));
 
         usernameTextView.setText(partner.getName());
         countyTextView.setText(partner.getLocality());

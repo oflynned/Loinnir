@@ -37,7 +37,6 @@ import cz.msebera.android.httpclient.Header;
 
 public class RouletteLoadingFrag extends Fragment {
 
-    private ImageView rouletteButton;
     private User partner;
 
     @Nullable
@@ -46,7 +45,7 @@ public class RouletteLoadingFrag extends Fragment {
         View view = inflater.inflate(R.layout.roulette_loading_frag, container, false);
         getActivity().setTitle(getResources().getString(R.string.app_name));
 
-        rouletteButton = (ImageView) view.findViewById(R.id.roulette_spinner_button);
+        ImageView rouletteButton = (ImageView) view.findViewById(R.id.roulette_spinner_button);
 
         rouletteButton.clearAnimation();
         rouletteButton.animate().rotation(360).start();
@@ -54,13 +53,16 @@ public class RouletteLoadingFrag extends Fragment {
         new GetImage(new NetworkCallback<Bitmap>() {
             @Override
             public void onResponse(final Bitmap response) {
+                final RouletteOutcomeFrag matchFrag = new RouletteOutcomeFrag()
+                        .setPartner(partner)
+                        .setBitmap(response);
+
+                System.out.println(partner.getAvatar());
+
                 // show loading screen for at least one second
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        RouletteOutcomeFrag matchFrag = new RouletteOutcomeFrag()
-                                .setPartner(partner)
-                                .setBitmap(response);
                         MainActivity.removeFragment(getFragmentManager());
                         MainActivity.setFragment(getFragmentManager(), matchFrag);
                     }
