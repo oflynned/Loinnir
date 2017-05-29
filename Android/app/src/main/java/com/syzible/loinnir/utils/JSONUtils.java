@@ -24,6 +24,18 @@ public class JSONUtils {
         return o;
     }
 
+    public static JSONObject getLocationChangePayload(Context context, boolean showLocation) {
+        JSONObject o = new JSONObject();
+        try {
+            o.put("fb_id", LocalStorage.getID(context));
+            o.put("show_location", showLocation);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return o;
+    }
+
     public static JSONObject getPartnerInteractionPayload(User partner, Context context) {
         JSONObject o = new JSONObject();
         try {

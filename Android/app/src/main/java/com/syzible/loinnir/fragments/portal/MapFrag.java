@@ -132,7 +132,9 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         }
 
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
-        getWebServerLocation(this.googleMap);
+
+        if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity()))
+            getWebServerLocation(this.googleMap);
     }
 
     private void getWebServerLocation(final GoogleMap googleMap) {

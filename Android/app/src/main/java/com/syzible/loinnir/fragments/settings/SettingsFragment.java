@@ -24,6 +24,8 @@ import com.syzible.loinnir.utils.LocalStorage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import cz.msebera.android.httpclient.Header;
+
 /**
  * Created by ed on 29/05/2017.
  */
@@ -90,6 +92,23 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 shouldShareLocation.setChecked(!LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity()));
                 LocalStorage.setBooleanPref(LocalStorage.Pref.should_share_location, (Boolean) newValue, context);
+
+                RestClient.post(context, Endpoints.EDIT_USER, JSONUtils.getLocationChangePayload(context, (Boolean) newValue), new BaseJsonHttpResponseHandler<JSONObject>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                        DisplayUtils.generateSnackbar(context, "Nuashonraíodh an socrú ceantair go rathúil");
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                        DisplayUtils.generateSnackbar(context, "Thit earáid amach leis an an socrú ceantair a athrú (" + errorResponse + ")");
+                    }
+
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONObject(rawJsonData);
+                    }
+                });
                 return false;
             }
         });
@@ -144,6 +163,7 @@ public class SettingsFragment extends PreferenceFragment {
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubText);
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareBodyText);
                 startActivity(Intent.createChooser(shareIntent, "Roinn le"));
+
 
                 return false;
             }

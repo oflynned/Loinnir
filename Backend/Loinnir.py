@@ -149,7 +149,7 @@ def get_all_users():
 def get_other_users():
     data = request.json
     fb_id = str(data["fb_id"])
-    return get_json(mongo.db.users.find({"fb_id": {"$ne": fb_id}}))
+    return get_json(mongo.db.users.find({"fb_id": {"$ne": fb_id}, "show_location": True}))
 
 
 # POST {fb_id:123456789}
@@ -403,7 +403,6 @@ def get_all_messages():
     return get_json(messages)
 
 
-# TODO order by time
 # get all messages residing within the locality for the user's record provided
 # POST {fb_id: ...}
 # GET [{...},{...}]

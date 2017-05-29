@@ -125,6 +125,7 @@ public class LoginFrag extends Fragment {
                                     postData.put("profile_pic", pic);
                                     postData.put("lat", LocationClient.GOOSEBERRY_HILL.latitude);
                                     postData.put("lng", LocationClient.GOOSEBERRY_HILL.longitude);
+                                    postData.put("show_location", true);
 
                                     LocalStorage.setPref(LocalStorage.Pref.id, id, getActivity());
                                     LocalStorage.setPref(LocalStorage.Pref.name, name, getActivity());

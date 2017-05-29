@@ -10,8 +10,6 @@ import com.syzible.loinnir.fragments.settings.SettingsFragment;
 
 public class SettingsActivity extends PreferenceActivity {
 
-    private Activity context = SettingsActivity.this;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,10 +21,6 @@ public class SettingsActivity extends PreferenceActivity {
                 .replace(android.R.id.content, fragment)
                 .addToBackStack(fragment.getClass().getName())
                 .commit();
-    }
-
-    public static void removeFragment(FragmentManager fragmentManager) {
-        fragmentManager.popBackStack();
     }
 
 }
