@@ -573,8 +573,6 @@ def get_conversations_previews():
     for partner in partners:
         # check if only one message exists in the conversation
         messages_col = mongo.db.partner_conversations
-        # query = {"or": [{"$and": [{"from_id": {"$in": [fb_id]}}, {"to_id": {"$in": [partner]}}]},
-        # {"$and": [{"from_id": {"$in": [partner]}}, {"to_id": {"$in": [fb_id]}}]}]}
         my_messages_query = {"$and": [{"from_id": {"$in": [fb_id]}}, {"to_id": {"$in": [partner]}}]}
         partner_messages_query = {"$and": [{"from_id": {"$in": [partner]}}, {"to_id": {"$in": [fb_id]}}]}
 
@@ -589,10 +587,10 @@ def get_conversations_previews():
 
         if my_messages_count > 0 and partner_messages_count == 0:
             # I sent messages but no replies were sent back
-            last_message_in_chat = list(messages_from_me.sort("time", -1).limit(1))
+            last_message_in_chat = list(messages_from_me.sort("time", -1).limit(1))[0]
         elif my_messages_count == 0 and partner_messages_count > 0:
             # partner sent me messages and I haven't replied
-            last_message_in_chat = list(messages_from_partner.sort("time", -1).limit(1))
+            last_message_in_chat = list(messages_from_partner.sort("time", -1).limit(1))[0]
         else:
             # both parties have communicated with each other
             query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}

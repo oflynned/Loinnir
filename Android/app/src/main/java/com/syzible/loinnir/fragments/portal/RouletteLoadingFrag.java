@@ -52,12 +52,10 @@ public class RouletteLoadingFrag extends Fragment {
 
         new GetImage(new NetworkCallback<Bitmap>() {
             @Override
-            public void onResponse(final Bitmap response) {
+            public void onResponse(Bitmap response) {
                 final RouletteOutcomeFrag matchFrag = new RouletteOutcomeFrag()
                         .setPartner(partner)
                         .setBitmap(response);
-
-                System.out.println(partner.getAvatar());
 
                 // show loading screen for at least one second
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
