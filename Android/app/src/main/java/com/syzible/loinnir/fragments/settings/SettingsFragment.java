@@ -85,6 +85,15 @@ public class SettingsFragment extends PreferenceFragment {
     private void setListenerShareLocation() {
         boolean isSharingLocation = LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, context);
         shouldShareLocation.setChecked(isSharingLocation);
+        shouldShareLocation.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                System.out.println(newValue);
+                shouldShareLocation.setChecked(!LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity()));
+                LocalStorage.setBooleanPref(LocalStorage.Pref.should_share_location, (Boolean) newValue, context);
+                return false;
+            }
+        });
     }
 
     // TODO make custom list fragment to list users and action to unblock
@@ -96,6 +105,13 @@ public class SettingsFragment extends PreferenceFragment {
                     int count = response.getInt("count");
                     String summary = "Tá " + count + " úsáideoir ann a bhfuil cosc curtha orthu";
                     manageBlockedUsers.setSummary(summary);
+                    manageBlockedUsers.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            SettingsActivity.setFragmentBackstack(getFragmentManager(), new BlockedUsersFragment());
+                            return false;
+                        }
+                    });
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
