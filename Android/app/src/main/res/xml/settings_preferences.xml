@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="Socruithe Cúntais">
-        <Preference
-            android:key="pref_update_profile_picture"
-            android:summary="Bainfear úsáid as do phictiúr próifíle reatha ar Facebook"
-            android:title="Nuashonraigh an Pictiúr Próifíle" />
-
-        <ListPreference
-            android:defaultValue="15_mins"
-            android:entries="@array/locationUpdateFrequencyHeadings"
-            android:entryValues="@array/locationUpdateFrequencyValues"
-            android:key="pref_location_update_frequency"
-            android:summary="Sioncronú cumasaithe ar gach aon 15 nóiméad"
-            android:title="Minicíocht Nuashonrú do Cheantair" />
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="pref_should_share_location"
-            android:summary="Mura bhfuil an rogha cumasaithe, ní bheidh tú in ann ceantair gharbha na n-úsáideoirí eile a fheiceáil, agus cuirfear do cheantar faoi cheilt."
+            android:summary="Beidh tú in ann ceantair gharbha na n-úsáideoirí eile a fheiceáil, ach roinnfear do cheantar garbh ar an léarscáil phoiblí"
             android:title="Taispeáin do Cheantar" />
 
         <Preference
             android:key="pref_manage_blocked_users"
-            android:summary="... úsáideoir ar cosc faoi láthair"
             android:title="Bainistigh Úsáideoirí ar Cosc" />
 
     </PreferenceCategory>
