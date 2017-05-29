@@ -56,6 +56,9 @@ public class LoginFrag extends Fragment {
 
         // the user has to agree to terms and conditions of the use of the app first
         if (!LocalStorage.getBooleanPref(LocalStorage.Pref.first_run, getActivity())) {
+            // default to on, has to be set at some point, may as well be here instead of overriding on each start
+            LocalStorage.setBooleanPref(LocalStorage.Pref.should_share_location, true, getActivity());
+
             ContextThemeWrapper darkTheme = new ContextThemeWrapper(getActivity(), R.style.DarkerAppTheme);
             new AlertDialog.Builder(darkTheme)
                     .setTitle("Fan Soicind Led' Thoil")

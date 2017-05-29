@@ -88,7 +88,6 @@ public class SettingsFragment extends PreferenceFragment {
         shouldShareLocation.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                System.out.println(newValue);
                 shouldShareLocation.setChecked(!LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity()));
                 LocalStorage.setBooleanPref(LocalStorage.Pref.should_share_location, (Boolean) newValue, context);
                 return false;
@@ -98,20 +97,24 @@ public class SettingsFragment extends PreferenceFragment {
 
     // TODO make custom list fragment to list users and action to unblock
     private void setListenerBlockedUsers() {
+        final BlockedUsersFragment fragment = new BlockedUsersFragment();
+
+        manageBlockedUsers.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                SettingsActivity.setFragmentBackstack(getFragmentManager(), new BlockedUsersFragment());
+                return false;
+            }
+        });
+
         RestClient.post(context, Endpoints.GET_BLOCKED_USERS, JSONUtils.getIdPayload(context), new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String rawJsonResponse, JSONObject response) {
                 try {
                     int count = response.getInt("count");
+                    fragment.setCount(count);
                     String summary = "Tá " + count + " úsáideoir ann a bhfuil cosc curtha orthu";
                     manageBlockedUsers.setSummary(summary);
-                    manageBlockedUsers.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                        @Override
-                        public boolean onPreferenceClick(Preference preference) {
-                            SettingsActivity.setFragmentBackstack(getFragmentManager(), new BlockedUsersFragment());
-                            return false;
-                        }
-                    });
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -120,6 +123,7 @@ public class SettingsFragment extends PreferenceFragment {
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
                 manageBlockedUsers.setSummary("Úsáideoir ar bith ar a bhfuil cosc curtha air/uirthi");
+                fragment.setCount(0);
             }
 
             @Override
