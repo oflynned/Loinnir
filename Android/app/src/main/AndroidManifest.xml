@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <uses-feature android:name="android.hardware.location.gps" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -34,7 +36,15 @@
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:orientation="vertical"
-            android:theme="@style/DarkerAppTheme.NoActionBar" />
+            android:theme="@style/DarkerAppTheme.NoActionBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
 
         <activity
             android:name=".activities.SplashActivity"
@@ -48,13 +58,6 @@
             android:name=".activities.SettingsActivity"
             android:theme="@style/DarkerAppTheme"
             android:label="Socruithe">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
         </activity>
 
         <activity

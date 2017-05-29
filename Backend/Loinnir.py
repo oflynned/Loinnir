@@ -217,7 +217,10 @@ def get_unmatched_user_count():
     data = request.json
     fb_id = str(data["fb_id"])
     users_col = mongo.db.users
-    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]["partners"]
+    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))
+    if len(partners_met) > 0:
+        partners_met = partners_met[0]["partners"]
+
     partners_met.append(fb_id)
     users = users_col.find({"fb_id": {"$nin": partners_met}})
     return get_json({"count": users.count()})
@@ -229,7 +232,10 @@ def get_unmatched_user_count():
 def get_matched_user_count():
     data = request.json
     fb_id = str(data["fb_id"])
-    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]["partners"]
+    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))
+    if len(partners_met) > 0:
+        partners_met = partners_met[0]["partners"]
+        
     return get_json({"count": len(partners_met)})
 
 

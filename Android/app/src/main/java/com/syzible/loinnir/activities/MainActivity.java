@@ -1,13 +1,17 @@
 package com.syzible.loinnir.activities;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -66,6 +70,12 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        /*
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, Manifest.permission.ACCESS_FINE_LOCATION);
+        }*/
+
         alarmReceiver.setAlarm(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -77,59 +87,21 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
-
-        String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
-        name = name.split(" ")[0];
-        DisplayUtils.generateSnackbar(this,
-                "Fáilte romhat, a " + LanguageUtils.getVocative(name) + "! " +
-                        EmojiUtils.getEmoji(EmojiUtils.HAPPY));
-
-        // set up nav bar header for personalisation
         headerView = navigationView.getHeaderView(0);
 
-        TextView userName = (TextView) headerView.findViewById(R.id.nav_header_name);
-        userName.setText(LocalStorage.getPref(LocalStorage.Pref.name, this));
+        greetUser();
+        setUpDrawer();
+        checkNotificationInvocation();
+    }
 
-        RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this), new BaseJsonHttpResponseHandler<JSONObject>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                try {
-                    TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
-                    String locality = response.getString("locality");
-                    localityName.setText(locality);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+    private void greetUser() {
+        String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
+        name = name.split(" ")[0];
+        DisplayUtils.generateSnackbar(this, "Fáilte romhat, a " + LanguageUtils.getVocative(name) + "! " +
+                        EmojiUtils.getEmoji(EmojiUtils.HAPPY));
+    }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-            }
-
-            @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
-            }
-        });
-
-        final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
-        String picUrl = LocalStorage.getPref(LocalStorage.Pref.profile_pic, this);
-
-        new GetImage(new NetworkCallback<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap pic) {
-                Bitmap croppedPic = BitmapUtils.getCroppedCircle(pic);
-                profilePic.setImageBitmap(croppedPic);
-            }
-
-            @Override
-            public void onFailure() {
-
-            }
-        }, picUrl, true).execute();
-
-        // check for invocation by notification
+    private void checkNotificationInvocation() {
         String invocationType = getIntent().getStringExtra("invoker");
         if (invocationType != null) {
             switch (invocationType) {
@@ -171,6 +143,50 @@ public class MainActivity extends AppCompatActivity
         } else {
             setFragment(getFragmentManager(), new MapFrag());
         }
+    }
+
+    private void setUpDrawer() {
+        TextView userName = (TextView) headerView.findViewById(R.id.nav_header_name);
+        userName.setText(LocalStorage.getPref(LocalStorage.Pref.name, this));
+
+        RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this), new BaseJsonHttpResponseHandler<JSONObject>() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                try {
+                    TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
+                    String locality = response.getString("locality");
+                    localityName.setText(locality);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return new JSONObject(rawJsonData);
+            }
+        });
+
+        final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
+        String picUrl = LocalStorage.getPref(LocalStorage.Pref.profile_pic, this);
+
+        new GetImage(new NetworkCallback<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap pic) {
+                Bitmap croppedPic = BitmapUtils.getCroppedCircle(pic);
+                profilePic.setImageBitmap(croppedPic);
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        }, picUrl, true).execute();
     }
 
     @Override
