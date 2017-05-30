@@ -8,7 +8,9 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp">
 
         <ImageView
             android:id="@+id/about_app_logo"
@@ -26,14 +28,26 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
             android:gravity="center_horizontal"
-            android:text="Comhrá ar bith! Cruthaigh nasc le duine nua leis an rúiléid."
+            android:text="Comhrá ar bith!"
+            android:textSize="18sp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/lack_of_conversations_subtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lack_of_conversations"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:gravity="center_horizontal"
+            android:text="Cruthaigh nasc le duine nua leis an rúiléid."
             android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/no_conversations_users_emoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lack_of_conversations"
+            android:layout_below="@+id/lack_of_conversations_subtext"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
             android:gravity="center_horizontal"

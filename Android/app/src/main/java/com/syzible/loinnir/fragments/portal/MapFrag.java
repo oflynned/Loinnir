@@ -221,27 +221,27 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         googleMap.clear();
 
         if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity())) {
-            getWebServerLocation();
+            //getWebServerLocation();
+            
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+            }
+
+            if (Constants.DEV_MODE)
+                googleMap.setMyLocationEnabled(true);
+
+            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+            if (myLocation == null) {
+                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+            } else {
+                handleNewLocation(myLocation);
+            }
         } else {
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-        }
-
-        if (Constants.DEV_MODE)
-            googleMap.setMyLocationEnabled(true);
-        
-        Location myLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-
-        if (myLocation == null) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-        } else {
-            handleNewLocation(myLocation);
         }
     }
 
@@ -255,21 +255,21 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         RestClient.post(getActivity(), Endpoints.UPDATE_USER_LOCATION,
                 JSONUtils.getLocationUpdatePayload(getActivity(), latLng),
                 new BaseJsonHttpResponseHandler<JSONObject>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
 
-            }
+                    }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
 
-            }
+                    }
 
-            @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
-            }
-        });
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONObject(rawJsonData);
+                    }
+                });
 
         googleMap.clear();
         addUserCircle(latLng, true);
