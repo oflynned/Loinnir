@@ -103,8 +103,7 @@
         </receiver>
 
         <receiver android:name=".services.AlarmReceiver" />
-
-        <service android:name=".services.UpdateLocationService" />
+        <service android:name=".services.LocationService" />
 
     </application>
 

@@ -621,6 +621,11 @@ def generate_notification():
     data = request.json
 
 
+@app.route("/api/v1/services/notify-chat-update", methods=["POST"])
+def notify_chat_update():
+    pass
+
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         env = sys.argv[1]

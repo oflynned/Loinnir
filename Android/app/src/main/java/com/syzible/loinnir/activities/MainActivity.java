@@ -36,6 +36,7 @@ import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.AlarmReceiver;
+import com.syzible.loinnir.services.LocationService;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
@@ -62,13 +63,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, Manifest.permission.ACCESS_FINE_LOCATION);
-        }*/
-
-        alarmReceiver.setAlarm(this);
+        alarmReceiver.cancelAlarm(this);
+        startService(new Intent(this, LocationService.class));
         registerBroadcastReceiver();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

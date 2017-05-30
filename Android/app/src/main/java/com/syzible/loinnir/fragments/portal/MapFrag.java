@@ -2,7 +2,10 @@ package com.syzible.loinnir.fragments.portal;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -58,49 +61,35 @@ import cz.msebera.android.httpclient.Header;
  * Created by ed on 07/05/2017.
  */
 
-public class MapFrag extends Fragment implements OnMapReadyCallback, LocationListener,
-        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class MapFrag extends Fragment implements OnMapReadyCallback, LocationListener {
     private GoogleMap googleMap;
-    private GoogleApiClient googleApiClient;
-
     private int GREEN_500;
-
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-    private LocationRequest locationRequest;
-
-    ArrayList<User> nearbyUsers = new ArrayList<>();
+    private ArrayList<User> nearbyUsers = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        googleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-
-        locationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)
-                .setFastestInterval(1000);
+        registerBroadcastReceiver();
 
         GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
-
         getActivity().setTitle(getResources().getString(R.string.app_name));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        googleApiClient.connect();
+
+        setMapPosition();
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (googleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-            googleApiClient.disconnect();
+    private void setMapPosition() {
+        if (googleMap != null) {
+            if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity())) {
+                getWebServerLocation();
+            } else {
+                googleMap.clear();
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
+            }
         }
     }
 
@@ -116,11 +105,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
@@ -131,6 +115,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     }
 
     private void getWebServerLocation() {
+        googleMap.clear();
+
         RestClient.post(getActivity(), Endpoints.GET_OTHER_USERS, JSONUtils.getIdPayload(getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
@@ -164,7 +150,9 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         try {
                             User me = new User(response);
-                            //addUserCircle(new LatLng(me.getLatitude(), me.getLongitude()), true);
+                            LatLng location = new LatLng(me.getLatitude(), me.getLongitude());
+                            addUserCircle(location, true);
+                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, LocationClient.MY_LOCATION_ZOOM));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -216,33 +204,15 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         }
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        googleMap.clear();
-
-        if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity())) {
-            //getWebServerLocation();
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                        ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
+    private void registerBroadcastReceiver() {
+        getActivity().registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("updated_location")) {
+                    getWebServerLocation();
                 }
             }
-
-            if (Constants.DEV_MODE)
-                googleMap.setMyLocationEnabled(true);
-
-            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-
-            if (myLocation == null) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-            } else {
-                handleNewLocation(myLocation);
-            }
-        } else {
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
-        }
+        }, new IntentFilter("updated_location"));
     }
 
     private void handleNewLocation(Location location) {
@@ -276,25 +246,5 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
 
         for (User user : nearbyUsers)
             addUserCircle(user.getLocation(), false);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        System.out.println("Location services suspended");
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        System.out.println("Location services failed");
-
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(getActivity(), CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println(connectionResult.getErrorMessage());
-        }
     }
 }
