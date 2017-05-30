@@ -1,13 +1,17 @@
 package com.syzible.loinnir.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -80,6 +84,7 @@ public class MainActivity extends AppCompatActivity
         }*/
 
         alarmReceiver.setAlarm(this);
+        registerBroadcastReceiver();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -97,11 +102,22 @@ public class MainActivity extends AppCompatActivity
         checkNotificationInvocation();
     }
 
+    private void registerBroadcastReceiver() {
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("finish_main_activity")) {
+                    finish();
+                }
+            }
+        }, new IntentFilter("finish_main_activity"));
+    }
+
     private void greetUser() {
         String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
         name = name.split(" ")[0];
         DisplayUtils.generateSnackbar(this, "Fáilte romhat, a " + LanguageUtils.getVocative(name) + "! " +
-                        EmojiUtils.getEmoji(EmojiUtils.HAPPY));
+                EmojiUtils.getEmoji(EmojiUtils.HAPPY));
     }
 
     private void checkNotificationInvocation() {
@@ -281,11 +297,25 @@ public class MainActivity extends AppCompatActivity
             clearBackstack(getFragmentManager());
             setFragment(getFragmentManager(), new LocalityConversationFrag());
         } else if (id == R.id.nav_rate) {
+            Intent intent;
 
-        } else if (id == R.id.nav_log_out) {
-            FacebookUtils.deleteToken(this);
-            finish();
-            startActivity(new Intent(this, AuthenticationActivity.class));
+            try {
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
+            } catch (android.content.ActivityNotFoundException e) {
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+            }
+            startActivity(intent);
+
+        } else if (id == R.id.nav_more_apps) {
+            Intent intent;
+
+            try {
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pub:Syzible"));
+            } catch (android.content.ActivityNotFoundException e) {
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/search?q:Syzible"));
+            }
+
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

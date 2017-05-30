@@ -14,10 +14,13 @@ import android.view.ContextThemeWrapper;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.activities.AuthenticationActivity;
+import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.activities.SettingsActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.DisplayUtils;
+import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
@@ -267,6 +270,11 @@ public class SettingsFragment extends PreferenceFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 DisplayUtils.generateToast(context, "Logáil tú amach");
+
+                                FacebookUtils.deleteToken(context);
+                                getActivity().sendBroadcast(new Intent("finish_main_activity"));
+                                getActivity().finish();
+                                startActivity(new Intent(context, AuthenticationActivity.class));
                             }
                         })
                         .setNegativeButton("Ná Logáil Amach", null)
