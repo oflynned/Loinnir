@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.zip.Inflater;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -50,58 +51,54 @@ public class ConversationsListFrag extends Fragment implements
     private ArrayList<Conversation> conversations = new ArrayList<>();
     private DialogsListAdapter<Conversation> dialogsListAdapter;
     private DialogsList dialogsList;
+    private JSONArray response;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.conversations_list_frag, container, false);
-
-        dialogsList = (DialogsList) view.findViewById(R.id.conversations_list);
-        dialogsListAdapter = new DialogsListAdapter<>(loadImage());
-
+    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
+        View view;
         getActivity().setTitle(getResources().getString(R.string.app_name));
-        loadMessages();
+
+        if (response.length() > 0) {
+            view = inflater.inflate(R.layout.conversations_list_frag, container, false);
+
+            dialogsList = (DialogsList) view.findViewById(R.id.conversations_list);
+            dialogsListAdapter = new DialogsListAdapter<>(loadImage());
+
+            loadMessages(response);
+        } else {
+            view = inflater.inflate(R.layout.no_past_conversations_fragment, container, false);
+        }
 
         return view;
     }
 
-    private void loadMessages() {
+    public ConversationsListFrag setResponse(JSONArray response) {
+        this.response = response;
+        return this;
+    }
+
+    private void loadMessages(JSONArray response) {
         conversations.clear();
-        RestClient.post(getActivity(), Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
-                JSONUtils.getIdPayload(getActivity()),
-                new BaseJsonHttpResponseHandler<JSONArray>() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject o = response.getJSONObject(i);
-                                User sender = new User(o.getJSONObject("user"));
-                                Message message = new Message(sender, o.getJSONObject("message"));
-                                Conversation conversation = new Conversation(sender, message);
+        for (int i = 0; i < response.length(); i++) {
+            try {
+                JSONObject o = response.getJSONObject(i);
+                User sender = new User(o.getJSONObject("user"));
+                Message message = new Message(sender, o.getJSONObject("message"));
+                Conversation conversation = new Conversation(sender, message);
 
-                                conversations.add(conversation);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                conversations.add(conversation);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
-                        dialogsListAdapter.addItems(conversations);
-                        dialogsListAdapter.setOnDialogClickListener(ConversationsListFrag.this);
-                        dialogsListAdapter.setOnDialogLongClickListener(ConversationsListFrag.this);
-                        dialogsList.setAdapter(dialogsListAdapter);
-                    }
+        dialogsListAdapter.setItems(conversations);
+        dialogsListAdapter.setOnDialogClickListener(ConversationsListFrag.this);
+        dialogsListAdapter.setOnDialogLongClickListener(ConversationsListFrag.this);
+        dialogsList.setAdapter(dialogsListAdapter);
 
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
 
-                    }
-
-                    @Override
-                    protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                        return new JSONArray(rawJsonData);
-                    }
-                }
-        );
     }
 
     @Override
@@ -123,33 +120,39 @@ public class ConversationsListFrag extends Fragment implements
                         "Má athraíonn tú do mheabhair ar ball, téigh chuig na socruithe agus bainistigh cé atá curtha ar cosc.")
                 .setPositiveButton("Cur cosc i bhfeidhm", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(DialogInterface dialog, final int which) {
                         final User userBlockee = (User) conversation.getUsers().get(0);
 
                         RestClient.post(getActivity(), Endpoints.BLOCK_USER,
                                 JSONUtils.getPartnerInteractionPayload(userBlockee, getActivity()),
                                 new BaseJsonHttpResponseHandler<JSONObject>() {
-                            @Override
-                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                                DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc ar " + LanguageUtils.lenite(blockee) + ".");
-                                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                                     @Override
-                                    public void run() {
-                                        loadMessages();
+                                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                        DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc ar " + LanguageUtils.lenite(blockee) + ".");
+
+                                        conversations.remove(which + 1);
+
+                                        if (conversations.size() > 0) {
+                                            dialogsListAdapter.setItems(conversations);
+                                            dialogsListAdapter.setOnDialogClickListener(ConversationsListFrag.this);
+                                            dialogsListAdapter.setOnDialogLongClickListener(ConversationsListFrag.this);
+                                            dialogsList.setAdapter(dialogsListAdapter);
+                                        } else {
+                                            MainActivity.removeFragment(getFragmentManager());
+                                            MainActivity.setFragment(getFragmentManager(), new NoConversationFrag());
+                                        }
                                     }
-                                }, 1000);
-                            }
 
-                            @Override
-                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
 
-                            }
+                                    }
 
-                            @Override
-                            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                return new JSONObject(rawJsonData);
-                            }
-                        });
+                                    @Override
+                                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                        return new JSONObject(rawJsonData);
+                                    }
+                                });
                     }
                 })
                 .setNegativeButton("Ná cur", null)

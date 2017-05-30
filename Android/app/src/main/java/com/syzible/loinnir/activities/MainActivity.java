@@ -19,6 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
+import com.stfalcon.chatkit.dialogs.DialogsList;
+import com.stfalcon.chatkit.dialogs.DialogsListAdapter;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.LocalityConversationFrag;
 import com.syzible.loinnir.fragments.portal.ConversationsListFrag;
@@ -250,7 +253,27 @@ public class MainActivity extends AppCompatActivity
             setFragment(getFragmentManager(), new MapFrag());
         } else if (id == R.id.nav_conversations) {
             clearBackstack(getFragmentManager());
-            setFragment(getFragmentManager(), new ConversationsListFrag());
+
+            RestClient.post(this, Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
+                    JSONUtils.getIdPayload(this),
+                    new BaseJsonHttpResponseHandler<JSONArray>() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                            setFragment(getFragmentManager(), new ConversationsListFrag().setResponse(response));
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+
+                        }
+
+                        @Override
+                        protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                            return new JSONArray(rawJsonData);
+                        }
+                    }
+            );
+
         } else if (id == R.id.nav_roulette) {
             clearBackstack(getFragmentManager());
             setFragment(getFragmentManager(), new RouletteFrag());
