@@ -50,6 +50,16 @@ public class SettingsFragment extends PreferenceFragment {
         context = getActivity();
 
         initialisePreferences();
+        initialisePreferenceValues();
+    }
+
+    @Override
+    public void onResume() {
+        initialisePreferenceValues();
+        super.onResume();
+    }
+
+    private void initialisePreferenceValues() {
 
         // account settings
         setListenerShareLocation();
@@ -69,7 +79,6 @@ public class SettingsFragment extends PreferenceFragment {
         setListenerLogOut();
         setListenerCleanAccount();
         setListenerDeleteAccount();
-
     }
 
     private void initialisePreferences() {
@@ -127,10 +136,10 @@ public class SettingsFragment extends PreferenceFragment {
                 RestClient.post(context, Endpoints.GET_BLOCKED_USERS, JSONUtils.getIdPayload(context), new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
                     public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String rawJsonResponse, JSONArray response) {
-                        fragment.setCount(response.length());
+                        int count = response.length();
 
                         ArrayList<String> blockedUsers = new ArrayList<>();
-                        for (int i=0; i<response.length(); i++) {
+                        for (int i=0; i<count; i++) {
                             try {
                                 blockedUsers.add(response.getString(i));
                             } catch (JSONException e) {
@@ -138,8 +147,8 @@ public class SettingsFragment extends PreferenceFragment {
                             }
                         }
 
-                        fragment.setBlockedUsers(blockedUsers);
-                        SettingsActivity.setFragmentBackstack(getFragmentManager(), fragment);
+                        SettingsActivity.setFragmentBackstack(getFragmentManager(),
+                                fragment.setCount(count).setBlockedUsers(blockedUsers));
                     }
 
                     @Override
@@ -188,7 +197,6 @@ public class SettingsFragment extends PreferenceFragment {
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubText);
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareBodyText);
                 startActivity(Intent.createChooser(shareIntent, "Roinn le"));
-
 
                 return false;
             }

@@ -23,4 +23,8 @@ public class SettingsActivity extends PreferenceActivity {
                 .commit();
     }
 
+    public static void removeFragment(FragmentManager fragmentManager) {
+        fragmentManager.popBackStack();
+    }
+
 }

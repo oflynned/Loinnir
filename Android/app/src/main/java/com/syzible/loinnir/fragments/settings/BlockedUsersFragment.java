@@ -1,6 +1,7 @@
 package com.syzible.loinnir.fragments.settings;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.Image;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.activities.SettingsActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
@@ -59,8 +61,6 @@ public class BlockedUsersFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
-        System.out.println(count);
 
         if (count > 0) {
             view = inflater.inflate(R.layout.blocked_users_fragment, container, false);
@@ -129,9 +129,7 @@ public class BlockedUsersFragment extends Fragment {
         private View view;
         private ArrayList<User> blockedUsers = new ArrayList<>();
 
-        private int lastPosition = -1;
-
-        public BlockedUsersAdapter(ArrayList<User> blockedUsers, Context context) {
+        BlockedUsersAdapter(ArrayList<User> blockedUsers, Context context) {
             super(context, R.layout.blocked_user, blockedUsers);
             this.blockedUsers = blockedUsers;
             this.context = context;
@@ -139,7 +137,7 @@ public class BlockedUsersFragment extends Fragment {
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             this.blockedUser = blockedUsers.get(position);
 
             if (convertView == null) {
@@ -158,8 +156,6 @@ public class BlockedUsersFragment extends Fragment {
                 view = convertView;
             }
 
-            lastPosition = position;
-
             new GetImage(new NetworkCallback<Bitmap>() {
                 @Override
                 public void onResponse(Bitmap response) {
@@ -176,6 +172,17 @@ public class BlockedUsersFragment extends Fragment {
                                 @Override
                                 public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                                     DisplayUtils.generateSnackbar(getActivity(), "Baineadh an cosc de " + LanguageUtils.lenite(blockedUser.getName()));
+
+                                    // now remove the selected blocked user and invalidate the list
+                                    System.out.println(position);
+                                    blockedUsers.remove(position);
+                                    ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+
+                                    if (blockedUsers.size() == 0) {
+                                        // now refresh the fragment to display the "no blocked users" frag if required
+                                        SettingsActivity.removeFragment(getFragmentManager());
+                                        SettingsActivity.setFragmentBackstack(getFragmentManager(), new BlockedUsersFragment().setCount(0));
+                                    }
                                 }
 
                                 @Override
@@ -198,7 +205,6 @@ public class BlockedUsersFragment extends Fragment {
                 }
             }, blockedUser.getAvatar(), true).execute();
 
-
             return view;
         }
     }
@@ -209,10 +215,12 @@ public class BlockedUsersFragment extends Fragment {
         FancyButton unblockUser;
     }
 
-    public void setCount(int count) {
+    public BlockedUsersFragment setCount(int count) {
         this.count = count;
+        return this;
     }
-    public void setBlockedUsers(ArrayList<String> blockedUserIds) {
+    public BlockedUsersFragment setBlockedUsers(ArrayList<String> blockedUserIds) {
         this.blockedUserIds = blockedUserIds;
+        return this;
     }
 }
