@@ -10,9 +10,6 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -23,7 +20,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
-import com.syzible.loinnir.activities.AuthenticationActivity;
 import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
@@ -127,9 +123,9 @@ public class LoginFrag extends Fragment {
                                     postData.put("lng", LocationClient.GOOSEBERRY_HILL.longitude);
                                     postData.put("show_location", true);
 
-                                    LocalStorage.setPref(LocalStorage.Pref.id, id, getActivity());
-                                    LocalStorage.setPref(LocalStorage.Pref.name, name, getActivity());
-                                    LocalStorage.setPref(LocalStorage.Pref.profile_pic, pic, getActivity());
+                                    LocalStorage.setStringPref(LocalStorage.Pref.id, id, getActivity());
+                                    LocalStorage.setStringPref(LocalStorage.Pref.name, name, getActivity());
+                                    LocalStorage.setStringPref(LocalStorage.Pref.profile_pic, pic, getActivity());
 
                                     Intent startFCMTokenService = new Intent(getActivity(), TokenService.class);
                                     getActivity().startService(startFCMTokenService);

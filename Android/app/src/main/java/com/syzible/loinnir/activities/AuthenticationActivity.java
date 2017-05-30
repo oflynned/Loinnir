@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.authentication.LoginFrag;
+import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.utils.FacebookUtils;
 
 /**
@@ -22,6 +23,9 @@ public class AuthenticationActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.authentication_frag_holder);
+
+        LocationClient.getInstance().requestLocationPermissions(this);
+        //LocationClient.getInstance().startPollingLocation(this);
 
         if (FacebookUtils.hasExistingToken(this)) {
             this.finish();

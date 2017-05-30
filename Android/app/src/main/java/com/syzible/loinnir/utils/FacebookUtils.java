@@ -13,11 +13,11 @@ import com.syzible.loinnir.services.TokenService;
 public class FacebookUtils {
 
     public static void saveToken(String token, Context context) {
-        LocalStorage.setPref(LocalStorage.Pref.fb_access_token, token, context);
+        LocalStorage.setStringPref(LocalStorage.Pref.fb_access_token, token, context);
     }
 
     private static String getToken(Context context) {
-        return LocalStorage.getPref(LocalStorage.Pref.fb_access_token, context);
+        return LocalStorage.getStringPref(LocalStorage.Pref.fb_access_token, context);
     }
 
     public static boolean hasExistingToken(Context context) {
@@ -30,7 +30,7 @@ public class FacebookUtils {
 
     public static void getStoredPrefs(Context context) {
         for (LocalStorage.Pref pref : LocalStorage.Pref.values())
-            System.out.println(pref.name() + ": " + LocalStorage.getPref(pref, context));
+            System.out.println(pref.name() + ": " + LocalStorage.getStringPref(pref, context));
     }
 
     public static void deleteToken(Context context) {

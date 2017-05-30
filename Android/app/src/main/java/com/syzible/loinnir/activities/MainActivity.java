@@ -1,7 +1,5 @@
 package com.syzible.loinnir.activities;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
@@ -9,21 +7,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,29 +24,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
-import com.stfalcon.chatkit.dialogs.DialogsList;
-import com.stfalcon.chatkit.dialogs.DialogsListAdapter;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.LocalityConversationFrag;
 import com.syzible.loinnir.fragments.portal.ConversationsListFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.PartnerConversationFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
-import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
-import com.syzible.loinnir.network.GetJSONArray;
-import com.syzible.loinnir.network.GetJSONObject;
 import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.RestClient;
-import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.AlarmReceiver;
-import com.syzible.loinnir.services.NotificationUtils;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
-import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
@@ -114,7 +99,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void greetUser() {
-        String name = LocalStorage.getPref(LocalStorage.Pref.name, this);
+        String name = LocalStorage.getStringPref(LocalStorage.Pref.name, this);
         name = name.split(" ")[0];
         DisplayUtils.generateSnackbar(this, "Fáilte romhat, a " + LanguageUtils.getVocative(name) + "! " +
                 EmojiUtils.getEmoji(EmojiUtils.HAPPY));
@@ -166,7 +151,7 @@ public class MainActivity extends AppCompatActivity
 
     private void setUpDrawer() {
         TextView userName = (TextView) headerView.findViewById(R.id.nav_header_name);
-        userName.setText(LocalStorage.getPref(LocalStorage.Pref.name, this));
+        userName.setText(LocalStorage.getStringPref(LocalStorage.Pref.name, this));
 
         RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this), new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
@@ -192,7 +177,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
-        String picUrl = LocalStorage.getPref(LocalStorage.Pref.profile_pic, this);
+        String picUrl = LocalStorage.getStringPref(LocalStorage.Pref.profile_pic, this);
 
         new GetImage(new NetworkCallback<Bitmap>() {
             @Override

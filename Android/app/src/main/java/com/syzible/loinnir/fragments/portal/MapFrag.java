@@ -2,10 +2,12 @@ package com.syzible.loinnir.fragments.portal;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -121,17 +124,13 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-        if (Constants.DEV_MODE) {
+        if (Constants.DEV_MODE)
             this.googleMap.getUiSettings().setZoomControlsEnabled(true);
-            this.googleMap.getUiSettings().setCompassEnabled(true);
-        }
 
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
     }
 
-    private void getWebServerLocation(final GoogleMap googleMap) {
-
-        // get others' locations and add to map without zooming to them
+    private void getWebServerLocation() {
         RestClient.post(getActivity(), Endpoints.GET_OTHER_USERS, JSONUtils.getIdPayload(getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
@@ -165,7 +164,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         try {
                             User me = new User(response);
-                            addUserCircle(new LatLng(me.getLatitude(), me.getLongitude()), true);
+                            //addUserCircle(new LatLng(me.getLatitude(), me.getLongitude()), true);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -219,32 +218,24 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        // TODO what the fuck is this? I have no idea how to handle Android M permission checks
-        // TODO put this into its own function to call
-
-        System.out.println("Location services connected");
         googleMap.clear();
 
         if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity())) {
-            getWebServerLocation(googleMap);
+            getWebServerLocation();
         } else {
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
         }
 
-        googleMap.setMyLocationEnabled(true);
+        if (Constants.DEV_MODE)
+            googleMap.setMyLocationEnabled(true);
+        
         Location myLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
         if (myLocation == null) {
@@ -255,9 +246,30 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     }
 
     private void handleNewLocation(Location location) {
+        System.out.println("Handling new location");
+
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
         LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+
+        RestClient.post(getActivity(), Endpoints.UPDATE_USER_LOCATION,
+                JSONUtils.getLocationUpdatePayload(getActivity(), latLng),
+                new BaseJsonHttpResponseHandler<JSONObject>() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+            }
+
+            @Override
+            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return new JSONObject(rawJsonData);
+            }
+        });
 
         googleMap.clear();
         addUserCircle(latLng, true);
@@ -283,7 +295,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
             }
         } else {
             System.out.println(connectionResult.getErrorMessage());
-            System.out.println("Location services failed (" + connectionResult.getErrorCode() + ")");
         }
     }
 }

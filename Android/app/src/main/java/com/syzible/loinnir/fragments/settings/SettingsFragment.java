@@ -2,7 +2,6 @@ package com.syzible.loinnir.fragments.settings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.view.ContextThemeWrapper;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.AuthenticationActivity;
-import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.activities.SettingsActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
@@ -257,7 +255,7 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     private void setListenerLogOut() {
-        final String accountName = LocalStorage.getPref(LocalStorage.Pref.name, context);
+        final String accountName = LocalStorage.getStringPref(LocalStorage.Pref.name, context);
         logOut.setSummary("Cúntas reatha: " + accountName);
 
         logOut.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

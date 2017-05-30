@@ -2,6 +2,7 @@ package com.syzible.loinnir.utils;
 
 import android.content.Context;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.syzible.loinnir.objects.User;
 
 import org.json.JSONException;
@@ -29,6 +30,19 @@ public class JSONUtils {
         try {
             o.put("fb_id", LocalStorage.getID(context));
             o.put("show_location", showLocation);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return o;
+    }
+
+    public static JSONObject getLocationUpdatePayload(Context context, LatLng location) {
+        JSONObject o = new JSONObject();
+        try {
+            o.put("fb_id", LocalStorage.getID(context));
+            o.put("lat", location.latitude);
+            o.put("lng", location.longitude);
         } catch (JSONException e) {
             e.printStackTrace();
         }

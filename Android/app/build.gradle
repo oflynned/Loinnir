@@ -40,6 +40,7 @@ dependencies {
     compile 'com.github.medyo:fancybuttons:1.8.3'
     compile 'com.google.android.gms:play-services-maps:10.2.6'
     compile 'com.google.android.gms:play-services-location:10.2.6'
+    compile 'com.kishan.askpermission:askpermission:1.0.3'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:support-vector-drawable:25.3.1'
     testCompile 'junit:junit:4.12'
