@@ -45,44 +45,27 @@ import mehdi.sakout.fancybuttons.FancyButton;
 
 public class BlockedUsersFragment extends Fragment {
     private ArrayList<User> blockedUsers = new ArrayList<>();
+    private ArrayList<String> blockedUserIds = new ArrayList<>();
     private ListView listView;
     private BlockedUsersAdapter adapter;
     private int count;
 
+    private View view;
+
+    private interface OnFinishedPolling {
+        void onDone();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view;
+
+        System.out.println(count);
 
         if (count > 0) {
             view = inflater.inflate(R.layout.blocked_users_fragment, container, false);
-            listView = (ListView) view.findViewById(R.id.blocked_users_list_view);
+            loadUsers();
 
-            RestClient.post(getActivity(), Endpoints.GET_BLOCKED_USERS, JSONUtils.getIdPayload(getActivity()), new BaseJsonHttpResponseHandler<JSONArray>() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            blockedUsers.add(new User(response.getJSONObject(i)));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    adapter = new BlockedUsersAdapter(blockedUsers, getActivity());
-                    listView.setAdapter(adapter);
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
-
-                }
-
-                @Override
-                protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                    return new JSONArray(rawJsonData);
-                }
-            });
         } else {
             view = inflater.inflate(R.layout.no_blocked_users_fragment, container, false);
 
@@ -91,6 +74,51 @@ public class BlockedUsersFragment extends Fragment {
         }
 
         return view;
+    }
+
+    private void loadUsers() {
+        listView = (ListView) view.findViewById(R.id.blocked_users_list_view);
+        final OnFinishedPolling callback = new OnFinishedPolling() {
+            @Override
+            public void onDone() {
+                adapter = new BlockedUsersAdapter(blockedUsers, getActivity());
+                listView.setAdapter(adapter);
+            }
+        };
+
+        for (int i=0; i<blockedUserIds.size(); i++) {
+            JSONObject payload = new JSONObject();
+            try {
+                payload.put("fb_id", blockedUserIds.get(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            final int finalIndex = i;
+            RestClient.post(getActivity(), Endpoints.GET_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                    try {
+                        blockedUsers.add(new User(response));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (finalIndex == blockedUserIds.size() - 1)
+                        callback.onDone();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                }
+
+                @Override
+                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                    return new JSONObject(rawJsonData);
+                }
+            });
+        }
     }
 
     private class BlockedUsersAdapter extends ArrayAdapter<User> {
@@ -136,7 +164,11 @@ public class BlockedUsersFragment extends Fragment {
                 @Override
                 public void onResponse(Bitmap response) {
                     viewHolder.name.setText(blockedUser.getName());
-                    viewHolder.profilePicture.setImageBitmap(BitmapUtils.getCroppedCircle(response));
+
+                    Bitmap avatar = BitmapUtils.getCroppedCircle(response);
+                    Bitmap scaledAvatar = BitmapUtils.scaleBitmap(avatar, BitmapUtils.BITMAP_SIZE_SMALL);
+
+                    viewHolder.profilePicture.setImageBitmap(scaledAvatar);
                     viewHolder.unblockUser.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -179,5 +211,8 @@ public class BlockedUsersFragment extends Fragment {
 
     public void setCount(int count) {
         this.count = count;
+    }
+    public void setBlockedUsers(ArrayList<String> blockedUserIds) {
+        this.blockedUserIds = blockedUserIds;
     }
 }

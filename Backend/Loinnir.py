@@ -198,9 +198,16 @@ def get_random_user():
 
     else:
         # append self too to exclude self matching
-        partners_met = list(partners_met)[0]["partners"]
+        blocked_users = list(partners_met)
+        if len(blocked_users) > 0:
+            blocked_users = blocked_users[0]["blocked"]
+
+        partners_met = list(partners_met)
+        if len(partners_met) > 0:
+            partners_met = partners_met[0]["partners"]
+
         partners_met.append(fb_id)
-        users = users_col.find({"fb_id": {"$nin": partners_met}})
+        users = users_col.find({"$and": [{"fb_id": {"$nin": partners_met}}, {"fb_id": {"$nin": blocked_users}}]})
 
         if users.count() == 0:
             return get_json({"success": False, "reason": "Out of new users"})
@@ -219,11 +226,14 @@ def get_unmatched_user_count():
     fb_id = str(data["fb_id"])
     users_col = mongo.db.users
     partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))
+    blocked_users = []
+
     if len(partners_met) > 0:
+        blocked_users = partners_met[0]["blocked"]
         partners_met = partners_met[0]["partners"]
 
     partners_met.append(fb_id)
-    users = users_col.find({"fb_id": {"$nin": partners_met}})
+    users = users_col.find({"$and": [{"fb_id": {"$nin": partners_met}}, {"fb_id": {"$nin": blocked_users}}]})
     return get_json({"count": users.count()})
 
 
@@ -534,10 +544,12 @@ def get_blocked_users():
 
     conversations_col = mongo.db.conversations
     users = conversations_col.find({"fb_id": fb_id})
+
     if users.count() == 0:
         return get_json([])
 
-    return get_json(list(users)[0]["blocked"])
+    users = list(users)[0]["blocked"]
+    return get_json(users)
 
 
 # POST {"my_id":..., "block_id":...}

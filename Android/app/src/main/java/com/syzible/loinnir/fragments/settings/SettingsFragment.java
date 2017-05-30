@@ -21,8 +21,11 @@ import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -121,33 +124,55 @@ public class SettingsFragment extends PreferenceFragment {
         manageBlockedUsers.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                SettingsActivity.setFragmentBackstack(getFragmentManager(), new BlockedUsersFragment());
+                RestClient.post(context, Endpoints.GET_BLOCKED_USERS, JSONUtils.getIdPayload(context), new BaseJsonHttpResponseHandler<JSONArray>() {
+                    @Override
+                    public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String rawJsonResponse, JSONArray response) {
+                        fragment.setCount(response.length());
+
+                        ArrayList<String> blockedUsers = new ArrayList<>();
+                        for (int i=0; i<response.length(); i++) {
+                            try {
+                                blockedUsers.add(response.getString(i));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        fragment.setBlockedUsers(blockedUsers);
+                        SettingsActivity.setFragmentBackstack(getFragmentManager(), fragment);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+
+                    }
+
+                    @Override
+                    protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONArray(rawJsonData);
+                    }
+                });
                 return false;
             }
         });
 
-        RestClient.post(context, Endpoints.GET_BLOCKED_USERS, JSONUtils.getIdPayload(context), new BaseJsonHttpResponseHandler<JSONObject>() {
+        RestClient.post(context, Endpoints.GET_BLOCKED_USERS, JSONUtils.getIdPayload(context), new BaseJsonHttpResponseHandler<JSONArray>() {
             @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String rawJsonResponse, JSONObject response) {
-                try {
-                    int count = response.getInt("count");
-                    fragment.setCount(count);
-                    String summary = "Tá " + count + " úsáideoir ann a bhfuil cosc curtha orthu";
-                    manageBlockedUsers.setSummary(summary);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, String rawJsonResponse, JSONArray response) {
+                int count = response.length();
+                fragment.setCount(count);
+                String summary = "Tá " + count + " úsáideoir ann a bhfuil cosc curtha orthu";
+                manageBlockedUsers.setSummary(summary);
             }
 
             @Override
-            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                manageBlockedUsers.setSummary("Úsáideoir ar bith ar a bhfuil cosc curtha air/uirthi");
-                fragment.setCount(0);
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+
             }
 
             @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
+            protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                return new JSONArray(rawJsonData);
             }
         });
     }

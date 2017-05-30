@@ -5,6 +5,8 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,12 +56,17 @@ public class ConversationsListFrag extends Fragment implements
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.conversations_list_frag, container, false);
 
-        conversations.clear();
         dialogsList = (DialogsList) view.findViewById(R.id.conversations_list);
         dialogsListAdapter = new DialogsListAdapter<>(loadImage());
 
         getActivity().setTitle(getResources().getString(R.string.app_name));
+        loadMessages();
 
+        return view;
+    }
+
+    private void loadMessages() {
+        conversations.clear();
         RestClient.post(getActivity(), Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
                 JSONUtils.getIdPayload(getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
@@ -95,7 +102,6 @@ public class ConversationsListFrag extends Fragment implements
                     }
                 }
         );
-        return view;
     }
 
     @Override
@@ -113,12 +119,37 @@ public class ConversationsListFrag extends Fragment implements
                 .setTitle("Cosc a Chur ar " + LanguageUtils.lenite(conversation.getDialogName()) + "?")
                 .setMessage("Má chuireann tú cosc ar úsáideoir araile, ní féidir leat nó le " + blockee + " dul i dteagmháil lena chéile. " +
                         "Bain úsáid as seo amháin go bhfuil tú cinnte nach dteastaíonn uait faic a chloisteáil a thuilleadh ón úsáideoir seo. " +
-                        "Cur cosc ar dhuine má imrítear bulaíocht ort, nó mura dteastaíonn tuilleadh teagmhála uait. " +
-                        "Má athraíonn tú do mheabhair, téigh chuig socruithe agus bainistigh cé atá faoi chosc.")
+                        "Cur cosc ar dhuine má imrítear bulaíocht ort, nó mura dteastaíonn uait tuilleadh teagmhála. " +
+                        "Má athraíonn tú do mheabhair ar ball, téigh chuig na socruithe agus bainistigh cé atá curtha ar cosc.")
                 .setPositiveButton("Cur cosc i bhfeidhm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc ar " + LanguageUtils.lenite(blockee) + ".");
+                        final User userBlockee = (User) conversation.getUsers().get(0);
+
+                        RestClient.post(getActivity(), Endpoints.BLOCK_USER,
+                                JSONUtils.getPartnerInteractionPayload(userBlockee, getActivity()),
+                                new BaseJsonHttpResponseHandler<JSONObject>() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc ar " + LanguageUtils.lenite(blockee) + ".");
+                                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        loadMessages();
+                                    }
+                                }, 1000);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                            }
+
+                            @Override
+                            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                return new JSONObject(rawJsonData);
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("Ná cur", null)
