@@ -89,7 +89,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
     @Override
     public void onResume() {
         super.onResume();
-        if (googleMap != null) renderMap();
         googleApiClient.connect();
     }
 
@@ -100,10 +99,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
             googleApiClient.disconnect();
         }
-    }
-
-    private void renderMap() {
-        googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
     @Nullable
@@ -132,9 +127,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         }
 
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
-
-        if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity()))
-            getWebServerLocation(this.googleMap);
     }
 
     private void getWebServerLocation(final GoogleMap googleMap) {
@@ -231,6 +223,14 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
         // TODO put this into its own function to call
 
         System.out.println("Location services connected");
+        googleMap.clear();
+
+        if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity())) {
+            getWebServerLocation(googleMap);
+        } else {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
