@@ -61,10 +61,9 @@ import cz.msebera.android.httpclient.Header;
  * Created by ed on 07/05/2017.
  */
 
-public class MapFrag extends Fragment implements OnMapReadyCallback, LocationListener {
+public class MapFrag extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     private int GREEN_500;
-    private ArrayList<User> nearbyUsers = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -171,11 +170,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
                 });
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        handleNewLocation(location);
-    }
-
     private int getFillColour() {
         int r = (GREEN_500) & 0xFF;
         int g = (GREEN_500 >> 8) & 0xFF;
@@ -213,38 +207,5 @@ public class MapFrag extends Fragment implements OnMapReadyCallback, LocationLis
                 }
             }
         }, new IntentFilter("updated_location"));
-    }
-
-    private void handleNewLocation(Location location) {
-        System.out.println("Handling new location");
-
-        double currentLatitude = location.getLatitude();
-        double currentLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
-
-        RestClient.post(getActivity(), Endpoints.UPDATE_USER_LOCATION,
-                JSONUtils.getLocationUpdatePayload(getActivity(), latLng),
-                new BaseJsonHttpResponseHandler<JSONObject>() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-                    }
-
-                    @Override
-                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                        return new JSONObject(rawJsonData);
-                    }
-                });
-
-        googleMap.clear();
-        addUserCircle(latLng, true);
-
-        for (User user : nearbyUsers)
-            addUserCircle(user.getLocation(), false);
     }
 }

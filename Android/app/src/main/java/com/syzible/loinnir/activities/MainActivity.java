@@ -70,7 +70,13 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setLocality();
+            }
+        });
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -145,10 +151,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setUpDrawer() {
-        TextView userName = (TextView) headerView.findViewById(R.id.nav_header_name);
-        userName.setText(LocalStorage.getStringPref(LocalStorage.Pref.name, this));
-
+    private void setLocality() {
         RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this), new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
@@ -171,6 +174,13 @@ public class MainActivity extends AppCompatActivity
                 return new JSONObject(rawJsonData);
             }
         });
+    }
+
+    private void setUpDrawer() {
+        TextView userName = (TextView) headerView.findViewById(R.id.nav_header_name);
+        userName.setText(LocalStorage.getStringPref(LocalStorage.Pref.name, this));
+
+        setLocality();
 
         final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
         String picUrl = LocalStorage.getStringPref(LocalStorage.Pref.profile_pic, this);
