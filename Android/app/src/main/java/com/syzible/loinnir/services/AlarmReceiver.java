@@ -22,7 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
 
-    private static final long INTERVAL = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
+    private static final long INTERVAL = AlarmManager.INTERVAL_HOUR;
 
     @Override
     public void onReceive(Context context, Intent intent) {

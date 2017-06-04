@@ -20,34 +20,37 @@ public class TokenService extends FirebaseInstanceIdService {
     @Override
     public void onTokenRefresh() {
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        System.out.println("Refreshed token: " + refreshedToken);
         sendRegistrationToOwnServer(refreshedToken);
     }
 
     private void sendRegistrationToOwnServer(String token) {
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
-            payload.put("fcm_token", token);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (LocalStorage.isLoggedIn(getApplicationContext())) {
+            JSONObject payload = new JSONObject();
+            try {
+                payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
+                payload.put("fcm_token", token);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            RestClient.post(getApplicationContext(), Endpoints.EDIT_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                    System.out.println(rawJsonResponse);
+                    System.out.println("Token refreshed successfully");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                    System.out.println(rawJsonData);
+                    System.out.println("Token refresh failed?");
+                }
+
+                @Override
+                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                    return new JSONObject(rawJsonData);
+                }
+            });
         }
-
-        RestClient.post(getApplicationContext(), Endpoints.EDIT_USER, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                System.out.println("Token refreshed successfully");
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                System.out.println("Token refresh failed?");
-            }
-
-            @Override
-            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                return new JSONObject(rawJsonData);
-            }
-        });
     }
 }

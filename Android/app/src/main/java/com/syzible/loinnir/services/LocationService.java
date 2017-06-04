@@ -2,9 +2,13 @@ package com.syzible.loinnir.services;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -17,6 +21,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
+import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.LocalStorage;
@@ -30,112 +35,146 @@ import cz.msebera.android.httpclient.Header;
  * Created by ed on 30/05/2017.
  */
 
-public class LocationService extends Service implements LocationListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class LocationService extends Service {
+    private LocationManager locationManager = null;
+    private static final int LOCATION_INTERVAL = 1000; // 15 mins
+    private static final float LOCATION_DISTANCE = 10f;
 
-    private boolean isReceivingUpdates = false;
+    private class LocationListener implements android.location.LocationListener {
 
-    private Location lastLocation;
-    private LocationRequest locationRequest;
-    private GoogleApiClient googleApiClient;
+        private Location lastLocation;
 
-    private static final long UPDATE_INTERVAL = 1000 * 60 * 15;
-    private static final long FASTEST_UPDATE_INTERVAL = UPDATE_INTERVAL / 2;
+        LocationListener(String provider) {
+            this.lastLocation = new Location(provider);
+        }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        startLocationUpdates();
-    }
+        @Override
+        public void onLocationChanged(Location location) {
+            System.out.println("?????");
+            lastLocation.set(location);
+            syncWithServer(location);
+        }
 
-    @Override
-    public void onConnectionSuspended(int i) {
+        private void syncWithServer(Location location) {
+            if (!LocalStorage.getID(getApplicationContext()).equals("")) {
+                JSONObject payload = new JSONObject();
 
-    }
+                try {
+                    payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
+                    payload.put("lng", location.getLongitude());
+                    payload.put("lat", location.getLatitude());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                // don't care about response on user side
+                RestClient.post(getApplicationContext(), Endpoints.UPDATE_USER_LOCATION, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                        getApplicationContext().sendBroadcast(new Intent("updated_location"));
+                    }
 
-    }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
 
-    @Override
-    public void onLocationChanged(Location location) {
-        this.lastLocation = location;
-        syncWithServer(location);
-    }
+                    }
 
-    private void startLocationUpdates() {
-        if (!isReceivingUpdates) {
-            isReceivingUpdates = true;
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONObject(rawJsonData);
+                    }
+                });
             }
+        }
 
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            System.out.println("onStatusChanged: " + provider);
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            System.out.println("onProviderEnabled: " + provider);
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            System.out.println("onProviderDisabled: " + provider);
         }
     }
 
-    private void stopLocationUpdates() {
-        if (isReceivingUpdates) {
-            isReceivingUpdates = false;
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        }
-    }
+    LocationListener[] locationListeners = new LocationListener[]{
+            new LocationListener(LocationManager.GPS_PROVIDER),
+            new LocationListener(LocationManager.NETWORK_PROVIDER)
+    };
 
-    private void syncWithServer(Location location) {
-        if (!LocalStorage.getID(getApplicationContext()).equals("")) {
-            JSONObject payload = new JSONObject();
-
-            try {
-                payload.put("fb_id", LocalStorage.getID(getApplicationContext()));
-                payload.put("lng", location.getLongitude());
-                payload.put("lat", location.getLatitude());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            // don't care about response on user side
-            RestClient.post(getApplicationContext(), Endpoints.UPDATE_USER_LOCATION, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                    getApplicationContext().sendBroadcast(new Intent("updated_location"));
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-                }
-
-                @Override
-                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                    return new JSONObject(rawJsonData);
-                }
-            });
-        }
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(LocationService.this)
-                .addApi(LocationServices.API)
-                .build();
-
-        createLocationRequest();
-    }
-
-    private void createLocationRequest() {
-        googleApiClient.connect();
-
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(UPDATE_INTERVAL);
-        locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL);
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-    }
-
-    @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent arg0) {
         return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
+    }
+
+    private void registerBroadcastReceiver(MainActivity.BroadcastFilters filter) {
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(MainActivity.BroadcastFilters.start_location_polling.name())) {
+                    System.out.println("Polling start location");
+                    startPollingLocation();
+                } else if (intent.getAction().equals(MainActivity.BroadcastFilters.end_location_polling.name())) {
+                    stopPollingLocation();
+                }
+            }
+        }, new IntentFilter(filter.name()));
+    }
+
+    @Override
+    public void onCreate() {
+        registerBroadcastReceiver(MainActivity.BroadcastFilters.start_location_polling);
+        registerBroadcastReceiver(MainActivity.BroadcastFilters.end_location_polling);
+
+        startPollingLocation();
+        super.onCreate();
+    }
+
+    private void startPollingLocation() {
+        initializeLocationManager();
+
+        try {
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                    locationListeners[0]);
+        } catch (java.lang.SecurityException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopPollingLocation() {
+        if (locationManager != null) {
+            for (LocationListener locationListener : locationListeners) {
+                try {
+                    locationManager.removeUpdates(locationListener);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopPollingLocation();
+    }
+
+    private void initializeLocationManager() {
+        if (locationManager == null) {
+            locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        }
     }
 }

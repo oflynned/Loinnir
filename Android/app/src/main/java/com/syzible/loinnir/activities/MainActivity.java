@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -23,6 +24,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.LocalityConversationFrag;
@@ -37,6 +39,7 @@ import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.AlarmReceiver;
 import com.syzible.loinnir.services.LocationService;
+import com.syzible.loinnir.services.TokenService;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
@@ -56,6 +59,10 @@ public class MainActivity extends AppCompatActivity
     private View headerView;
     private AlarmReceiver alarmReceiver = new AlarmReceiver();
 
+    public enum BroadcastFilters {
+        finish_main_activity, start_location_polling, end_location_polling
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,9 +70,39 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        String fcmToken = FirebaseInstanceId.getInstance().getToken();
+        if (!fcmToken.equals("")) {
+            JSONObject o = new JSONObject();
+            try {
+                o.put("fb_id", LocalStorage.getID(this));
+                o.put("fcm_token", fcmToken);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            RestClient.post(this, Endpoints.EDIT_USER, o, new BaseJsonHttpResponseHandler<JSONObject>() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                    System.out.println("Token update successful");
+                    System.out.println(response.toString());
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                    System.out.println(rawJsonData);
+                }
+
+                @Override
+                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                    return new JSONObject(rawJsonData);
+                }
+            });
+        }
+
         alarmReceiver.cancelAlarm(this);
         startService(new Intent(this, LocationService.class));
-        registerBroadcastReceiver();
+
+        sendBroadcast(new Intent(BroadcastFilters.start_location_polling.name()));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -89,15 +126,27 @@ public class MainActivity extends AppCompatActivity
         checkNotificationInvocation();
     }
 
-    private void registerBroadcastReceiver() {
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
+    }
+
+    private void registerBroadcastReceiver(BroadcastFilters filter) {
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("finish_main_activity")) {
+                if (intent.getAction().equals(BroadcastFilters.finish_main_activity.name())) {
                     finish();
                 }
             }
-        }, new IntentFilter("finish_main_activity"));
+        }, new IntentFilter(filter.name()));
     }
 
     private void greetUser() {
