@@ -43,6 +43,7 @@ dependencies {
     compile 'com.kishan.askpermission:askpermission:1.0.3'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:support-vector-drawable:25.3.1'
+    compile 'agency.tango.android:material-intro-screen:0.0.5'
     testCompile 'junit:junit:4.12'
 }
 

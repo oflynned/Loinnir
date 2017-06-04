@@ -25,7 +25,6 @@ public class AuthenticationActivity extends AppCompatActivity {
         setContentView(R.layout.authentication_frag_holder);
 
         LocationClient.getInstance().requestLocationPermissions(this);
-        //LocationClient.getInstance().startPollingLocation(this);
 
         if (FacebookUtils.hasExistingToken(this)) {
             this.finish();

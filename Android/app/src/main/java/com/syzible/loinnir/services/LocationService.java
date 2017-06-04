@@ -11,7 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
-import com.syzible.loinnir.location.LocationClient;
+import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.LocalStorage;
@@ -26,22 +26,21 @@ import cz.msebera.android.httpclient.Header;
  */
 
 public class LocationService extends Service {
-
-    private static final String TAG = "gps_service";
     private LocationManager locationManager = null;
-    private static final int LOCATION_INTERVAL = 1000 * 60 * 15; // 15 mins
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final int LOCATION_INTERVAL = 1000 * 30;
+    private static final float LOCATION_DISTANCE = 1f;
 
     private class LocationListener implements android.location.LocationListener {
 
         private Location lastLocation;
 
-        public LocationListener(String provider) {
+        LocationListener(String provider) {
             this.lastLocation = new Location(provider);
         }
 
         @Override
         public void onLocationChanged(Location location) {
+            System.out.println("New location!");
             lastLocation.set(location);
             syncWithServer(location);
         }
@@ -110,8 +109,30 @@ public class LocationService extends Service {
         return START_STICKY;
     }
 
+    private void registerBroadcastReceiver(MainActivity.BroadcastFilters filter) {
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(MainActivity.BroadcastFilters.start_location_polling.name())) {
+                    System.out.println("Polling start location");
+                    startPollingLocation();
+                } else if (intent.getAction().equals(MainActivity.BroadcastFilters.end_location_polling.name())) {
+                    stopPollingLocation();
+                }
+            }
+        }, new IntentFilter(filter.name()));
+    }
+
     @Override
     public void onCreate() {
+        registerBroadcastReceiver(MainActivity.BroadcastFilters.start_location_polling);
+        registerBroadcastReceiver(MainActivity.BroadcastFilters.end_location_polling);
+
+        startPollingLocation();
+        super.onCreate();
+    }
+
+    private void startPollingLocation() {
         initializeLocationManager();
         try {
             locationManager.requestLocationUpdates(
@@ -130,9 +151,7 @@ public class LocationService extends Service {
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    private void stopPollingLocation() {
         if (locationManager != null) {
             for (LocationListener locationListener : locationListeners) {
                 try {
@@ -142,6 +161,12 @@ public class LocationService extends Service {
                 }
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopPollingLocation();
     }
 
     private void initializeLocationManager() {

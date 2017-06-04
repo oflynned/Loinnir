@@ -119,9 +119,11 @@ public class LoginFrag extends Fragment {
                                     postData.put("fb_id", id);
                                     postData.put("name", URLEncoder.encode(name, "UTF-8"));
                                     postData.put("profile_pic", pic);
-                                    postData.put("lat", LocationClient.GOOSEBERRY_HILL.latitude);
-                                    postData.put("lng", LocationClient.GOOSEBERRY_HILL.longitude);
                                     postData.put("show_location", true);
+
+                                    // TODO should poll most recent location
+                                    postData.put("lat", LocationClient.ATHLONE.latitude);
+                                    postData.put("lng", LocationClient.ATHLONE.longitude);
 
                                     LocalStorage.setStringPref(LocalStorage.Pref.id, id, getActivity());
                                     LocalStorage.setStringPref(LocalStorage.Pref.name, name, getActivity());
@@ -133,6 +135,7 @@ public class LoginFrag extends Fragment {
                                     RestClient.post(getActivity(), Endpoints.CREATE_USER, postData, new BaseJsonHttpResponseHandler<JSONObject>() {
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                            DisplayUtils.generateToast(getActivity(), "Nuashonreofar do cheantar laistigh de chúpla nóiméad");
                                             startMain();
                                         }
 
