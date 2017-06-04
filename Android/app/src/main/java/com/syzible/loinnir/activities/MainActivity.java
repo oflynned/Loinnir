@@ -107,13 +107,14 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
-            public void onClick(View v) {
+            public void onDrawerOpened(View drawerView) {
                 setLocality();
+                super.onDrawerOpened(drawerView);
             }
-        });
+        };
+
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -202,6 +203,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setLocality() {
+        System.out.println("Setting locality");
         RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this), new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {

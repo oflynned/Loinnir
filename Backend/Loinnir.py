@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, Response
 from flask_pymongo import PyMongo
 from bson import json_util
 from random import randint
-from flask_pyfcm import FCM
+from pyfcm import FCMNotification
 import json, os, sys, time, math
 
 from Helper import Helper
@@ -17,11 +17,6 @@ app.debug = True
 
 # persistence
 mongo = PyMongo(app)
-
-# real time messaging
-app.config["FCM_API_KEY"] = Helper.get_fcm_api_key()
-fcm = FCM()
-fcm.init_app(app)
 
 # TODO
 """
@@ -616,12 +611,27 @@ def get_conversations_previews():
     return get_json(sorted_list)
 
 
-@app.route("/api/v1/services/create-individual-notification", methods=["POST"])
+# POST {"fb_id": "...", ...}
+@app.route("/api/v1/services/create-notification", methods=["POST"])
 def generate_notification():
     data = request.json
+    fb_ids = list(mongo.db.users.find({"fb_id": str(data["fb_id"])}))
+
+    # generate notifications via fcm for the group
+    user_to_notify = fb_ids[0]
+
+    registration_id = user_to_notify["fcm_token"]
+    message_title = str(user_to_notify["name"])
+    message_body = "Test test test?"
+
+    push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
+    result = push_service.notify_single_device(registration_id=registration_id, message_title=message_title,
+                                               message_body=message_body)
+
+    return get_json(dict(result))
 
 
-@app.route("/api/v1/services/notify-chat-update", methods=["POST"])
+@app.route("/api/v1/services/notify-chat-update", methods=["GET", "POST"])
 def notify_chat_update():
     pass
 
