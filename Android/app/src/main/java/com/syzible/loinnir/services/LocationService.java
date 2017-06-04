@@ -1,25 +1,15 @@
 package com.syzible.loinnir.services;
 
-import android.Manifest;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
@@ -37,8 +27,8 @@ import cz.msebera.android.httpclient.Header;
 
 public class LocationService extends Service {
     private LocationManager locationManager = null;
-    private static final int LOCATION_INTERVAL = 1000; // 15 mins
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final int LOCATION_INTERVAL = 1000 * 30;
+    private static final float LOCATION_DISTANCE = 1f;
 
     private class LocationListener implements android.location.LocationListener {
 
@@ -50,7 +40,7 @@ public class LocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            System.out.println("?????");
+            System.out.println("New location!");
             lastLocation.set(location);
             syncWithServer(location);
         }
@@ -144,6 +134,13 @@ public class LocationService extends Service {
 
     private void startPollingLocation() {
         initializeLocationManager();
+        try {
+            locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                    locationListeners[1]);
+        } catch (java.lang.SecurityException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
 
         try {
             locationManager.requestLocationUpdates(

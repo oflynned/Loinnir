@@ -135,6 +135,7 @@ public class LoginFrag extends Fragment {
                                     RestClient.post(getActivity(), Endpoints.CREATE_USER, postData, new BaseJsonHttpResponseHandler<JSONObject>() {
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                            DisplayUtils.generateToast(getActivity(), "Nuashonreofar do cheantar laistigh de chúpla nóiméad");
                                             startMain();
                                         }
 

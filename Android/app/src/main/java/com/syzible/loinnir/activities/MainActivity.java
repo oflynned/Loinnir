@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity
         alarmReceiver.cancelAlarm(this);
         startService(new Intent(this, LocationService.class));
 
+        registerBroadcastReceiver(BroadcastFilters.finish_main_activity);
         sendBroadcast(new Intent(BroadcastFilters.start_location_polling.name()));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
