@@ -22,8 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
 
-    // debug 1 min v release 15 mins
-    private static final long INTERVAL = AlarmManager.INTERVAL_FIFTEEN_MINUTES; // Constants.DEV_MODE ? (1000 * 60) : AlarmManager.INTERVAL_FIFTEEN_MINUTES;
+    private static final long INTERVAL = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
 
     @Override
     public void onReceive(Context context, Intent intent) {
