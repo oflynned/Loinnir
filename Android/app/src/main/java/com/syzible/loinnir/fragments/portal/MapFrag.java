@@ -76,9 +76,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onResume() {
-        super.onResume();
-
         setMapPosition();
+        super.onResume();
     }
 
     private void setMapPosition() {
@@ -110,7 +109,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
         if (Constants.DEV_MODE)
             this.googleMap.getUiSettings().setZoomControlsEnabled(true);
 
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
+        setMapPosition();
     }
 
     private void getWebServerLocation() {
