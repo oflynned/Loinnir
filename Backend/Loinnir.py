@@ -4,6 +4,7 @@ from bson import json_util
 from random import randint
 from pyfcm import FCMNotification
 import json, os, sys, time, math
+import urllib.parse
 
 from Helper import Helper
 
@@ -62,7 +63,7 @@ def get_json(data):
 
 @app.route('/api/v1', methods=["GET", "POST"])
 def hello_world():
-    return get_json({"response": "hello world!"})
+    return get_json({"subtitle": ":)", "header": "Hey Sean", "title": "I'm watching you", "should_run": True})
 
 
 @app.route('/api/v1/get-array', methods=["GET", "POST"])
@@ -611,22 +612,41 @@ def get_conversations_previews():
     return get_json(sorted_list)
 
 
-# POST {"fb_id": "...", ...}
+def get_decoded_name(encoded_name):
+    return urllib.parse.unquote(encoded_name).replace("+", " ")
+
+
+# TODO change to helper function that doesn't have to be called remotely
+# POST {"my_id": "...", "partner_id": "..."}
 @app.route("/api/v1/services/create-notification", methods=["POST"])
 def generate_notification():
     data = request.json
-    fb_ids = list(mongo.db.users.find({"fb_id": str(data["fb_id"])}))
 
-    # generate notifications via fcm for the group
-    user_to_notify = fb_ids[0]
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
 
-    registration_id = user_to_notify["fcm_token"]
-    message_title = str(user_to_notify["name"])
-    message_body = "Test test test?"
+    me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
+    partner  = dict(list(mongo.db.users.find({"fb_id": partner_id}))[0])
+
+    registration_id = partner["fcm_token"]
+    message_title = get_decoded_name(str(me["name"]))
+    message_avatar = me["profile_pic"]
+
+    # get latest message from you to notify partner
+    my_messages_query = {"$and": [{"from_id": {"$in": [my_id]}}, {"to_id": {"$in": [partner_id]}}]}
+    message = mongo.db.messages_col.find(my_messages_query).limit(1)
+
+    data_content = {
+        "message_title": message_title,
+        "message_avatar": message_avatar,
+        "from": me,
+        "to": partner,
+        "message": message
+    }
 
     push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
-    result = push_service.notify_single_device(registration_id=registration_id, message_title=message_title,
-                                               message_body=message_body)
+    result = push_service.notify_single_device(registration_id=registration_id, message_body=message_title,
+                                               data_message=data_content)
 
     return get_json(dict(result))
 

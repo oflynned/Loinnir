@@ -1,3 +1,4 @@
+pyfcm
 pymongo==3.4.0
 Flask==0.12.1
 Flask_PyMongo==0.4.1
