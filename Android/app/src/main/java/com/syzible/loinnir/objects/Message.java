@@ -2,7 +2,9 @@ package com.syzible.loinnir.objects;
 
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
+import com.syzible.loinnir.utils.EmojiUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,22 +20,30 @@ public class Message implements IMessage {
     private long time;
     private String contents;
 
-    public Message(String id, User sender, long time, String contents) {
-        this.id = id;
+    public Message(User sender, JSONArray array) {
+        // debug -- for blank message []
         this.sender = sender;
-        this.time = time;
-        this.contents = contents;
+        this.id = "123456789";
+        this.time = System.currentTimeMillis();
+        this.contents = "Test message " + EmojiUtils.getEmoji(EmojiUtils.HAPPY);
     }
 
     public Message(User sender, JSONObject messageObject) {
         try {
-            this.sender = sender;
             this.id = messageObject.getString("_id");
+            this.sender = sender;
             this.time = messageObject.getLong("time");
             this.contents = messageObject.getString("message");
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public Message(String id, User sender, long time, String contents) {
+        this.id = id;
+        this.sender = sender;
+        this.time = time;
+        this.contents = contents;
     }
 
     @Override

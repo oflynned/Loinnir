@@ -28,7 +28,7 @@ import cz.msebera.android.httpclient.Header;
 public class LocationService extends Service {
     private LocationManager locationManager = null;
     private static final int LOCATION_INTERVAL = 1000 * 30;
-    private static final float LOCATION_DISTANCE = 1f;
+    private static final float LOCATION_DISTANCE = 100f;
 
     private class LocationListener implements android.location.LocationListener {
 
@@ -163,10 +163,12 @@ public class LocationService extends Service {
         }
     }
 
+
     @Override
     public void onDestroy() {
-        super.onDestroy();
         stopPollingLocation();
+        this.stopSelf();
+        super.onDestroy();
     }
 
     private void initializeLocationManager() {
