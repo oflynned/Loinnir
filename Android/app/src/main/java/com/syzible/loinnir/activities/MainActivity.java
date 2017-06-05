@@ -71,32 +71,34 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         String fcmToken = FirebaseInstanceId.getInstance().getToken();
-        if (!fcmToken.equals("")) {
-            JSONObject o = new JSONObject();
-            try {
-                o.put("fb_id", LocalStorage.getID(this));
-                o.put("fcm_token", fcmToken);
-            } catch (JSONException e) {
-                e.printStackTrace();
+        if (fcmToken != null) {
+            if (!fcmToken.equals("")) {
+                JSONObject o = new JSONObject();
+                try {
+                    o.put("fb_id", LocalStorage.getID(this));
+                    o.put("fcm_token", fcmToken);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                RestClient.post(this, Endpoints.EDIT_USER, o, new BaseJsonHttpResponseHandler<JSONObject>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                        System.out.println("Token update successful");
+                        System.out.println(response.toString());
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                        System.out.println(rawJsonData);
+                    }
+
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONObject(rawJsonData);
+                    }
+                });
             }
-
-            RestClient.post(this, Endpoints.EDIT_USER, o, new BaseJsonHttpResponseHandler<JSONObject>() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                    System.out.println("Token update successful");
-                    System.out.println(response.toString());
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                    System.out.println(rawJsonData);
-                }
-
-                @Override
-                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                    return new JSONObject(rawJsonData);
-                }
-            });
         }
 
         alarmReceiver.cancelAlarm(this);

@@ -24,7 +24,7 @@ public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        // handle FCM notification updates from the server
+        // handle custom FCM notification updates from the server
         if (remoteMessage.getData().size() > 0) {
             System.out.println(remoteMessage.getData());
             try {
@@ -36,11 +36,14 @@ public class MessagingService extends FirebaseMessagingService {
                 Message message = new Message(from, new JSONArray(remoteMessage.getData().get("message")));
 
                 if (message_type.equals(NotificationTypes.new_partner_message.name())) {
+                    // for updating UI or creating notifications on receiving a message
                     Intent newDataIntent = new Intent("new_message");
                     newDataIntent.putExtra("partner_id", from.getId());
                     getApplicationContext().sendBroadcast(newDataIntent);
 
                     NotificationUtils.generateMessageNotification(getApplicationContext(), from, message);
+                } else if (message_type.equals(NotificationTypes.app_information.name())) {
+                    // in case a periodic notification is dispatched to all users about Loinnir
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
