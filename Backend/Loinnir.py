@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, Response
 from flask_pymongo import PyMongo
 from bson import json_util
 from random import randint
+from enum import Enum
 from pyfcm import FCMNotification
 import json, os, sys, time, math
 import urllib.parse
@@ -628,25 +629,30 @@ def generate_notification():
     me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
     partner  = dict(list(mongo.db.users.find({"fb_id": partner_id}))[0])
 
+    me.pop("_id")
+    partner.pop("_id")
+
     registration_id = partner["fcm_token"]
     message_title = get_decoded_name(str(me["name"]))
     message_avatar = me["profile_pic"]
 
     # get latest message from you to notify partner
     my_messages_query = {"$and": [{"from_id": {"$in": [my_id]}}, {"to_id": {"$in": [partner_id]}}]}
-    message = mongo.db.messages_col.find(my_messages_query).limit(1)
+    message = list(mongo.db.messages_col.find(my_messages_query).limit(1))
 
     data_content = {
+        "notification_type": "new_partner_message",
         "message_title": message_title,
         "message_avatar": message_avatar,
-        "from": me,
-        "to": partner,
+        "from_details": me,
+        "to_details": partner,
         "message": message
     }
 
+    print(data_content)
+
     push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
-    result = push_service.notify_single_device(registration_id=registration_id, message_body=message_title,
-                                               data_message=data_content)
+    result = push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
     return get_json(dict(result))
 
