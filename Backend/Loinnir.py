@@ -23,11 +23,6 @@ mongo = PyMongo(app)
 # TODO
 """
     unread/read messages
-    dispatch notifications
-    past conversations preview
-    notify individuals via fcm
-    implement fcm server
-    account deletion
     reporting? when should an auto ban occur?
     auto generate password to protect public api by tokens
     
@@ -65,15 +60,6 @@ def get_json(data):
 @app.route('/api/v1', methods=["GET", "POST"])
 def hello_world():
     return get_json({"subtitle": ":)", "header": "Hey Sean", "title": "I'm watching you", "should_run": True})
-
-
-@app.route('/api/v1/get-array', methods=["GET", "POST"])
-def hello_world_array():
-    response = []
-    for i in range(0, 10):
-        response.append({"response": i})
-
-    return get_json(response)
 
 
 # POST {fb_id: 123456789, ...}
@@ -337,6 +323,9 @@ def send_partner_message():
 
     partner_col = mongo.db.partner_conversations
     partner_col.insert(message)
+
+    notify_partner_chat_update(data["from_id"], data["to_id"])
+
     return get_json({"success": True, "message": message})
 
 
@@ -359,6 +348,8 @@ def send_locality_message():
 
     locality_col = mongo.db.locality_conversations
     locality_col.insert(message)
+
+    notify_locality_chat_update(fb_id)
 
     return get_json({"success": True})
 
@@ -617,17 +608,9 @@ def get_decoded_name(encoded_name):
     return urllib.parse.unquote(encoded_name).replace("+", " ")
 
 
-# TODO change to helper function that doesn't have to be called remotely
-# POST {"my_id": "...", "partner_id": "..."}
-@app.route("/api/v1/services/create-notification", methods=["POST"])
-def generate_notification():
-    data = request.json
-
-    my_id = str(data["my_id"])
-    partner_id = str(data["partner_id"])
-
+def notify_partner_chat_update(my_id, partner_id):
     me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
-    partner  = dict(list(mongo.db.users.find({"fb_id": partner_id}))[0])
+    partner = dict(list(mongo.db.users.find({"fb_id": partner_id}))[0])
 
     me.pop("_id")
     partner.pop("_id")
@@ -649,16 +632,46 @@ def generate_notification():
         "message": message
     }
 
-    print(data_content)
-
     push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
     result = push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
     return get_json(dict(result))
 
 
-@app.route("/api/v1/services/notify-chat-update", methods=["GET", "POST"])
-def notify_chat_update():
+def notify_locality_chat_update(my_id):
+    me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
+    me.pop("_id")
+
+    locality = me["locality"]
+    ids = []
+
+    locality_users = list(mongo.db.users.find({
+        "$and": [
+            {"fb_id": {"$ne": my_id}},
+            {"locality": {"$eq": locality}}
+        ]}))
+
+    for user in locality_users:
+        ids.append(user["fcm_token"])
+
+    message_title = me["locality"]
+    message = "Tá " + str(len(locality_users)) + " úsáideoir eile sa cheantar seo faoi láthair."
+
+    data_content = {
+        "notification_type": "new_locality_information",
+        "message_title": message_title,
+        "message": message
+    }
+
+    # perhaps should not notify users on a new locality message @ spam
+    push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
+    result = push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
+
+    return get_json(dict(result))
+
+
+# kinda unneeded unless I wanna send out notifications about currently active users every Friday etc?
+def notify_device_notification():
     pass
 
 

@@ -18,7 +18,7 @@ import org.json.JSONObject;
 public class MessagingService extends FirebaseMessagingService {
 
     private enum NotificationTypes {
-        new_partner_message, app_information
+        new_partner_message, new_locality_information, app_information
     }
 
     @Override
@@ -29,10 +29,7 @@ public class MessagingService extends FirebaseMessagingService {
             System.out.println(remoteMessage.getData());
             try {
                 String message_type = remoteMessage.getData().get("notification_type");
-                String title = remoteMessage.getData().get("message_title");
-                String avatar_url = remoteMessage.getData().get("message_avatar");
                 User from = new User(new JSONObject(remoteMessage.getData().get("from_details")));
-                User to = new User(new JSONObject(remoteMessage.getData().get("to_details")));
                 Message message = new Message(from, new JSONArray(remoteMessage.getData().get("message")));
 
                 if (message_type.equals(NotificationTypes.new_partner_message.name())) {
@@ -42,8 +39,11 @@ public class MessagingService extends FirebaseMessagingService {
                     getApplicationContext().sendBroadcast(newDataIntent);
 
                     NotificationUtils.generateMessageNotification(getApplicationContext(), from, message);
+                } else if (message_type.equals(NotificationTypes.new_locality_information.name())) {
+
                 } else if (message_type.equals(NotificationTypes.app_information.name())) {
                     // in case a periodic notification is dispatched to all users about Loinnir
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
