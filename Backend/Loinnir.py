@@ -433,10 +433,14 @@ def get_locality_messages():
     # don't show blocked users' messages
     if len(blocked_users) > 0:
         blocked_users = blocked_users[0]["blocked"]
+    else:
+        blocked_users = []
 
     # aggregate over the messages to get the fb user details
     messages = locality_col.find({"locality": locality, "fb_id": {"$nin": blocked_users}})
     messages = list(messages)
+
+    print(messages)
 
     for i, message in enumerate(messages):
         fb_id = message["fb_id"]
