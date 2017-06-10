@@ -635,7 +635,7 @@ def notify_partner_chat_update(my_id, partner_id):
     push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
     result = push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
-    return get_json(dict(result))
+    return get_json({"success": True})
 
 
 def notify_locality_chat_update(my_id):
@@ -667,7 +667,7 @@ def notify_locality_chat_update(my_id):
     push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
     result = push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
 
-    return get_json(dict(result))
+    return get_json({"success": True})
 
 
 # kinda unneeded unless I wanna send out notifications about currently active users every Friday etc?
