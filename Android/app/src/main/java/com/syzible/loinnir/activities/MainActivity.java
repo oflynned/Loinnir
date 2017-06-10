@@ -39,6 +39,7 @@ import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.AlarmReceiver;
 import com.syzible.loinnir.services.LocationService;
+import com.syzible.loinnir.services.MessagingService;
 import com.syzible.loinnir.services.TokenService;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity
 
     private View headerView;
     private AlarmReceiver alarmReceiver = new AlarmReceiver();
+
+    private BroadcastReceiver receiver;
 
     public enum BroadcastFilters {
         finish_main_activity, start_location_polling, end_location_polling,
@@ -86,7 +89,6 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         System.out.println("Token update successful");
-                        System.out.println(response.toString());
                     }
 
                     @Override
@@ -102,8 +104,8 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        alarmReceiver.cancelAlarm(this);
         startService(new Intent(this, LocationService.class));
+        startService(new Intent(this, MessagingService.class));
 
         registerBroadcastReceiver(BroadcastFilters.finish_main_activity);
         sendBroadcast(new Intent(BroadcastFilters.start_location_polling.name()));
@@ -143,15 +145,23 @@ public class MainActivity extends AppCompatActivity
         sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
     }
 
+    @Override
+    protected void onStop() {
+        unregisterReceiver(receiver);
+        super.onStop();
+    }
+
     private void registerBroadcastReceiver(BroadcastFilters filter) {
-        registerReceiver(new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(BroadcastFilters.finish_main_activity.name())) {
                     finish();
                 }
             }
-        }, new IntentFilter(filter.name()));
+        };
+
+        registerReceiver(receiver, new IntentFilter(filter.name()));
     }
 
     private void greetUser() {

@@ -1,11 +1,15 @@
+import json
+import math
+import os
+import sys
+import time
+import urllib.parse
+from random import randint
+
+from bson import json_util
 from flask import Flask, render_template, request, Response
 from flask_pymongo import PyMongo
-from bson import json_util
-from random import randint
-from enum import Enum
 from pyfcm import FCMNotification
-import json, os, sys, time, math
-import urllib.parse
 
 from Helper import Helper
 
@@ -658,16 +662,14 @@ def notify_partner_chat_update(my_id, partner_id):
 
     print("Dispatching partner chat update!")
 
+    # TODO check if the partner still exists or hasn't blocked this user
     key = Helper.get_fcm_api_key(mode)
-    print(key)
-
     push_service = FCMNotification(api_key=key)
     push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
     return get_json({"success": True})
 
 
-@app.route("/api/v1/services/notify-locality-update", methods=["POST"])
 def notify_locality_chat_update(my_id):
     me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
     me.pop("_id")
@@ -698,11 +700,6 @@ def notify_locality_chat_update(my_id):
 
         # perhaps should not notify users on a new locality message @ spam
         key = Helper.get_fcm_api_key(mode)
-        print(key)
-
-        print("ids:")
-        print(ids)
-
         push_service = FCMNotification(api_key=key)
         push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
 

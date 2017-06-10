@@ -54,13 +54,20 @@ public class RouletteFrag extends Fragment {
                             e.printStackTrace();
                         }
 
-                        String usersLeftMessage = "Tá " + count + " úsáideoir eile ag baint úsáide as an aip seo nár bhuail tú leis/léi go fóill " + EmojiUtils.getEmoji(EmojiUtils.COOL);
+                        String usersLeftMessage;
+                        if (count == 0)
+                            usersLeftMessage = "Níl aon daoine nua ann le nasc a chruthú leo! " + EmojiUtils.getEmoji(EmojiUtils.SAD);
+                        else if (count == 1)
+                            usersLeftMessage = "Tá " + count + " úsáideoir eile ag baint úsáide as an aip seo nár bhuail tú leis/léi go fóill " + EmojiUtils.getEmoji(EmojiUtils.COOL);
+                        else
+                            usersLeftMessage = "Tá " + count + " úsáideoir eile ag baint úsáide as an aip seo nár bhuail tú leo go fóill " + EmojiUtils.getEmoji(EmojiUtils.COOL);
+
                         unmatchedUserCountTextView.setText(usersLeftMessage);
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                        String usersLeftMessage = "Is tusa an chéad úsáideoir don aip seo! " + EmojiUtils.getEmoji(EmojiUtils.HEART_EYES);
+                        String usersLeftMessage = "Thit earáid amach ar an tseibhís " + EmojiUtils.getEmoji(EmojiUtils.SAD);
                         unmatchedUserCountTextView.setText(usersLeftMessage);
                     }
 

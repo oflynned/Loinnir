@@ -23,12 +23,15 @@ public class MessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        System.out.println("Received FCM update");
 
         // handle custom FCM notification updates from the server
         if (remoteMessage.getData().size() > 0) {
             System.out.println(remoteMessage.getData());
             try {
                 String message_type = remoteMessage.getData().get("notification_type");
+                System.out.println(message_type + " received!!!");
+
                 User from = new User(new JSONObject(remoteMessage.getData().get("from_details")));
                 Message message = new Message(from, new JSONArray(remoteMessage.getData().get("message")));
 

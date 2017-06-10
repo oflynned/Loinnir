@@ -148,6 +148,7 @@ public class LocalityConversationFrag extends Fragment {
                     }
                 });
 
+        loadMessages();
         registerBroadcastReceiver(MainActivity.BroadcastFilters.new_locality_information);
 
         return view;

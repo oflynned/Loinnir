@@ -64,6 +64,7 @@ import cz.msebera.android.httpclient.Header;
 public class MapFrag extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     private int GREEN_500;
+    private BroadcastReceiver receiver;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,7 +117,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
     private void getWebServerLocation() {
         googleMap.clear();
 
-        RestClient.post(getActivity(), Endpoints.GET_OTHER_USERS, JSONUtils.getIdPayload(getActivity()),
+        RestClient.post(getActivity(), Endpoints.GET_OTHER_USERS, JSONUtils.getIdPayload(getActivity().getBaseContext()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
@@ -199,13 +200,22 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
     }
 
     private void registerBroadcastReceiver() {
-        getActivity().registerReceiver(new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("updated_location")) {
                     getWebServerLocation();
                 }
             }
-        }, new IntentFilter("updated_location"));
+        };
+
+        getActivity().registerReceiver(receiver, new IntentFilter("updated_location"));
+    }
+
+    @Override
+    public void onStop() {
+        if (receiver != null)
+            getActivity().unregisterReceiver(receiver);
+        super.onStop();
     }
 }
