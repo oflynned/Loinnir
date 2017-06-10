@@ -40,10 +40,10 @@ public class MessagingService extends FirebaseMessagingService {
 
                     NotificationUtils.generateMessageNotification(getApplicationContext(), from, message);
                 } else if (message_type.equals(NotificationTypes.new_locality_information.name())) {
-
+                    Intent intent = new Intent(NotificationTypes.new_locality_information.name());
+                    getApplicationContext().sendBroadcast(intent);
                 } else if (message_type.equals(NotificationTypes.app_information.name())) {
                     // in case a periodic notification is dispatched to all users about Loinnir
-
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

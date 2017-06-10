@@ -1,6 +1,10 @@
 package com.syzible.loinnir.fragments.portal;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +19,7 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
@@ -139,6 +144,28 @@ public class PartnerConversationFrag extends Fragment {
             }
         });
 
+        loadMessages();
+
+        getActivity().setTitle(partner.getName());
+        registerBroadcastReceiver(MainActivity.BroadcastFilters.new_partner_message);
+
+        return view;
+    }
+
+    private void registerBroadcastReceiver(MainActivity.BroadcastFilters filter) {
+        getActivity().registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(MainActivity.BroadcastFilters.new_partner_message.name())) {
+                    // clear the messages and reload
+                    loadMessages();
+                }
+            }
+        }, new IntentFilter(filter.name()));
+    }
+
+    private void loadMessages() {
+        adapter.clear();
         RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES,
                 JSONUtils.getPartnerInteractionPayload(partner, getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
@@ -147,15 +174,10 @@ public class PartnerConversationFrag extends Fragment {
                         ArrayList<Message> messages = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
                             try {
-                                System.out.println(response.getJSONObject(i));
-
                                 JSONObject d = response.getJSONObject(i);
-
                                 JSONObject m = d.getJSONObject("message");
-                                User sender = new User(d.getJSONObject("user"));
-                                Message message = new Message(sender, m);
-
-                                messages.add(message);
+                                User s = new User(d.getJSONObject("user"));
+                                messages.add(new Message(s, m));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -173,20 +195,11 @@ public class PartnerConversationFrag extends Fragment {
                         return new JSONArray(rawJsonData);
                     }
                 });
-
-        getActivity().setTitle(partner.getName());
-
-        return view;
     }
 
     public PartnerConversationFrag setPartner(User partner) {
         this.partner = partner;
         return this;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     private ImageLoader loadImage() {
@@ -208,6 +221,7 @@ public class PartnerConversationFrag extends Fragment {
         };
     }
 
+    // TODO what is this for??? Unread messages??? Pagination???
     private int getMessageCount(User me, User partner) throws JSONException {
         RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES_COUNT,
                 JSONUtils.getPartnerInteractionPayload(partner, getActivity()),

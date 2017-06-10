@@ -1,6 +1,10 @@
 package com.syzible.loinnir.fragments.portal;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +19,7 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
@@ -143,13 +148,25 @@ public class LocalityConversationFrag extends Fragment {
                     }
                 });
 
+        registerBroadcastReceiver(MainActivity.BroadcastFilters.new_locality_information);
+
         return view;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    private void registerBroadcastReceiver(MainActivity.BroadcastFilters filter) {
+        getActivity().registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(MainActivity.BroadcastFilters.new_locality_information.name())) {
+                    // clear the messages and reload
+                    loadMessages();
+                }
+            }
+        }, new IntentFilter(filter.name()));
+    }
 
+    private void loadMessages() {
+        adapter.clear();
         RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, JSONUtils.getIdPayload(getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override

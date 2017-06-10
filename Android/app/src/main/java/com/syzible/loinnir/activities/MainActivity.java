@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity
     private AlarmReceiver alarmReceiver = new AlarmReceiver();
 
     public enum BroadcastFilters {
-        finish_main_activity, start_location_polling, end_location_polling
+        finish_main_activity, start_location_polling, end_location_polling,
+        new_locality_information, new_partner_message
     }
 
     @Override
