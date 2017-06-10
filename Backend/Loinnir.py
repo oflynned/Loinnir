@@ -658,7 +658,10 @@ def notify_partner_chat_update(my_id, partner_id):
 
     print("Dispatching partner chat update!")
 
-    push_service = FCMNotification(api_key=Helper.get_fcm_api_key(mode))
+    key = Helper.get_fcm_api_key(mode)
+    print(key)
+
+    push_service = FCMNotification(api_key=key)
     push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
     return get_json({"success": True})
@@ -692,7 +695,10 @@ def notify_locality_chat_update(my_id):
     print("Dispatching locality chat update!")
 
     # perhaps should not notify users on a new locality message @ spam
-    push_service = FCMNotification(api_key=Helper.get_fcm_api_key(mode))
+    key = Helper.get_fcm_api_key(mode)
+    print(key)
+
+    push_service = FCMNotification(api_key=key)
     push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
 
     return get_json({"success": True})
