@@ -214,8 +214,15 @@ def get_unmatched_user_count():
     blocked_users = []
 
     if len(partners_met) > 0:
-        blocked_users = partners_met[0]["blocked"]
-        partners_met = partners_met[0]["partners"]
+        if "blocked" in partners_met[0]:
+            blocked_users = partners_met[0]["blocked"]
+        else:
+            blocked_users = []
+
+        if "partners" in partners_met[0]:
+            partners_met = partners_met[0]["partners"]
+        else:
+            partners_met = []
 
     partners_met.append(fb_id)
     users = users_col.find({"$and": [{"fb_id": {"$nin": partners_met}}, {"fb_id": {"$nin": blocked_users}}]})
@@ -431,7 +438,6 @@ def get_locality_messages():
     user_querying_blocked_users = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]
 
     # don't show blocked users' messages
-    # TODO issue on no blocked users yet
     if "blocked" in user_querying_blocked_users:
         blocked_users = user_querying_blocked_users["blocked"]
     else:
