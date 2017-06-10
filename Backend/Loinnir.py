@@ -403,6 +403,18 @@ def get_all_messages():
     return get_json(messages)
 
 
+@app.route("/api/v1/messages/get-all-locality-messages", methods=["GET"])
+def get_all_locality_messages():
+    messages = mongo.db.locality_conversations.find()
+    return get_json(list(messages))
+
+
+@app.route("/api/v1/messages/get-all-partner-messages", methods=["GET"])
+def get_all_locality_messages():
+    messages = mongo.db.partner_conversations.find()
+    return get_json(list(messages))
+
+
 # get all messages residing within the locality for the user's record provided
 # POST {fb_id: ...}
 # GET [{...},{...}]
