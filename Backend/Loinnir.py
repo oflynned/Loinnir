@@ -410,7 +410,7 @@ def get_all_locality_messages():
 
 
 @app.route("/api/v1/messages/get-all-partner-messages", methods=["GET"])
-def get_all_locality_messages():
+def get_all_partner_messages():
     messages = mongo.db.partner_conversations.find()
     return get_json(list(messages))
 
