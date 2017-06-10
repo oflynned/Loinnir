@@ -22,9 +22,6 @@ import com.syzible.loinnir.objects.User;
  */
 
 public class NoConversationFrag extends Fragment {
-
-    private User partner;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {

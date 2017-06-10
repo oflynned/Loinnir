@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -27,20 +26,18 @@ import android.widget.TextView;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
-import com.syzible.loinnir.fragments.portal.LocalityConversationFrag;
 import com.syzible.loinnir.fragments.portal.ConversationsListFrag;
+import com.syzible.loinnir.fragments.portal.LocalityConversationFrag;
 import com.syzible.loinnir.fragments.portal.MapFrag;
 import com.syzible.loinnir.fragments.portal.PartnerConversationFrag;
 import com.syzible.loinnir.fragments.portal.RouletteFrag;
 import com.syzible.loinnir.network.Endpoints;
-import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.GetImage;
+import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
-import com.syzible.loinnir.services.AlarmReceiver;
 import com.syzible.loinnir.services.LocationService;
 import com.syzible.loinnir.services.MessagingService;
-import com.syzible.loinnir.services.TokenService;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
@@ -58,7 +55,6 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private View headerView;
-    private AlarmReceiver alarmReceiver = new AlarmReceiver();
 
     private BroadcastReceiver receiver;
 

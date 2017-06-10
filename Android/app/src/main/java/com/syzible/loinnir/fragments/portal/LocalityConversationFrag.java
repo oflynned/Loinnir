@@ -26,6 +26,7 @@ import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LanguageUtils;
@@ -38,6 +39,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -206,17 +208,29 @@ public class LocalityConversationFrag extends Fragment {
         return new ImageLoader() {
             @Override
             public void loadImage(final ImageView imageView, final String url) {
-                new GetImage(new NetworkCallback<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap response) {
-                        imageView.setImageBitmap(BitmapUtils.getCroppedCircle(response));
-                    }
+                // can only use Facebook to sign up so use the embedded id in the url
+                final String fileName = url.split("/")[3];
 
-                    @Override
-                    public void onFailure() {
-                        System.out.println("dl failure on chat pic");
-                    }
-                }, url, true).execute();
+                if (!CachingUtil.doesImageExist(getActivity(), fileName)) {
+                    System.out.println("Does not exist!");
+                    new GetImage(new NetworkCallback<Bitmap>() {
+                        @Override
+                        public void onResponse(Bitmap response) {
+                            Bitmap croppedImage = BitmapUtils.getCroppedCircle(response);
+                            CachingUtil.cacheImage(getActivity(), fileName, croppedImage);
+                            imageView.setImageBitmap(croppedImage);
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            System.out.println("dl failure on chat pic");
+                        }
+                    }, url, true).execute();
+                } else {
+                    System.out.println("Exists!");
+                    Bitmap cachedImage = CachingUtil.getCachedImage(getActivity(), fileName);
+                    imageView.setImageBitmap(cachedImage);
+                }
             }
         };
     }

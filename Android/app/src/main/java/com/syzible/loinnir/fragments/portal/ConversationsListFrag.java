@@ -26,6 +26,7 @@ import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Conversation;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.JSONUtils;
@@ -176,17 +177,27 @@ public class ConversationsListFrag extends Fragment implements
         return new ImageLoader() {
             @Override
             public void loadImage(final ImageView imageView, final String url) {
-                new GetImage(new NetworkCallback<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap response) {
-                        imageView.setImageBitmap(BitmapUtils.getCroppedCircle(response));
-                    }
+                // can only use Facebook to sign up so use the embedded id in the url
+                final String fileName = url.split("/")[3];
 
-                    @Override
-                    public void onFailure() {
-                        System.out.println("dl failure on chat pic");
-                    }
-                }, url, true).execute();
+                if (!CachingUtil.doesImageExist(getActivity(), fileName)) {
+                    new GetImage(new NetworkCallback<Bitmap>() {
+                        @Override
+                        public void onResponse(Bitmap response) {
+                            Bitmap croppedImage = BitmapUtils.getCroppedCircle(response);
+                            CachingUtil.cacheImage(getActivity(), fileName, croppedImage);
+                            imageView.setImageBitmap(croppedImage);
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            System.out.println("dl failure on chat pic");
+                        }
+                    }, url, true).execute();
+                } else {
+                    Bitmap cachedImage = CachingUtil.getCachedImage(getActivity(), fileName);
+                    imageView.setImageBitmap(cachedImage);
+                }
             }
         };
     }
