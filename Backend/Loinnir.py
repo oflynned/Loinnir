@@ -183,13 +183,17 @@ def get_random_user():
 
     else:
         # append self too to exclude self matching
-        blocked_users = list(partners_met)
-        if len(blocked_users) > 0:
+        blocked_users = list(partners_met)[0]
+        if "blocked" in blocked_users:
             blocked_users = blocked_users[0]["blocked"]
+        else:
+            blocked_users = []
 
-        partners_met = list(partners_met)
-        if len(partners_met) > 0:
-            partners_met = partners_met[0]["partners"]
+        partners_met = list(partners_met)[0]
+        if "partners" in partners_met:
+            partners_met = partners_met["partners"]
+        else:
+            partners_met = []
 
         partners_met.append(fb_id)
         users = users_col.find({"$and": [{"fb_id": {"$nin": partners_met}}, {"fb_id": {"$nin": blocked_users}}]})
