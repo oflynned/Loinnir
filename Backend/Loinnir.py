@@ -432,7 +432,7 @@ def get_locality_messages():
 
     # don't show blocked users' messages
     # TODO issue on no blocked users yet
-    if user_querying_blocked_users["blocked"]:
+    if "blocked" in user_querying_blocked_users:
         blocked_users = user_querying_blocked_users["blocked"]
     else:
         blocked_users = []
