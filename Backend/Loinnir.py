@@ -17,6 +17,8 @@ app.config["MONGO_DBNAME"] = "loinnir"
 app.config["MONGO_URI"] = "mongodb://localhost:27017/loinnir"
 app.debug = True
 
+mode = "dev"
+
 # persistence
 mongo = PyMongo(app)
 
@@ -632,8 +634,8 @@ def notify_partner_chat_update(my_id, partner_id):
         "message": message
     }
 
-    push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
-    result = push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
+    push_service = FCMNotification(api_key=Helper.get_fcm_api_key(mode))
+    push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
     return get_json({"success": True})
 
@@ -664,8 +666,8 @@ def notify_locality_chat_update(my_id):
     }
 
     # perhaps should not notify users on a new locality message @ spam
-    push_service = FCMNotification(api_key=Helper.get_fcm_api_key())
-    result = push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
+    push_service = FCMNotification(api_key=Helper.get_fcm_api_key(mode))
+    push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
 
     return get_json({"success": True})
 
@@ -679,6 +681,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         env = sys.argv[1]
         if env == "prod":
+            mode = "prod"
             app.run(host='0.0.0.0', port=80)
     else:
         app.run(host='0.0.0.0', port=3000)

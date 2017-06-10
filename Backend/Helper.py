@@ -3,14 +3,21 @@ import json
 
 class Helper:
     @staticmethod
-    def get_fcm_api_key():
-        with open("../../../../loinnir_auth.json", "r") as f:
+    def get_path(mode):
+        if mode == "prod":
+            return "../../loinnir_auth.json"
+        else:
+            return "../../../../loinnir_auth.json"
+
+    @staticmethod
+    def get_fcm_api_key(mode):
+        with open(Helper.get_path(mode), "r") as f:
             data = json.loads(f.read())
             return data["fcm_api_key"]
 
     @staticmethod
-    def get_places_api_key():
-        with open("../../../../loinnir_auth.json", "r") as f:
+    def get_places_api_key(mode):
+        with open(Helper.get_path(mode), "r") as f:
             data = json.loads(f.read())
             return data["places_api_key"]
 
@@ -18,7 +25,6 @@ class Helper:
     def get_populated_areas():
         with open("./populated_areas.json", "r") as f:
             data = json.loads(f.read())
-            # returns json array
             return data["features"]
 
     @staticmethod
