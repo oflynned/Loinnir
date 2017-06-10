@@ -185,7 +185,7 @@ def get_random_user():
         # append self too to exclude self matching
         blocked_users = list(partners_met)[0]
         if "blocked" in blocked_users:
-            blocked_users = blocked_users[0]["blocked"]
+            blocked_users = blocked_users["blocked"]
         else:
             blocked_users = []
 
