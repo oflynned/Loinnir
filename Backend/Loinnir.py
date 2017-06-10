@@ -428,11 +428,12 @@ def get_locality_messages():
     locality_col = mongo.db.locality_conversations
 
     # get user doc under conversations to see if it's been generated from sending a message yet
-    blocked_users = list(mongo.db.conversations.find({"fb_id": fb_id}))
+    user_querying_blocked_users = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]
 
     # don't show blocked users' messages
-    if len(blocked_users) > 0:
-        blocked_users = blocked_users[0]["blocked"]
+    # TODO issue on no blocked users yet
+    if user_querying_blocked_users["blocked"]:
+        blocked_users = user_querying_blocked_users["blocked"]
     else:
         blocked_users = []
 
@@ -575,7 +576,7 @@ def unblock_user():
 
 
 # POST {fb_id: ...}
-# GET [{fb_id:..., last_message_time:..., last_message_content:...}]
+# GET [{fb_id:..., last_message_time:..., last_message_content:...}, {...}, ...]
 @app.route("/api/v1/messages/get-past-conversation-previews", methods=["POST"])
 def get_conversations_previews():
     data = request.json
