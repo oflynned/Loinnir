@@ -454,8 +454,6 @@ def get_locality_messages():
     messages = locality_col.find({"locality": locality, "fb_id": {"$nin": blocked_users}})
     messages = list(messages)
 
-    print(messages)
-
     for i, message in enumerate(messages):
         fb_id = message["fb_id"]
         user = mongo.db.users.find({"fb_id": fb_id})
@@ -658,6 +656,8 @@ def notify_partner_chat_update(my_id, partner_id):
         "message": message
     }
 
+    print("Dispatching partner chat update!")
+
     push_service = FCMNotification(api_key=Helper.get_fcm_api_key(mode))
     push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
@@ -688,6 +688,8 @@ def notify_locality_chat_update(my_id):
         "message_title": message_title,
         "message": message
     }
+
+    print("Dispatching locality chat update!")
 
     # perhaps should not notify users on a new locality message @ spam
     push_service = FCMNotification(api_key=Helper.get_fcm_api_key(mode))
