@@ -235,9 +235,12 @@ def get_unmatched_user_count():
 def get_matched_user_count():
     data = request.json
     fb_id = str(data["fb_id"])
-    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))
-    if len(partners_met) > 0:
-        partners_met = partners_met[0]["partners"]
+    partners_met = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]
+
+    if "partners" in partners_met:
+        partners_met = partners_met["partners"]
+    else:
+        partners_met = []
 
     return get_json({"count": len(partners_met)})
 
@@ -454,12 +457,6 @@ def get_locality_messages():
         user = mongo.db.users.find({"fb_id": fb_id})
         user_details = list(user)[0]
         messages[i]["user"] = user_details
-
-        # temp disable this as I'm not sure how much info I need to provide for messages
-
-        # messages[i]["user"] = dict()
-        # messages[i]["user"]["name"] = user_details["name"]
-        # messages[i]["user"]["profile_pic"] = user_details["profile_pic"]
 
     return get_json(list(messages))
 
