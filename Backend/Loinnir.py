@@ -667,7 +667,7 @@ def notify_partner_chat_update(my_id, partner_id):
     return get_json({"success": True})
 
 
-@app.route("/api/v1/services/notify-locality-update", methods=["GET"])
+@app.route("/api/v1/services/notify-locality-update", methods=["POST"])
 def notify_locality_chat_update(my_id):
     me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
     me.pop("_id")
