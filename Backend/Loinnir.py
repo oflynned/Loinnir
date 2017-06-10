@@ -667,7 +667,11 @@ def notify_partner_chat_update(my_id, partner_id):
     return get_json({"success": True})
 
 
-def notify_locality_chat_update(my_id):
+@app.route("/api/v1/services/notify-locality-update", methods=["GET"])
+def notify_locality_chat_update():
+    # TODO test
+    my_id = "1433224973407916"
+
     me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
     me.pop("_id")
 
@@ -680,28 +684,34 @@ def notify_locality_chat_update(my_id):
             {"locality": {"$eq": locality}}
         ]}))
 
-    for user in locality_users:
-        ids.append(user["fcm_token"])
+    if len(locality_users) > 0:
+        for user in locality_users:
+            ids.append(user["fcm_token"])
 
-    message_title = me["locality"]
-    message = "Tá " + str(len(locality_users)) + " úsáideoir eile sa cheantar seo faoi láthair."
+        message_title = me["locality"]
+        message = "Tá " + str(len(locality_users)) + " úsáideoir eile sa cheantar seo faoi láthair."
 
-    data_content = {
-        "notification_type": "new_locality_information",
-        "message_title": message_title,
-        "message": message
-    }
+        data_content = {
+            "notification_type": "new_locality_information",
+            "message_title": message_title,
+            "message": message
+        }
 
-    print("Dispatching locality chat update!")
+        print("Dispatching locality chat update!")
 
-    # perhaps should not notify users on a new locality message @ spam
-    key = Helper.get_fcm_api_key(mode)
-    print(key)
+        # perhaps should not notify users on a new locality message @ spam
+        key = Helper.get_fcm_api_key(mode)
+        print(key)
 
-    push_service = FCMNotification(api_key=key)
-    push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
+        print("ids:")
+        print(ids)
 
-    return get_json({"success": True})
+        push_service = FCMNotification(api_key=key)
+        push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
+
+        return get_json({"success": True})
+    else:
+        return get_json({"success": False, "reason": "no users in locality right now"})
 
 
 # kinda unneeded unless I wanna send out notifications about currently active users every Friday etc?
