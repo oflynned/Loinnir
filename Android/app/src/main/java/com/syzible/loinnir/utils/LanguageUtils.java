@@ -146,7 +146,7 @@ public class LanguageUtils {
             if (count % 10 == 0)
                 return noun;
 
-            count = count % 10;
+            count %= 10;
 
             // 1 bhliain
             if (count > 0 && count < 3)
@@ -165,11 +165,12 @@ public class LanguageUtils {
         } else {
             if (count == 10)
                 return eclipse(noun);
+
             // 20, 30, 40...
             if (count % 10 == 0)
                 return noun;
 
-            count = count % 10;
+            count %= 10;
 
             // 1 bhád, 2 bhád...
             if (count > 0 && count < 7)

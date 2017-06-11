@@ -27,6 +27,7 @@ import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.services.TokenService;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
+import com.syzible.loinnir.utils.EncodingUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
@@ -117,7 +118,7 @@ public class LoginFrag extends Fragment {
 
                                     JSONObject postData = new JSONObject();
                                     postData.put("fb_id", id);
-                                    postData.put("name", URLEncoder.encode(name, "UTF-8"));
+                                    postData.put("name", EncodingUtils.encodeText(name));
                                     postData.put("profile_pic", pic);
                                     postData.put("show_location", true);
 
@@ -150,7 +151,7 @@ public class LoginFrag extends Fragment {
                                         }
                                     });
 
-                                } catch (JSONException | UnsupportedEncodingException e) {
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
 

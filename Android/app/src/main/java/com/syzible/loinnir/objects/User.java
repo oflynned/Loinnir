@@ -3,6 +3,7 @@ package com.syzible.loinnir.objects;
 import com.google.android.gms.maps.model.LatLng;
 import com.stfalcon.chatkit.commons.models.IUser;
 import com.syzible.loinnir.utils.Constants;
+import com.syzible.loinnir.utils.EncodingUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,11 +31,7 @@ public class User implements IUser {
         this.longitude = (float) data.getDouble("lng");
         this.latitude = (float) data.getDouble("lat");
         this.location = new LatLng(latitude, longitude);
-        try {
-            this.name = URLDecoder.decode(data.getString("name"), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        this.name = EncodingUtils.decodeText(data.getString("name"));
         this.avatar = data.getString("profile_pic");
         this.locality = data.getString("locality");
     }

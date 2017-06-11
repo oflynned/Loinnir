@@ -21,6 +21,7 @@ import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.utils.BitmapUtils;
+import com.syzible.loinnir.utils.EncodingUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,7 +72,7 @@ public class NotificationUtils {
                                 .setLargeIcon(circularIcon)
                                 .setSmallIcon(R.drawable.logo_small)
                                 .setContentTitle(user.getName())
-                                .setContentText(message.getText());
+                                .setContentText(EncodingUtils.decodeText(message.getText()));
 
                 // intent for opening partner conversation window
                 Intent resultingIntent = new Intent(context, MainActivity.class);

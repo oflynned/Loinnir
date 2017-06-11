@@ -28,6 +28,7 @@ import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
+import com.syzible.loinnir.utils.EncodingUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
@@ -92,7 +93,7 @@ public class PartnerConversationFrag extends Fragment {
                                                 JSONObject messagePayload = new JSONObject();
                                                 messagePayload.put("from_id", LocalStorage.getID(getActivity()));
                                                 messagePayload.put("to_id", partner.getId());
-                                                messagePayload.put("message", message.getText());
+                                                messagePayload.put("message", EncodingUtils.encodeText(message.getText()));
 
                                                 RestClient.post(getActivity(), Endpoints.SEND_PARTNER_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
                                                     @Override
@@ -175,10 +176,12 @@ public class PartnerConversationFrag extends Fragment {
                         ArrayList<Message> messages = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
                             try {
-                                JSONObject d = response.getJSONObject(i);
-                                JSONObject m = d.getJSONObject("message");
-                                User s = new User(d.getJSONObject("user"));
-                                messages.add(new Message(s, m));
+                                JSONObject data = response.getJSONObject(i);
+                                JSONObject dataMessage = data.getJSONObject("message");
+                                User sender = new User(data.getJSONObject("user"));
+                                Message message = new Message(sender, dataMessage);
+
+                                messages.add(message);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

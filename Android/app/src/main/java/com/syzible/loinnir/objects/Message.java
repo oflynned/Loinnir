@@ -3,6 +3,7 @@ package com.syzible.loinnir.objects;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 import com.syzible.loinnir.utils.EmojiUtils;
+import com.syzible.loinnir.utils.EncodingUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,7 +34,7 @@ public class Message implements IMessage {
             this.id = messageObject.getString("_id");
             this.sender = sender;
             this.time = messageObject.getLong("time");
-            this.contents = messageObject.getString("message");
+            this.contents = EncodingUtils.encodeText(messageObject.getString("message"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -53,7 +54,7 @@ public class Message implements IMessage {
 
     @Override
     public String getText() {
-        return contents;
+        return EncodingUtils.decodeText(contents);
     }
 
     @Override

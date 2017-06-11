@@ -28,23 +28,18 @@ import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
+import com.syzible.loinnir.utils.EncodingUtils;
 import com.syzible.loinnir.utils.JSONUtils;
-import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.util.EncodingUtils;
 
 /**
  * Created by ed on 07/05/2017.
@@ -89,7 +84,7 @@ public class LocalityConversationFrag extends Fragment {
                                     // send to server
                                     JSONObject messagePayload = new JSONObject();
                                     messagePayload.put("fb_id", LocalStorage.getID(getActivity()));
-                                    messagePayload.put("message", message.getText());
+                                    messagePayload.put("message", EncodingUtils.encodeText(message.getText()));
 
                                     RestClient.post(getActivity(), Endpoints.SEND_LOCALITY_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
                                         @Override

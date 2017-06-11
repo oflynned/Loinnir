@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private View headerView;
-
-    private BroadcastReceiver receiver;
+    private BroadcastReceiver finishMainActivityReceiver, startLocationPollingReceiver,
+            endLocationPollingReceiver, newLocalityInformationReceiver, newPartnerMessageReceiver;
 
     public enum BroadcastFilters {
         finish_main_activity, start_location_polling, end_location_polling,
@@ -100,12 +100,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        startService(new Intent(this, LocationService.class));
-        startService(new Intent(this, MessagingService.class));
-
-        registerBroadcastReceiver(BroadcastFilters.finish_main_activity);
-        sendBroadcast(new Intent(BroadcastFilters.start_location_polling.name()));
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
@@ -131,24 +125,36 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
-        super.onPause();
         sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
+        super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        startService(new Intent(this, LocationService.class));
+        startService(new Intent(this, MessagingService.class));
+        registerBroadcastReceivers();
+        sendBroadcast(new Intent(BroadcastFilters.start_location_polling.name()));
+
+        super.onStart();
     }
 
     @Override
     protected void onStop() {
-        unregisterReceiver(receiver);
+        unregisterReceiver(startLocationPollingReceiver);
+        unregisterReceiver(endLocationPollingReceiver);
+        unregisterReceiver(finishMainActivityReceiver);
         super.onStop();
     }
 
-    private void registerBroadcastReceiver(BroadcastFilters filter) {
-        receiver = new BroadcastReceiver() {
+    private void registerBroadcastReceivers() {
+        finishMainActivityReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(BroadcastFilters.finish_main_activity.name())) {
@@ -157,7 +163,23 @@ public class MainActivity extends AppCompatActivity
             }
         };
 
-        registerReceiver(receiver, new IntentFilter(filter.name()));
+        startLocationPollingReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                startService(new Intent(getApplicationContext(), LocationService.class));
+            }
+        };
+
+        endLocationPollingReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                stopService(new Intent(getApplicationContext(), LocationService.class));
+            }
+        };
+
+        registerReceiver(finishMainActivityReceiver, new IntentFilter(BroadcastFilters.finish_main_activity.name()));
+        registerReceiver(startLocationPollingReceiver, new IntentFilter(BroadcastFilters.start_location_polling.name()));
+        registerReceiver(endLocationPollingReceiver, new IntentFilter(BroadcastFilters.end_location_polling.name()));
     }
 
     private void greetUser() {

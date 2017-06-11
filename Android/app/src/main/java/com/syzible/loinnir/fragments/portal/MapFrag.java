@@ -69,8 +69,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        registerBroadcastReceiver();
-
         GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
         getActivity().setTitle(getResources().getString(R.string.app_name));
     }
@@ -213,9 +211,14 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
+    public void onStart() {
+        registerBroadcastReceiver();
+        super.onStart();
+    }
+
+    @Override
     public void onStop() {
-        if (receiver != null)
-            getActivity().unregisterReceiver(receiver);
+        getActivity().unregisterReceiver(receiver);
         super.onStop();
     }
 }
