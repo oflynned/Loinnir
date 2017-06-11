@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.fragments.authentication.LoginFrag;
+import com.syzible.loinnir.utils.FacebookUtils;
+import com.syzible.loinnir.utils.LocalStorage;
 
 import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.SlideFragment;
@@ -21,11 +24,21 @@ public class IntroductionActivity extends MaterialIntroActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addSlide(introductionSlide());
-        addSlide(locationSlide());
-        addSlide(chatSlide());
-        addSlide(permissionsSlide());
-        addSlide(getStartedSlide());
+        if (FacebookUtils.hasExistingToken(this)) {
+            this.finish();
+            startActivity(new Intent(this, MainActivity.class));
+        } else {
+            if (LocalStorage.isFirstRun(this)) {
+                this.finish();
+                startActivity(new Intent(this, AuthenticationActivity.class));
+            } else {
+                addSlide(introductionSlide());
+                addSlide(locationSlide());
+                addSlide(chatSlide());
+                addSlide(permissionsSlide());
+                addSlide(getStartedSlide());
+            }
+        }
     }
 
     @Override
@@ -71,7 +84,7 @@ public class IntroductionActivity extends MaterialIntroActivity {
                 .image(R.drawable.ic_permissions_white)
                 .title("Ceadanna")
                 .description("Iarraimid ort glacadh le ceadanna an cheantair ionas go mbeidh an eispéireas is fearr agat don aip.")
-                .neededPermissions(new String[] {
+                .neededPermissions(new String[]{
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION
                 })
