@@ -34,7 +34,7 @@ public class Message implements IMessage {
             this.id = messageObject.getString("_id");
             this.sender = sender;
             this.time = messageObject.getLong("time");
-            this.contents = EncodingUtils.encodeText(messageObject.getString("message"));
+            this.contents = messageObject.getString("message");
         } catch (JSONException e) {
             e.printStackTrace();
         }
