@@ -6,11 +6,8 @@ import android.graphics.BitmapFactory;
 import android.os.Environment;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by ed on 10/06/2017.
@@ -18,21 +15,17 @@ import java.util.Date;
 
 public class CachingUtil {
 
-    private static final String DIRECTORY = "/loinnir";
-
     public static boolean doesImageExist(Context context, String id) {
         checkDirectoryExists(context);
         File[] files = new File(getDirectoryPath(context)).listFiles();
-
-        System.out.println(files.length + " files in dir");
 
         if (files.length == 0)
             return false;
 
         for (File file : files)
-            if (file.getName().equals(id + ".png"))
+            if (file.getName().equals(getFileWithExtension(id)))
                 return true;
-        
+
         return false;
     }
 
@@ -52,7 +45,6 @@ public class CachingUtil {
     }
 
     private static void saveToFile(Context context, String name, Bitmap file) {
-        // TODO hash/unhash the names to hide the Facebook id?
         File pictureFile = getOutputMediaFile(context, name);
         assert pictureFile != null;
 

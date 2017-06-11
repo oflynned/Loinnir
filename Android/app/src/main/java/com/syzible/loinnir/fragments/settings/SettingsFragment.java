@@ -342,7 +342,29 @@ public class SettingsFragment extends PreferenceFragment {
                         .setPositiveButton("Deimhnigh an Scriosadh", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DisplayUtils.generateToast(context, "Scriosadh do chúntas");
+                                RestClient.delete(getActivity(), Endpoints.DELETE_USER,
+                                        JSONUtils.getIdPayload(getActivity()),
+                                        new BaseJsonHttpResponseHandler<JSONObject>() {
+                                            @Override
+                                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                                DisplayUtils.generateToast(context, "Scriosadh do chúntas!");
+                                                FacebookUtils.deleteToken(context);
+
+                                                getActivity().sendBroadcast(new Intent("finish_main_activity"));
+                                                getActivity().finish();
+                                                startActivity(new Intent(context, AuthenticationActivity.class));
+                                            }
+
+                                            @Override
+                                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                                            }
+
+                                            @Override
+                                            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                                return new JSONObject(rawJsonData);
+                                            }
+                                        });
                             }
                         })
                         .setNegativeButton("Ná Scrios!", null)

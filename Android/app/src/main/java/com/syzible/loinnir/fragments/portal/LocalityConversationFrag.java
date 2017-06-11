@@ -64,7 +64,10 @@ public class LocalityConversationFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.conversation_frag, container, false);
 
-        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
+        MessagesListAdapter.HoldersConfig holdersConfig = new MessagesListAdapter.HoldersConfig();
+        holdersConfig.setIncoming(IncomingMessage.class, R.layout.chat_message_layout);
+
+        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), holdersConfig, loadImage());
         messagesList = (MessagesList) view.findViewById(R.id.messages_list);
         messagesList.setAdapter(adapter);
 

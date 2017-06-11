@@ -98,15 +98,6 @@
             </intent-filter>
         </service>
 
-        <receiver
-            android:name=".services.BootReceiver"
-            android:process=":remote">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".services.AlarmReceiver" />
         <service android:name=".services.LocationService" />
 
     </application>

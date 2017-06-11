@@ -26,6 +26,11 @@ import cz.msebera.android.httpclient.Header;
  */
 
 public class LocationService extends Service {
+
+    /**
+     * TODO need to fix battery drain! 12%+ being spent on GPS alone
+     */
+
     private LocationManager locationManager = null;
     private static final int LOCATION_INTERVAL = 1000 * 30;
     private static final float LOCATION_DISTANCE = 100f;
