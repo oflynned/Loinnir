@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/iv_login_app_logo"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
+        android:layout_width="192dp"
+        android:layout_height="192dp"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
         android:src="@drawable/logo_small" />
@@ -27,39 +27,11 @@
         android:text="Logáil isteach le do chúntas Facebook chun bualadh le daoine nua níos éasca trí sheirbhísí Loinnir."
         android:textColor="@color/white" />
 
-
-    <TextView
-        android:id="@+id/login_tip_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/login_tip_1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginEnd="64dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="16dp"
-        android:gravity="center_horizontal"
-        android:text="Buail le daoine nua ar fud an domhain a bhfuil Gaeilge á labhairt acu."
-        android:textColor="@color/white" />
-
-
-    <TextView
-        android:id="@+id/login_tip_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/login_tip_2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginEnd="64dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="16dp"
-        android:gravity="center_horizontal"
-        android:text="Fionn agus aimsigh pobal i do thimpeall a bhfuil Gaeilge labhartha aige."
-        android:textColor="@color/white" />
-
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_fb_login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/login_tip_3"
+        android:layout_below="@+id/login_tip_1"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_horizontal"
