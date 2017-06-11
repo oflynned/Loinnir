@@ -32,8 +32,8 @@ public class LocationService extends Service {
      */
 
     private LocationManager locationManager = null;
-    private static final int LOCATION_INTERVAL = 1000 * 30;
-    private static final float LOCATION_DISTANCE = 100f;
+    private static final int LOCATION_INTERVAL = 1000; //
+    private static final float LOCATION_DISTANCE = 100f; // 100m
 
     private class LocationListener implements android.location.LocationListener {
 
@@ -130,9 +130,6 @@ public class LocationService extends Service {
 
     @Override
     public void onCreate() {
-        registerBroadcastReceiver(MainActivity.BroadcastFilters.start_location_polling);
-        registerBroadcastReceiver(MainActivity.BroadcastFilters.end_location_polling);
-
         startPollingLocation();
         super.onCreate();
     }

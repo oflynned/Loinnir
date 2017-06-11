@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
         super.onDestroy();
     }
 
@@ -147,6 +146,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
+        sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
+        stopService(new Intent(this, LocationService.class));
+
         unregisterReceiver(startLocationPollingReceiver);
         unregisterReceiver(endLocationPollingReceiver);
         unregisterReceiver(finishMainActivityReceiver);
