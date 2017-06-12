@@ -41,9 +41,14 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/tacaiocht", methods=["GET"])
+@app.route("/tos", methods=["GET"])
 def tacaiocht():
-    return render_template("tacaiocht.html")
+    return render_template("tos.html")
+
+
+@app.route("/ceadunais", methods=["GET"])
+def ceadunais():
+    return render_template("ceadunais.html")
 
 
 @app.route("/priobhaideacht", methods=["GET"])
