@@ -1,37 +1,42 @@
 div.full-page {
-    min-height: 100vh;
-    min-width: 100vw;
+  min-height: 100vh;
+  min-width: 100vw;
 }
 
 .amber-300-element {
-    background: #FFD54F;
+  background: #FFD54F;
 }
 
 .amber-500-element {
-    background: #FFC107;
+  background: #FFC107;
 }
 
 .amber-700-element {
-    background: #FFA000;
+  background: #FFA000;
 }
 
 .loinnir-nav {
-    background: #000;
+  background: #000;
 }
 
 div.is-under-nav {
-    padding-top: 5em;
+  padding-top: 5em;
 }
 
 div.content-margin-small {
-    margin-top: 1em;
+  margin-top: 1em;
 }
 
 .logo-main {
-    max-height: 15em;
-    max-width: 15em;
+  max-height: 15em;
+  max-width: 15em;
 }
 
-body, h1, a{
-    font-family: 'Quicksand', sans-serif;
+body, h1, h2, h3, a{
+  font-family: 'Quicksand', sans-serif;
+}
+
+p.block-text {
+  color: white;
+  text-align: justify;
 }
