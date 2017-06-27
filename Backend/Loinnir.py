@@ -29,7 +29,6 @@ mongo = PyMongo(app)
 # TODO
 """
     unread/read messages
-    reporting? when should an auto ban occur?
     auto generate password to protect public api by tokens
     
     refactor by moving to blueprints, this is getting too long to comfortably code

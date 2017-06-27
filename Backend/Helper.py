@@ -43,3 +43,4 @@ class Helper:
 
             # get random town from json
             # add/subtract random value on lat & lng up to 10km
+            # regenerate locality for the fake profile
