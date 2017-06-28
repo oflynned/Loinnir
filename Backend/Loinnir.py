@@ -29,6 +29,7 @@ mongo = PyMongo(app)
 # TODO
 """
     unread/read messages
+    pagination
     auto generate password to protect public api by tokens
     
     refactor by moving to blueprints, this is getting too long to comfortably code
@@ -65,11 +66,6 @@ def get_json(data):
         json_util.dumps(data),
         mimetype='application/json'
     )
-
-
-@app.route('/api/v1', methods=["GET", "POST"])
-def hello_world():
-    return get_json({"subtitle": ":)", "header": "Hey Sean", "title": "I'm watching you", "should_run": True})
 
 
 # POST {fb_id: 123456789, ...}

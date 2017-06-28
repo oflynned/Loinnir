@@ -47,7 +47,7 @@ public class Endpoints {
     public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner";
     public static final String UNSUBSCRIBE_PARTNER = "/messages/unsubscribe-partner";
 
-    public static final String LICENCES = "/licences";
+    public static final String LICENCES = "/ceadunais";
     public static final String PRIVACY_POLICIES = "/priobhaideacht";
     public static final String TERMS_OF_SERVICE = "/tos";
 

@@ -255,7 +255,7 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     private void setListenerLogOut() {
-        final String accountName = LocalStorage.getStringPref(LocalStorage.Pref.name, context);
+        final String accountName = LocalStorage.getFullName(context);
         logOut.setSummary("Cúntas reatha: " + accountName);
 
         logOut.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

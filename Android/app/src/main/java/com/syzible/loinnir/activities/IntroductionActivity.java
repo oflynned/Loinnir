@@ -4,12 +4,15 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
 
 import com.syzible.loinnir.R;
+import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import agency.tango.materialintroscreen.MaterialIntroActivity;
+import agency.tango.materialintroscreen.MessageButtonBehaviour;
 import agency.tango.materialintroscreen.SlideFragment;
 import agency.tango.materialintroscreen.SlideFragmentBuilder;
 
@@ -18,6 +21,11 @@ import agency.tango.materialintroscreen.SlideFragmentBuilder;
  */
 
 public class IntroductionActivity extends MaterialIntroActivity {
+    /*
+    * TODO
+    * request permissions
+    * facebook login
+    * */
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,7 +35,7 @@ public class IntroductionActivity extends MaterialIntroActivity {
             this.finish();
             startActivity(new Intent(this, MainActivity.class));
         } else {
-            if (LocalStorage.isFirstRun(this)) {
+            if (!LocalStorage.isFirstRun(this)) {
                 this.finish();
                 startActivity(new Intent(this, AuthenticationActivity.class));
             } else {
@@ -96,7 +104,7 @@ public class IntroductionActivity extends MaterialIntroActivity {
                 .buttonsColor(R.color.blue500)
                 .image(R.drawable.ic_facebook_white)
                 .title("Cúntas Facebook")
-                .description("Tá cúntas Facebook riachtanach le síniú isteach ar sheirbhísí Loinnir.")
+                .description("Tá sé riachtanach cúntas Facebook a bheith agat le síniú isteach ar sheirbhísí Loinnir ionas go mbeidh an eispéireas is fearr agat.")
                 .build();
     }
 
