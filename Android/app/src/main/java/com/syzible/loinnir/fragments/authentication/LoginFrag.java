@@ -52,34 +52,8 @@ public class LoginFrag extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // the user has to agree to terms and conditions of the use of the app first
-        if (!LocalStorage.getBooleanPref(LocalStorage.Pref.first_run, getActivity())) {
-            // default to on, has to be set at some point, may as well be here instead of overriding on each start
-            LocalStorage.setBooleanPref(LocalStorage.Pref.should_share_location, true, getActivity());
-
-            ContextThemeWrapper darkTheme = new ContextThemeWrapper(getActivity(), R.style.DarkerAppTheme);
-            new AlertDialog.Builder(darkTheme)
-                    .setTitle("Fan Soicind Led' Thoil")
-                    .setMessage("Sula dtosaíonn tú ag baint úsáide as seirbhísí Loinnir, an nglacann tú leis na coinníollacha a ghabhann le h-úsáid na h-aipe seo? " + EmojiUtils.getEmoji(EmojiUtils.HAPPY))
-                    .setPositiveButton("Glacaim leo", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            LocalStorage.setBooleanPref(LocalStorage.Pref.first_run, true, getActivity());
-                            DisplayUtils.generateSnackbar(getActivity(), "Is féidir tuilleadh a léamh faoi na coinníollacha seirbhíse sna socruithe " + EmojiUtils.getEmoji(EmojiUtils.COOL));
-                        }
-                    })
-                    .setNegativeButton("Ní ghlacaim leo", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            DisplayUtils.generateToast(getActivity(), "Ní féidir leat an aip seo a úsáid gan glacadh leis na coinníollacha úsáide");
-                            getActivity().finish();
-                        }
-                    })
-                    .setCancelable(false)
-                    .create()
-                    .show();
-        }
-
+        // default to on, has to be set at some point, may as well be here instead of overriding on each start
+        LocalStorage.setBooleanPref(LocalStorage.Pref.should_share_location, true, getActivity());
         callbackManager = CallbackManager.Factory.create();
     }
 
@@ -112,22 +86,28 @@ public class LoginFrag extends Fragment {
                             @Override
                             public void onCompleted(JSONObject o, GraphResponse response) {
                                 try {
+                                    System.out.println("Received o: " + o.toString());
                                     String id = o.getString("id");
-                                    String name = o.getString("name");
+                                    String forename = o.getString("first_name");
+                                    String surname = o.getString("last_name");
+                                    String gender = o.getString("gender");
                                     String pic = "https://graph.facebook.com/" + id + "/picture?type=large";
 
                                     JSONObject postData = new JSONObject();
                                     postData.put("fb_id", id);
-                                    postData.put("name", EncodingUtils.encodeText(name));
+                                    postData.put("forename", EncodingUtils.encodeText(forename));
+                                    postData.put("surname", EncodingUtils.encodeText(surname));
+                                    postData.put("gender", gender);
                                     postData.put("profile_pic", pic);
                                     postData.put("show_location", true);
 
-                                    // TODO should poll most recent location
+                                    // temp location until the phone updates
                                     postData.put("lat", LocationClient.ATHLONE.latitude);
                                     postData.put("lng", LocationClient.ATHLONE.longitude);
 
                                     LocalStorage.setStringPref(LocalStorage.Pref.id, id, getActivity());
-                                    LocalStorage.setStringPref(LocalStorage.Pref.name, name, getActivity());
+                                    LocalStorage.setStringPref(LocalStorage.Pref.forename, forename, getActivity());
+                                    LocalStorage.setStringPref(LocalStorage.Pref.surname, surname, getActivity());
                                     LocalStorage.setStringPref(LocalStorage.Pref.profile_pic, pic, getActivity());
 
                                     Intent startFCMTokenService = new Intent(getActivity(), TokenService.class);
@@ -159,7 +139,7 @@ public class LoginFrag extends Fragment {
                         });
 
                 Bundle parameters = new Bundle();
-                parameters.putString("Fields", "id,first_name,last_name,email,gender");
+                parameters.putString("fields", "id, first_name, last_name, gender");
                 request.setParameters(parameters);
                 request.executeAsync();
             }

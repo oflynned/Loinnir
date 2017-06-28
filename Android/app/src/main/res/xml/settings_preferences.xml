@@ -42,16 +42,16 @@
     <PreferenceCategory android:title="Cúrsaí Dleathacha">
 
         <Preference
-            android:key="pref_licences"
-            android:title="Ceadúnais" />
+            android:key="pref_tos"
+            android:title="Téarmaí Seirbhíse" />
 
         <Preference
             android:key="pref_privacy_policy"
             android:title="Polasaí Príobháideachais" />
 
         <Preference
-            android:key="pref_tos"
-            android:title="Téarmaí Seirbhíse" />
+            android:key="pref_licences"
+            android:title="Ceadúnais" />
 
     </PreferenceCategory>
 

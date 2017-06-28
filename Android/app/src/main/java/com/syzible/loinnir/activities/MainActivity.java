@@ -185,8 +185,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void greetUser() {
-        String name = LocalStorage.getStringPref(LocalStorage.Pref.name, this);
-        name = name.split(" ")[0];
+        String name = LocalStorage.getStringPref(LocalStorage.Pref.forename, this);
         DisplayUtils.generateSnackbar(this, "Fáilte romhat, a " + LanguageUtils.getVocative(name) + "! " +
                 EmojiUtils.getEmoji(EmojiUtils.HAPPY));
     }
@@ -263,7 +262,7 @@ public class MainActivity extends AppCompatActivity
 
     private void setUpDrawer() {
         TextView userName = (TextView) headerView.findViewById(R.id.nav_header_name);
-        userName.setText(LocalStorage.getStringPref(LocalStorage.Pref.name, this));
+        userName.setText(LocalStorage.getFullName(this));
 
         setLocality();
 

@@ -11,7 +11,7 @@ import android.net.Uri;
 public class Endpoints {
     private static final int API_VERSION = 1;
     private static final String LOCAL_ENDPOINT = "http://10.0.2.2:3000";
-    private static final String REMOTE_ENDPOINT = "http://13.94.249.94";
+    private static final String REMOTE_ENDPOINT = "http://ec2-54-194-22-138.eu-west-1.compute.amazonaws.com";
     private static final String STEM_URL = REMOTE_ENDPOINT;
     private static final String API_URL = STEM_URL + "/api/v" + API_VERSION;
 
@@ -47,7 +47,7 @@ public class Endpoints {
     public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner";
     public static final String UNSUBSCRIBE_PARTNER = "/messages/unsubscribe-partner";
 
-    public static final String LICENCES = "/licences";
+    public static final String LICENCES = "/ceadunais";
     public static final String PRIVACY_POLICIES = "/priobhaideacht";
     public static final String TERMS_OF_SERVICE = "/tos";
 
