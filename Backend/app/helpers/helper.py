@@ -173,10 +173,10 @@ class Helper:
         return lng + (111.320 * math.cos(dist_in_km))
 
     @staticmethod
-    def generate_fake_users():
+    def generate_fake_users(quantity=100):
         users = []
 
-        for i in range(100):
+        for i in range(quantity):
             # generate a name set
             with open("app/datasets/forenames.json", "r") as f:
                 forenames = list(json.loads(f.read()))
@@ -205,14 +205,16 @@ class Helper:
                 new_locality = Helper.get_locality(new_lat_location, new_lng_location)
 
             profile_pic = "http://c1.thejournal.ie/media/2015/10/1916-easter-rising-commemoration-2-390x285.jpg"
-            gender = "male" if randint(0,1) == 0 else "female"
+            gender = "male" if randint(0, 1) == 0 else "female"
             fb_id = str(randint(0, sys.maxsize - 1))
+            show_location = True
 
             users.append({
                 "fb_id": fb_id,
                 "forename": forename,
                 "surname": surname,
                 "gender": gender,
+                "show_location": show_location,
                 "lat": new_lat_location,
                 "lng": new_lng_location,
                 "locality": new_locality,
