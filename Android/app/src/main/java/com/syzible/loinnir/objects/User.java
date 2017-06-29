@@ -22,18 +22,22 @@ public class User implements IUser {
     private String fb_id;
     private float longitude, latitude;
     private LatLng location;
-    private String name;
+    private String forename;
+    private String surname;
     private String avatar;
     private String locality;
+    private boolean isFemale;
 
     public User(JSONObject data) throws JSONException {
         this.fb_id = data.getString("fb_id");
         this.longitude = (float) data.getDouble("lng");
         this.latitude = (float) data.getDouble("lat");
         this.location = new LatLng(latitude, longitude);
-        this.name = EncodingUtils.decodeText(data.getString("name"));
+        this.forename = EncodingUtils.decodeText(data.getString("forename"));
+        this.surname = EncodingUtils.decodeText(data.getString("surname"));
         this.avatar = data.getString("profile_pic");
         this.locality = data.getString("locality");
+        this.isFemale = data.getString("gender").equals("female");
     }
 
     @Override
@@ -43,7 +47,7 @@ public class User implements IUser {
 
     @Override
     public String getName() {
-        return name;
+        return forename + " " + surname;
     }
 
     @Override
@@ -65,5 +69,17 @@ public class User implements IUser {
 
     public String getLocality() {
         return locality;
+    }
+
+    public String getForename() {
+        return forename;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public boolean isFemale() {
+        return isFemale;
     }
 }
