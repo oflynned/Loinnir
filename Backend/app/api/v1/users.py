@@ -1,12 +1,10 @@
-from flask import Blueprint, request, Flask
-from flask_pymongo import PyMongo
-
-from app.app import app
-from app.helpers.helper import Helper
-from app.app import mongo
-
 import json
 from random import randint
+
+from flask import Blueprint, request
+
+from app.app import mongo
+from app.helpers.helper import Helper
 
 user_endpoint = Blueprint("users", __name__)
 

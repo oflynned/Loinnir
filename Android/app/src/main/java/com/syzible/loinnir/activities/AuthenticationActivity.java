@@ -1,17 +1,13 @@
 package com.syzible.loinnir.activities;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.authentication.LoginFrag;
-import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.utils.FacebookUtils;
 
 /**
@@ -23,8 +19,6 @@ public class AuthenticationActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.authentication_frag_holder);
-
-        LocationClient.getInstance().requestLocationPermissions(this);
 
         if (FacebookUtils.hasExistingToken(this)) {
             this.finish();

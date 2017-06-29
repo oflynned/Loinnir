@@ -3,6 +3,7 @@ import time
 
 from app.app import mongo
 from app.helpers.helper import Helper
+from Loinnir import mode
 
 messages_endpoint = Blueprint("messages", __name__)
 
@@ -22,7 +23,7 @@ def send_partner_message():
     partner_col = mongo.db.partner_conversations
     partner_col.insert(message)
 
-    Helper.notify_partner_chat_update(data["from_id"], data["to_id"])
+    Helper.notify_partner_chat_update(data["from_id"], data["to_id"], mode)
 
     return Helper.get_json({"success": True, "message": message})
 
@@ -47,7 +48,7 @@ def send_locality_message():
     locality_col = mongo.db.locality_conversations
     locality_col.insert(message)
 
-    Helper.notify_locality_chat_update(fb_id)
+    Helper.notify_locality_chat_update(fb_id, mode)
 
     return Helper.get_json({"success": True})
 

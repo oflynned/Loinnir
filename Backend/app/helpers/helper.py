@@ -22,9 +22,9 @@ class Helper:
     @staticmethod
     def get_path(mode):
         if mode == "prod":
-            return "../../../../loinnir_auth.json"
+            return "../../loinnir_auth.json"
         else:
-            return "../../../../../../loinnir_auth.json"
+            return "../../../../loinnir_auth.json"
 
     @staticmethod
     def get_fcm_api_key(mode):

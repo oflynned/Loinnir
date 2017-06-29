@@ -1,6 +1,8 @@
 from app import app
 import sys
 
+mode = "dev"
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         env = sys.argv[1]
@@ -12,6 +14,7 @@ if __name__ == '__main__':
 
 # TODO
 """
+    fcm
     unread/read messages
     pagination
     auto generate password to protect public api by tokens
