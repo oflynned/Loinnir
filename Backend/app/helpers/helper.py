@@ -213,6 +213,7 @@ class Helper:
             show_location = True
 
             users.append({
+                "fcm_id": 0,
                 "fb_id": fb_id,
                 "forename": forename,
                 "surname": surname,
