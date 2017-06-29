@@ -125,12 +125,12 @@ def get_locality_messages():
     locality_col = mongo.db.locality_conversations
 
     # get user doc under conversations to see if it's been generated from sending a message yet
-    user_querying_blocked_users = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]
+    user_querying_blocked_users = list(mongo.db.conversations.find({"fb_id": fb_id}))
 
     # don't show blocked users' messages
     if len(user_querying_blocked_users) > 0:
         if "blocked" in user_querying_blocked_users:
-            blocked_users = user_querying_blocked_users["blocked"]
+            blocked_users = user_querying_blocked_users[0]["blocked"]
     else:
         blocked_users = []
 
