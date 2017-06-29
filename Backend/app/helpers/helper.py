@@ -4,6 +4,7 @@ from flask_pyfcm import FCMNotification
 
 from app.app import mongo
 
+import os
 import sys
 import json
 import math
@@ -21,10 +22,12 @@ class Helper:
 
     @staticmethod
     def get_path(mode):
+
         if mode == "prod":
-            return "../../loinnir_auth.json"
+            return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'loinnir_auth.json'))
         else:
-            return "../../../../loinnir_auth.json"
+            return os.path.abspath(
+                os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', '..', 'loinnir_auth.json'))
 
     @staticmethod
     def get_fcm_api_key(mode):

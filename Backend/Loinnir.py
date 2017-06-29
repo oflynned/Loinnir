@@ -1,7 +1,12 @@
 from app import app
 import sys
 
+from app.helpers.helper import Helper
+
 mode = "dev"
+
+print(Helper.get_path("dev"))
+print(Helper.get_path("prod"))
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
