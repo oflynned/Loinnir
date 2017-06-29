@@ -1,14 +1,15 @@
 from flask import Blueprint, request
+from app.helpers.helper import Helper
 
 services_endpoint = Blueprint("services", __name__)
 
 
 # POST {lat: ..., lng: ...}
 # GET {locality: ...}
-@services_endpoint.route("/api/v1/services/get-nearest-town", methods=["POST"])
+@services_endpoint.route("/get-nearest-town", methods=["POST"])
 def get_nearest_town():
     data = request.json
     lat = data["lat"]
     lng = data["lng"]
 
-    return get_json({"locality": get_locality(lat, lng)})
+    return Helper.get_json({"locality": Helper.get_locality(lat, lng)})

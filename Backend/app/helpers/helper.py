@@ -1,8 +1,12 @@
 from flask import Response
 from bson import json_util
+from app.app import mongo
+from app.helpers.dataset import Dataset
+from flask_pyfcm import FCMNotification
 
 import json
 import math
+import urllib.parse
 
 
 class Helper:
@@ -32,7 +36,7 @@ class Helper:
 
     @staticmethod
     def get_locality(lat, lng):
-        dataset = Helper.get_groomed_populated_areas()
+        dataset = Dataset.get_groomed_populated_areas()
 
         nearest_town = 0
         shortest_distance = 0
@@ -52,10 +56,12 @@ class Helper:
 
         return nearest_town
 
+    @staticmethod
     def get_decoded_name(encoded_name):
         return urllib.parse.unquote(encoded_name).replace("+", " ")
 
-    def notify_partner_chat_update(my_id, partner_id):
+    @staticmethod
+    def notify_partner_chat_update(my_id, partner_id, mode):
         me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
         partner = dict(list(mongo.db.users.find({"fb_id": partner_id}))[0])
 
@@ -63,7 +69,7 @@ class Helper:
         partner.pop("_id")
 
         registration_id = partner["fcm_token"]
-        message_title = get_decoded_name(str(me["name"]))
+        message_title = Helper.get_decoded_name(str(me["name"]))
         message_avatar = me["profile_pic"]
 
         # get latest message from you to notify partner
@@ -86,9 +92,10 @@ class Helper:
         push_service = FCMNotification(api_key=key)
         push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
-        return get_json({"success": True})
+        return Helper.get_json({"success": True})
 
-    def notify_locality_chat_update(my_id):
+    @staticmethod
+    def notify_locality_chat_update(my_id, mode):
         me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
         me.pop("_id")
 
@@ -121,9 +128,9 @@ class Helper:
             push_service = FCMNotification(api_key=key)
             push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
 
-            return get_json({"success": True})
+            return Helper.get_json({"success": True})
         else:
-            return get_json({"success": False, "reason": "no users in locality right now"})
+            return Helper.get_json({"success": False, "reason": "no users in locality right now"})
 
     @staticmethod
     def generate_fake_users():

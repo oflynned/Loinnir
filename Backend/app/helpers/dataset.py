@@ -5,7 +5,7 @@ import json
 class Dataset:
     @staticmethod
     def groom_population_dataset():
-        dataset = Helper.get_populated_areas()
+        dataset = Dataset.get_populated_areas()
         groomed_set = []
 
         for item in dataset:

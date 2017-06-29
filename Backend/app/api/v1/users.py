@@ -1,4 +1,9 @@
 from flask import Blueprint, request
+from app.app import mongo
+from app.helpers.helper import Helper
+
+import json
+from random import randint
 
 user_endpoint = Blueprint("users", __name__)
 
@@ -10,17 +15,17 @@ def create_user():
     users_col = mongo.db.users
     data = request.json
     data["fb_id"] = str(data["fb_id"])
-    data["locality"] = get_locality(float(data["lat"]), float(data["lng"]))
+    data["locality"] = Helper.get_locality(float(data["lat"]), float(data["lng"]))
     fb_id = data["fb_id"]
 
     users_found = users_col.find({"fb_id": str(fb_id)})
     exists = users_found.count() > 0
 
     if exists:
-        return get_json({"success": False, "reason": "User already exists"})
+        return Helper.get_json({"success": False, "reason": "User already exists"})
     else:
         users_col.insert(data)
-        return get_json({"success": True})
+        return Helper.get_json({"success": True})
 
 
 # POST {fb_id: ..., ...}
@@ -39,7 +44,7 @@ def edit_user():
 
     users_col.save(user)
 
-    return get_json({"success": True, "updated_data": user})
+    return Helper.get_json({"success": True, "updated_data": user})
 
 
 # POST {fb_id: 123456789}
@@ -55,16 +60,16 @@ def get_user():
     is_existing = user.count() > 0
 
     if is_existing:
-        return get_json(list(user)[0])
+        return Helper.get_json(list(user)[0])
     else:
-        return get_json({"success": False, "reason": "fb_id doesn't exist"})
+        return Helper.get_json({"success": False, "reason": "fb_id doesn't exist"})
 
 
 # POST {fb_id:123456789}
 # GET [{}]
 @user_endpoint.route('/get-all', methods=["GET"])
 def get_all_users():
-    return get_json(mongo.db.users.find())
+    return Helper.get_json(mongo.db.users.find())
 
 
 # POST {fb_id:123456789}
@@ -73,7 +78,7 @@ def get_all_users():
 def get_other_users():
     data = request.json
     fb_id = str(data["fb_id"])
-    return get_json(mongo.db.users.find({"fb_id": {"$ne": fb_id}, "show_location": True}))
+    return Helper.get_json(mongo.db.users.find({"fb_id": {"$ne": fb_id}, "show_location": True}))
 
 
 # POST {fb_id:123456789}
@@ -87,7 +92,7 @@ def get_nearby_users():
     users_col = mongo.db.users
     this_user = list(users_col.find({"fb_id": fb_id}))[0]
     nearby_users = users_col.find({"fb_id": {"$ne": fb_id}, "locality": this_user["locality"]})
-    return get_json(nearby_users)
+    return Helper.get_json(nearby_users)
 
 
 # POST {fb_id:123456789}
@@ -101,7 +106,7 @@ def get_nearby_users_count():
     this_user = list(users_col.find({"fb_id": fb_id}))[0]
     locality = this_user["locality"]
     nearby_users = users_col.find({"fb_id": {"$ne": fb_id}, "locality": locality})
-    return get_json({"count": nearby_users.count(), "locality": locality})
+    return Helper.get_json({"count": nearby_users.count(), "locality": locality})
 
 
 # POST {fb_id:123456789}
@@ -118,7 +123,7 @@ def get_random_user():
         users = users_col.find({"fb_id": {"$ne": fb_id}})
         count = mongo.db.users.count() - 2
         user = users[randint(0, count)]
-        return get_json(user)
+        return Helper.get_json(user)
 
     else:
         # user_endpointend self too to exclude self matching
@@ -138,12 +143,12 @@ def get_random_user():
         users = users_col.find({"$and": [{"fb_id": {"$nin": partners_met}}, {"fb_id": {"$nin": blocked_users}}]})
 
         if users.count() == 0:
-            return get_json({"success": False, "reason": "Out of new users"})
+            return Helper.get_json({"success": False, "reason": "Out of new users"})
         elif users.count() == 1:
-            return get_json(list(users)[0])
+            return Helper.get_json(list(users)[0])
         else:
             user = users[randint(0, users.count() - 1)]
-            return get_json(user)
+            return Helper.get_json(user)
 
 
 # POST {fb_id:...}
@@ -169,7 +174,7 @@ def get_unmatched_user_count():
 
     partners_met.user_endpointend(fb_id)
     users = users_col.find({"$and": [{"fb_id": {"$nin": partners_met}}, {"fb_id": {"$nin": blocked_users}}]})
-    return get_json({"count": users.count()})
+    return Helper.get_json({"count": users.count()})
 
 
 # POST {fb_id:...}
@@ -185,7 +190,7 @@ def get_matched_user_count():
     else:
         partners_met = []
 
-    return get_json({"count": len(partners_met)})
+    return Helper.get_json({"count": len(partners_met)})
 
 
 # DELETE {fb_id: 123456789}
@@ -195,7 +200,7 @@ def delete_user():
     data = json.loads(request.data)
     fb_id = str(data["fb_id"])
     users_col.remove({"fb_id": fb_id})
-    return get_json({"success": True})
+    return Helper.get_json({"success": True})
 
 
 # POST {fb_id: 123456789, lat: ..., lng: ...}
@@ -208,13 +213,13 @@ def update_location():
     user = list(users_col.find({"fb_id": fb_id}))[0]
     user["lat"] = data["lat"]
     user["lng"] = data["lng"]
-    user["locality"] = get_locality(data["lat"], data["lng"])
+    user["locality"] = Helper.get_locality(data["lat"], data["lng"])
 
     users_col.save(user)
-    return get_json({"success": True, "user": user})
+    return Helper.get_json({"success": True, "user": user})
 
 # POST {"my_id":..., "partner_id":...}
-@app.route("/api/v1/users/block-user", methods=["POST"])
+@user_endpoint.route("/block-user", methods=["POST"])
 def block_user():
     data = request.json
     my_id = str(data["my_id"])
@@ -230,11 +235,11 @@ def block_user():
     conversations_col.update({"fb_id": my_id}, {"$push": {"blocked": partner_id}})
     my_profile = list(conversations_col.find({"fb_id": my_id}))[0]
 
-    return get_json({"success": True, "user": my_profile})
+    return Helper.get_json({"success": True, "user": my_profile})
 
 
 # POST {fb_id: ...}
-@app.route("/api/v1/users/get-blocked-users", methods=["POST"])
+@user_endpoint.route("/get-blocked-users", methods=["POST"])
 def get_blocked_users():
     data = request.json
     fb_id = str(data["fb_id"])
@@ -243,14 +248,14 @@ def get_blocked_users():
     users = conversations_col.find({"fb_id": fb_id})
 
     if users.count() == 0:
-        return get_json([])
+        return Helper.get_json([])
 
     users = list(users)[0]["blocked"]
-    return get_json(users)
+    return Helper.get_json(users)
 
 
 # POST {"my_id":..., "block_id":...}
-@app.route("/api/v1/users/unblock-user", methods=["POST"])
+@user_endpoint.route("/unblock-user", methods=["POST"])
 def unblock_user():
     data = request.json
     my_id = str(data["my_id"])
@@ -262,4 +267,4 @@ def unblock_user():
     conversations_col.update({"fb_id": my_id}, {"$pull": {"blocked": partner_id}})
     my_profile = list(conversations_col.find({"fb_id": my_id}))[0]
 
-    return get_json({"success": True, "user": my_profile})
+    return Helper.get_json({"success": True, "user": my_profile})
