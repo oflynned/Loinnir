@@ -99,6 +99,7 @@ public class LocalityConversationFrag extends Fragment {
 
                                         @Override
                                         protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                            System.out.println(rawJsonData);
                                             return new JSONObject(rawJsonData);
                                         }
                                     });

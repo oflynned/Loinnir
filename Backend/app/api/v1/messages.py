@@ -128,8 +128,9 @@ def get_locality_messages():
     user_querying_blocked_users = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]
 
     # don't show blocked users' messages
-    if "blocked" in user_querying_blocked_users:
-        blocked_users = user_querying_blocked_users["blocked"]
+    if len(user_querying_blocked_users) > 0:
+        if "blocked" in user_querying_blocked_users:
+            blocked_users = user_querying_blocked_users["blocked"]
     else:
         blocked_users = []
 

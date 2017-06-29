@@ -1,7 +1,6 @@
-from app import app
 import sys
 
-from app.helpers.helper import Helper
+from app import app
 
 mode = "dev"
 
