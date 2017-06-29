@@ -13,3 +13,8 @@ def get_nearest_town():
     lng = data["lng"]
 
     return Helper.get_json({"locality": Helper.get_locality(lat, lng)})
+
+
+@services_endpoint.route("/get-fake-users", methods=["GET"])
+def get_fake_users():
+    return Helper.get_json(Helper.generate_fake_users())
