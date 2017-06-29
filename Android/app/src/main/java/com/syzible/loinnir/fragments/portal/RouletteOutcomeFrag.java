@@ -45,6 +45,7 @@ public class RouletteOutcomeFrag extends Fragment {
         ImageView profilePictureImageView = (ImageView) view.findViewById(R.id.roulette_partner_profile_pic);
         TextView usernameTextView = (TextView) view.findViewById(R.id.name_text_roulette);
         TextView countyTextView = (TextView) view.findViewById(R.id.county_text_roulette);
+        TextView matchWarningTextView = (TextView) view.findViewById(R.id.match_loss_warning_if_no_chat);
 
         FancyButton backToRouletteButton = (FancyButton) view.findViewById(R.id.back_to_roulette_btn);
         backToRouletteButton.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +71,10 @@ public class RouletteOutcomeFrag extends Fragment {
 
         usernameTextView.setText(partner.getName());
         countyTextView.setText(partner.getLocality());
+
+        String outcome = "Is féidir an rúiléid a atriail, ach caillfidh tú an nasc leis an duine seo mura thosaíonn tú comhrá ";
+        outcome += partner.isFemale() ? "léi" : "leis";
+        matchWarningTextView.setText(outcome);
 
         return view;
     }
