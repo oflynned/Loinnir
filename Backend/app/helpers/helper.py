@@ -153,13 +153,16 @@ class Helper:
 
     @staticmethod
     def get_populated_areas():
-        with open("../datasets/populated_areas.json", "r") as f:
+        with open("app/datasets/populated_areas.json", "r") as f:
             data = json.loads(f.read())
             return data["features"]
 
     @staticmethod
     def get_groomed_populated_areas():
-        with open("../datasets/groomed_populated_areas_localised.json", "r") as f:
+        import os
+        print(os.getcwd())
+
+        with open("app/datasets/groomed_populated_areas_localised.json", "r") as f:
             return json.loads(f.read())
 
     @staticmethod
