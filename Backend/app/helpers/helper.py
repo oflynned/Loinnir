@@ -1,7 +1,6 @@
 from flask import Response
 from bson import json_util
 from app.app import mongo
-from app.helpers.dataset import Dataset
 from flask_pyfcm import FCMNotification
 
 import json
@@ -20,9 +19,9 @@ class Helper:
     @staticmethod
     def get_path(mode):
         if mode == "prod":
-            return "../../loinnir_auth.json"
-        else:
             return "../../../../loinnir_auth.json"
+        else:
+            return "../../../../../../loinnir_auth.json"
 
     @staticmethod
     def get_fcm_api_key(mode):
@@ -131,6 +130,36 @@ class Helper:
             return Helper.get_json({"success": True})
         else:
             return Helper.get_json({"success": False, "reason": "no users in locality right now"})
+
+    @staticmethod
+    def groom_population_dataset():
+        dataset = Helper.get_populated_areas()
+        groomed_set = []
+
+        for item in dataset:
+            town = item["properties"]["NAMN1"]
+            town_lng = item["geometry"]["coordinates"][0]
+            town_lat = item["geometry"]["coordinates"][1]
+            groomed_set.append({"town": town, "lat": town_lat, "lng": town_lng})
+
+        return groomed_set
+
+    @staticmethod
+    def get_places_api_key(mode):
+        with open(Helper.get_path(mode), "r") as f:
+            data = json.loads(f.read())
+            return data["places_api_key"]
+
+    @staticmethod
+    def get_populated_areas():
+        with open("../datasets/populated_areas.json", "r") as f:
+            data = json.loads(f.read())
+            return data["features"]
+
+    @staticmethod
+    def get_groomed_populated_areas():
+        with open("../datasets/groomed_populated_areas_localised.json", "r") as f:
+            return json.loads(f.read())
 
     @staticmethod
     def generate_fake_users():
