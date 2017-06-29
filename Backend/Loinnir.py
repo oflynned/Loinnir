@@ -6,9 +6,9 @@ if __name__ == '__main__':
         env = sys.argv[1]
         if env == "prod":
             mode = "prod"
-            app.run(host='127.0.0.1', port=80)
+            app.run(host='0.0.0.0', port=80)
     else:
-        app.run(host='127.0.0.1', port=3000)
+        app.run(host='0.0.0.0', port=3000)
 
 # TODO
 """
