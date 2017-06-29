@@ -24,10 +24,10 @@ class Helper:
     def get_path(mode):
 
         if mode == "prod":
-            return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'loinnir_auth.json'))
+            return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'loinnir_auth.json'))
         else:
             return os.path.abspath(
-                os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', '..', 'loinnir_auth.json'))
+                os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'loinnir_auth.json'))
 
     @staticmethod
     def get_fcm_api_key(mode):
