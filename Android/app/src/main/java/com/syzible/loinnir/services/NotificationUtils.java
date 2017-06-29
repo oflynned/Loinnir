@@ -40,8 +40,36 @@ public class NotificationUtils {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context)
                         .setLargeIcon(icon)
+                        .setSmallIcon(R.drawable.logo_small)
                         .setContentTitle(remoteMessage.getNotification().getTitle())
                         .setContentText(remoteMessage.getNotification().getBody());
+
+        Intent resultingIntent = new Intent(context, MainActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultingIntent);
+
+        PendingIntent resultingPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        notificationBuilder.setContentIntent(resultingPendingIntent);
+
+        NotificationManager manager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        manager.notify(0, notificationBuilder.build());
+    }
+
+    public static void generateNotification(Context context, String title, String content) {
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(context)
+                        .setLargeIcon(icon)
+                        .setSmallIcon(R.drawable.logo_small)
+                        .setContentTitle(title)
+                        .setContentText(content);
 
         Intent resultingIntent = new Intent(context, MainActivity.class);
 

@@ -32,19 +32,21 @@ public class MessagingService extends FirebaseMessagingService {
                 String message_type = remoteMessage.getData().get("notification_type");
                 System.out.println(message_type + " received!!!");
 
-                User from = new User(new JSONObject(remoteMessage.getData().get("from_details")));
-                Message message = new Message(from, new JSONArray(remoteMessage.getData().get("message")));
+                if (message_type.equals(NotificationTypes.new_locality_information.name())) {
+                    NotificationUtils.generateNotification(getApplicationContext(), remoteMessage.getData().get("message_title"), remoteMessage.getData().get("message"));
 
-                if (message_type.equals(NotificationTypes.new_partner_message.name())) {
+                    Intent intent = new Intent(NotificationTypes.new_locality_information.name());
+                    getApplicationContext().sendBroadcast(intent);
+                } else if (message_type.equals(NotificationTypes.new_partner_message.name())){
+                    User from = new User(new JSONObject(remoteMessage.getData().get("from_details")));
+                    Message message = new Message(from, new JSONArray(remoteMessage.getData().get("message")));
+
                     // for updating UI or creating notifications on receiving a message
                     Intent newDataIntent = new Intent("new_message");
                     newDataIntent.putExtra("partner_id", from.getId());
                     getApplicationContext().sendBroadcast(newDataIntent);
 
                     NotificationUtils.generateMessageNotification(getApplicationContext(), from, message);
-                } else if (message_type.equals(NotificationTypes.new_locality_information.name())) {
-                    Intent intent = new Intent(NotificationTypes.new_locality_information.name());
-                    getApplicationContext().sendBroadcast(intent);
                 } else if (message_type.equals(NotificationTypes.app_information.name())) {
                     // in case a periodic notification is dispatched to all users about Loinnir
                 }
