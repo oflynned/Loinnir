@@ -4,6 +4,7 @@ from flask_pyfcm import FCMNotification
 
 from app.app import mongo
 
+import sys
 import json
 import math
 import urllib.parse
@@ -204,10 +205,14 @@ class Helper:
                 new_locality = Helper.get_locality(new_lat_location, new_lng_location)
 
             profile_pic = "http://c1.thejournal.ie/media/2015/10/1916-easter-rising-commemoration-2-390x285.jpg"
+            gender = "male" if randint(0,1) == 0 else "female"
+            fb_id = str(randint(0, sys.maxsize - 1))
 
             users.append({
+                "fb_id": fb_id,
                 "forename": forename,
                 "surname": surname,
+                "gender": gender,
                 "lat": new_lat_location,
                 "lng": new_lng_location,
                 "locality": new_locality,
