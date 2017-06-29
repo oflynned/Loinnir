@@ -1,7 +1,8 @@
 from flask import Response
 from bson import json_util
-from app.app import mongo
 from flask_pyfcm import FCMNotification
+
+from app.app import mongo
 
 import json
 import math
@@ -35,7 +36,7 @@ class Helper:
 
     @staticmethod
     def get_locality(lat, lng):
-        dataset = Dataset.get_groomed_populated_areas()
+        dataset = Helper.get_groomed_populated_areas()
 
         nearest_town = 0
         shortest_distance = 0

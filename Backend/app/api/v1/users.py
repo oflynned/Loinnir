@@ -1,6 +1,9 @@
-from flask import Blueprint, request
-from app.app import mongo
+from flask import Blueprint, request, Flask
+from flask_pymongo import PyMongo
+
+from app.app import app
 from app.helpers.helper import Helper
+from app.app import mongo
 
 import json
 from random import randint
@@ -69,7 +72,8 @@ def get_user():
 # GET [{}]
 @user_endpoint.route('/get-all', methods=["GET"])
 def get_all_users():
-    return Helper.get_json(mongo.db.users.find())
+    users = mongo.db.users.find()
+    return Helper.get_json(users)
 
 
 # POST {fb_id:123456789}
@@ -217,6 +221,7 @@ def update_location():
 
     users_col.save(user)
     return Helper.get_json({"success": True, "user": user})
+
 
 # POST {"my_id":..., "partner_id":...}
 @user_endpoint.route("/block-user", methods=["POST"])
