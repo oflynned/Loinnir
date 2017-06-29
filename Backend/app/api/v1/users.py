@@ -130,7 +130,7 @@ def get_random_user():
         return Helper.get_json(user)
 
     else:
-        # user_endpointend self too to exclude self matching
+        # append self too to exclude self matching
         blocked_users = list(partners_met)[0]
         if "blocked" in blocked_users:
             blocked_users = blocked_users["blocked"]
@@ -143,7 +143,7 @@ def get_random_user():
         else:
             partners_met = []
 
-        partners_met.user_endpointend(fb_id)
+        partners_met.append(fb_id)
         users = users_col.find({"$and": [{"fb_id": {"$nin": partners_met}}, {"fb_id": {"$nin": blocked_users}}]})
 
         if users.count() == 0:
@@ -176,7 +176,7 @@ def get_unmatched_user_count():
         else:
             partners_met = []
 
-    partners_met.user_endpointend(fb_id)
+    partners_met.append(fb_id)
     users = users_col.find({"$and": [{"fb_id": {"$nin": partners_met}}, {"fb_id": {"$nin": blocked_users}}]})
     return Helper.get_json({"count": users.count()})
 
