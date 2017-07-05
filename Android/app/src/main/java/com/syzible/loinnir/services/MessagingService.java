@@ -25,24 +25,23 @@ public class MessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         System.out.println("Received FCM update");
 
-        // handle custom FCM notification updates from the server
         if (remoteMessage.getData().size() > 0) {
             System.out.println(remoteMessage.getData());
             try {
                 String message_type = remoteMessage.getData().get("notification_type");
-                System.out.println(message_type + " received!!!");
 
                 if (message_type.equals(NotificationTypes.new_locality_information.name())) {
-                    NotificationUtils.generateNotification(getApplicationContext(), remoteMessage.getData().get("message_title"), remoteMessage.getData().get("message"));
-
+                    // new locality update in chat, emit a broadcast to force an update if the locality fragment is active
                     Intent intent = new Intent(NotificationTypes.new_locality_information.name());
                     getApplicationContext().sendBroadcast(intent);
-                } else if (message_type.equals(NotificationTypes.new_partner_message.name())){
+                } else if (message_type.equals(NotificationTypes.new_partner_message.name())) {
+                    // on message received in the foreground
                     User from = new User(new JSONObject(remoteMessage.getData().get("from_details")));
                     Message message = new Message(from, new JSONArray(remoteMessage.getData().get("message")));
 
                     // for updating UI or creating notifications on receiving a message
-                    Intent newDataIntent = new Intent("new_message");
+                    // TODO update partner conversation fragment to properly use new filter
+                    Intent newDataIntent = new Intent("com.syzible.loinnir.new_message");
                     newDataIntent.putExtra("partner_id", from.getId());
                     getApplicationContext().sendBroadcast(newDataIntent);
 
@@ -55,6 +54,7 @@ public class MessagingService extends FirebaseMessagingService {
             }
         }
 
+        // on chat partner message update -- only in background
         if (remoteMessage.getNotification() != null) {
             NotificationUtils.generateNotification(getApplicationContext(), remoteMessage);
         }

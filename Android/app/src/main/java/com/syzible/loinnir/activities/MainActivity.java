@@ -55,12 +55,48 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private View headerView;
-    private BroadcastReceiver finishMainActivityReceiver, startLocationPollingReceiver,
-            endLocationPollingReceiver, newLocalityInformationReceiver, newPartnerMessageReceiver;
+
+    private BroadcastReceiver finishMainActivityReceiver;
+    private BroadcastReceiver startLocationPollingReceiver, endLocationPollingReceiver;
+
+    // TODO move to conversation fragment and allow a global context if app is in background
+    private BroadcastReceiver newPartnerMessageReceiver;
 
     public enum BroadcastFilters {
-        finish_main_activity, start_location_polling, end_location_polling,
-        new_locality_information, new_partner_message
+        finish_main_activity {
+            @Override
+            public String toString() {
+                return "com.syzible.loinnir.finish_main_activity";
+            }
+        },
+
+        start_location_polling {
+            @Override
+            public String toString() {
+                return "com.syzible.loinnir.start_location_polling";
+            }
+        },
+
+        end_location_polling {
+            @Override
+            public String toString() {
+                return "com.syzible.loinnir.end_location_polling";
+            }
+        },
+
+        new_locality_information {
+            @Override
+            public String toString() {
+                return "com.syzible.loinnir.new_locality_information";
+            }
+        },
+
+        new_partner_message {
+            @Override
+            public String toString() {
+                return "com.syzible.loinnir.new_partner_message";
+            }
+        }
     }
 
     @Override
@@ -126,6 +162,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
+        stopService(new Intent(this, LocationService.class));
+
+        unregisterReceiver(startLocationPollingReceiver);
+        unregisterReceiver(endLocationPollingReceiver);
+        unregisterReceiver(finishMainActivityReceiver);
         super.onPause();
     }
 
@@ -146,12 +187,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
-        stopService(new Intent(this, LocationService.class));
-
-        unregisterReceiver(startLocationPollingReceiver);
-        unregisterReceiver(endLocationPollingReceiver);
-        unregisterReceiver(finishMainActivityReceiver);
         super.onStop();
     }
 

@@ -50,23 +50,45 @@ public class LocalityConversationFrag extends Fragment {
     private Date lastLoadedDate;
     private int loadedCount;
 
-    private MessagesList messagesList;
     private MessagesListAdapter<Message> adapter;
-    private MessageInput messageInput;
+    private BroadcastReceiver newLocalityInformationReceiver;
+
+    private View view;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.conversation_frag, container, false);
+        view = inflater.inflate(R.layout.conversation_frag, container, false);
 
+        setupAdapter(view);
+        loadMessages();
+        registerBroadcastReceiver(MainActivity.BroadcastFilters.new_locality_information);
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        setupAdapter(view);
+        loadMessages();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    private void setupAdapter(View view) {
         MessagesListAdapter.HoldersConfig holdersConfig = new MessagesListAdapter.HoldersConfig();
         holdersConfig.setIncoming(IncomingMessage.class, R.layout.chat_message_layout);
 
         adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), holdersConfig, loadImage());
-        messagesList = (MessagesList) view.findViewById(R.id.messages_list);
+        MessagesList messagesList = (MessagesList) view.findViewById(R.id.messages_list);
         messagesList.setAdapter(adapter);
 
-        messageInput = (MessageInput) view.findViewById(R.id.message_input);
+        MessageInput messageInput = (MessageInput) view.findViewById(R.id.message_input);
         messageInput.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(final CharSequence input) {
@@ -148,11 +170,6 @@ public class LocalityConversationFrag extends Fragment {
                         return new JSONObject(rawJsonData);
                     }
                 });
-
-        loadMessages();
-        registerBroadcastReceiver(MainActivity.BroadcastFilters.new_locality_information);
-
-        return view;
     }
 
     private void registerBroadcastReceiver(MainActivity.BroadcastFilters filter) {
@@ -168,7 +185,8 @@ public class LocalityConversationFrag extends Fragment {
     }
 
     private void loadMessages() {
-        adapter.clear();
+        setupAdapter(view);
+
         RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, JSONUtils.getIdPayload(getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
