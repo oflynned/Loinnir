@@ -178,7 +178,7 @@ def get_unmatched_user_count():
 def get_matched_user_count():
     data = request.json
     fb_id = str(data["fb_id"])
-    partners_met = list(mongo.db.users.find({"fb_id": fb_id}))
+    partners_met = User.get_user(fb_id)["partners"]
     return Helper.get_json({"count": len(partners_met)})
 
 

@@ -86,7 +86,6 @@ public class LocalityConversationFrag extends Fragment {
                 new IntentFilter(BroadcastFilters.new_locality_info_update.toString()));
 
         super.onResume();
-
     }
 
     @Override
