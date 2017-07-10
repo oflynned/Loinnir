@@ -43,7 +43,7 @@ def create_user():
     data["blocked"] = []
     data["partners"] = []
 
-    if not User.does_user_exist(data["fb_id"]):
+    if User.does_user_exist(data["fb_id"]):
         return Helper.get_json({"success": False, "reason": "User already exists"})
     else:
         users_col.insert(data)
