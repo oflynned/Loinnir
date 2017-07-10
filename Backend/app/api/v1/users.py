@@ -161,14 +161,15 @@ def get_random_user():
 def get_unmatched_user_count():
     data = request.json
     fb_id = str(data["fb_id"])
-    partners_met = list(mongo.db.users.find({"fb_id": fb_id}))
-    blocked_users = list(mongo.db.users.find({"fb_id": fb_id}))
+    partners_met = User.get_user(fb_id)["partners"]
+    blocked_users = User.get_user(fb_id)["blocked"]
+
+    excluded_profiles = partners_met + blocked_users
+    excluded_profiles.append(fb_id)
 
     # don't show users matched and blocked
-    interaction_exception_count = len(partners_met) + len(blocked_users)
-    # also don't forget to exclude yourself from the lookup
-    user_pool_size = (len(list(mongo.db.users.find())) - interaction_exception_count) - 1
-    return Helper.get_json({"count": user_pool_size})
+    remaining_user_pool = list(mongo.db.users.find({"fb_id": {"$nin": excluded_profiles}}))
+    return Helper.get_json({"count": len(remaining_user_pool)})
 
 
 # POST { fb_id: <string> }
