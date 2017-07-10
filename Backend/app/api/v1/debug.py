@@ -22,5 +22,5 @@ def get_all_conversations():
 
 
 @debug_endpoint.route("/get-all-users", methods=["GET"])
-def get_all_conversations():
+def get_all_users():
     return Helper.get_json(list(mongo.db.users.find({})))
