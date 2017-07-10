@@ -50,12 +50,14 @@ public class LocalityConversationFrag extends Fragment {
 
     private Date lastLoadedDate;
     private int loadedCount;
+    private String lastLoadedMessageId;
 
     private MessagesListAdapter<Message> adapter;
     private BroadcastReceiver newLocalityInformationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BroadcastFilters.new_locality_info_update.name())) {
+            System.out.println("Invoked Locality Receiver!");
+            if (intent.getAction().equals(BroadcastFilters.new_locality_info_update.toString())) {
                 // TODO change this, the screen refreshes completely D:
                 // clear the messages and reload
                 loadMessages();
@@ -80,9 +82,8 @@ public class LocalityConversationFrag extends Fragment {
     public void onResume() {
         setupAdapter(view);
         loadMessages();
-        LocalBroadcastManager.getInstance(getActivity())
-                .registerReceiver(newLocalityInformationReceiver,
-                        new IntentFilter(BroadcastFilters.new_locality_info_update.toString()));
+        getActivity().registerReceiver(newLocalityInformationReceiver,
+                new IntentFilter(BroadcastFilters.new_locality_info_update.toString()));
 
         super.onResume();
 

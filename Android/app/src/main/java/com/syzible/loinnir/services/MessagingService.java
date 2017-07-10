@@ -45,6 +45,7 @@ public class MessagingService extends FirebaseMessagingService {
     }
 
     private void onLocalityInfoUpdate() {
+        System.out.println("Dispatching onLocalityInfoUpdate()");
         // new locality update in chat, emit a broadcast to force an update if the locality fragment is active
         String newLocalityIntent = BroadcastFilters.new_locality_info_update.toString();
         Intent intent = new Intent(newLocalityIntent);
