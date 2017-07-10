@@ -61,7 +61,7 @@ class FCM:
                 ids.append(user["fcm_token"])
 
             data_content = {
-                "notification_type": "new_locality_information",
+                "notification_type": "new_locality_update",
                 "message_title": me["locality"],
                 "message": {"count": len(locality_users), "locality": me["locality"]}
             }

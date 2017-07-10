@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void registerBroadcastReceivers() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(finishMainActivityReceiver,
+        registerReceiver(finishMainActivityReceiver,
                 new IntentFilter(BroadcastFilters.finish_main_activity.toString()));
     }
 
