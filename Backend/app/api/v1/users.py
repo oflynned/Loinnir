@@ -17,6 +17,8 @@ def create_user():
     data = request.json
     data["fb_id"] = str(data["fb_id"])
     data["locality"] = Helper.get_locality(float(data["lat"]), float(data["lng"]))
+    data["blocked"] = []
+    data["partners"] = []
     fb_id = data["fb_id"]
 
     users_found = users_col.find({"fb_id": str(fb_id)})
