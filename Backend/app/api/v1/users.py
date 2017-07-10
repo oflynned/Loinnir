@@ -168,7 +168,7 @@ def get_unmatched_user_count():
     interaction_exception_count = len(partners_met) + len(blocked_users)
     # also don't forget to exclude yourself from the lookup
     user_pool_size = (len(list(mongo.db.users.find())) - interaction_exception_count) - 1
-    return Helper.get_json({"count": interaction_exception_count})
+    return Helper.get_json({"count": user_pool_size})
 
 
 # POST { fb_id: <string> }
