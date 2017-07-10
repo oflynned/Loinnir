@@ -5,6 +5,7 @@ from flask import Blueprint, request
 
 from app.app import mongo
 from app.helpers.helper import Helper
+from app.helpers.geo import Geo
 
 user_endpoint = Blueprint("users", __name__)
 
@@ -35,7 +36,7 @@ def create_user():
     users_col = mongo.db.users
     data = request.json
     data["fb_id"] = str(data["fb_id"])
-    data["locality"] = Helper.get_locality(float(data["lat"]), float(data["lng"]))
+    data["locality"] = Geo.get_locality(float(data["lat"]), float(data["lng"]))
     data["gender"] = "female" if (data["gender"] == "female") else "male"
 
     # blank lists -- will be populated as the user interacts with profiles
@@ -201,7 +202,7 @@ def update_location():
     user = list(mongo.db.users.find({"fb_id": fb_id}))[0]
     user["lat"] = data["lat"]
     user["lng"] = data["lng"]
-    user["locality"] = Helper.get_locality(data["lat"], data["lng"])
+    user["locality"] = Geo.get_locality(data["lat"], data["lng"])
 
     mongo.db.users.save(user)
     return Helper.get_json({"success": True, "user": user})
