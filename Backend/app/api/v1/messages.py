@@ -97,7 +97,7 @@ def get_partner_messages_count():
 
 
 # get all messages residing within the locality for the user's record provided
-# POST {fb_id: ...}
+# POST { fb_id: <string> }
 # RETURN [ <message>, ... ]
 @messages_endpoint.route("/get-locality-messages", methods=["POST"])
 def get_locality_messages():

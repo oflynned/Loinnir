@@ -50,6 +50,7 @@ class FCM:
         locality = me["locality"]
         ids = []
 
+        # do we care about blocked users?
         locality_users = list(mongo.db.users.find({
             "$and": [
                 {"fb_id": {"$ne": my_id}},
@@ -63,7 +64,8 @@ class FCM:
             data_content = {
                 "notification_type": "new_locality_update",
                 "message_title": me["locality"],
-                "message": {"count": len(locality_users), "locality": me["locality"]}
+                "message": {},
+                "meta_data": {"count": len(locality_users), "locality": me["locality"]}
             }
 
             # perhaps should not notify users on a new locality message @ spam

@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
+import com.stfalcon.chatkit.messages.MessagesListAdapter;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.fragments.portal.ConversationsListFrag;
 import com.syzible.loinnir.fragments.portal.LocalityConversationFrag;
@@ -193,7 +194,8 @@ public class MainActivity extends AppCompatActivity
                     });
             }
         } else {
-            setFragment(getFragmentManager(), new MapFrag());
+            //setFragment(getFragmentManager(), new MapFrag());
+            setFragment(getFragmentManager(), new LocalityConversationFrag());
         }
     }
 

@@ -21,14 +21,6 @@ public class Message implements IMessage {
     private long time;
     private String contents;
 
-    public Message(User sender, JSONArray array) {
-        // debug -- for blank message []
-        this.sender = sender;
-        this.id = "123456789";
-        this.time = System.currentTimeMillis();
-        this.contents = "Test message " + EmojiUtils.getEmoji(EmojiUtils.HAPPY);
-    }
-
     public Message(User sender, JSONObject messageObject) {
         try {
             this.id = messageObject.getString("_id");

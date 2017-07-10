@@ -31,8 +31,11 @@ public class LocationService extends Service {
     // TODO need to fix battery drain! 12%+ being spent on GPS alone!
 
     private LocationManager locationManager = null;
-    private static final int LOCATION_INTERVAL = 1000 * 15; // obtain fix interval
-    private static final float LOCATION_DISTANCE = 100f; // 100m
+
+    // obtain fix interval every 5 minutes while the app is in the foreground
+    private static final int LOCATION_INTERVAL = 1000 * 60 * 5;
+    // update every time 500m of a distance change is observed
+    private static final float LOCATION_DISTANCE = 500f;
 
     private class LocationListener implements android.location.LocationListener {
 

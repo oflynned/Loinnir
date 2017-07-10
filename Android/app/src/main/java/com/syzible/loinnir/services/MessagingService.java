@@ -55,7 +55,7 @@ public class MessagingService extends FirebaseMessagingService {
     private void onPartnerMessage(RemoteMessage remoteMessage) throws JSONException {
         // on message received in the foreground
         User from = new User(new JSONObject(remoteMessage.getData().get("from_details")));
-        Message message = new Message(from, new JSONArray(remoteMessage.getData().get("message")));
+        Message message = new Message(from, new JSONObject(remoteMessage.getData().get("message")));
 
         // for updating UI or creating notifications on receiving a message
         String newMessageIntent = BroadcastFilters.new_partner_message.toString();

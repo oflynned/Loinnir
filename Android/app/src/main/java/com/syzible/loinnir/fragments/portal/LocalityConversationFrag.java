@@ -8,7 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +16,7 @@ import android.widget.ImageView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.stfalcon.chatkit.commons.ImageLoader;
+import com.stfalcon.chatkit.messages.MessageHolders;
 import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
@@ -46,21 +47,45 @@ import cz.msebera.android.httpclient.Header;
  * Created by ed on 07/05/2017.
  */
 
-public class LocalityConversationFrag extends Fragment {
+public class LocalityConversationFrag extends Fragment implements
+        MessagesListAdapter.SelectionListener, MessagesListAdapter.OnLoadMoreListener {
 
     private Date lastLoadedDate;
     private int loadedCount;
     private String lastLoadedMessageId;
 
+    private ArrayList<Message> messages = new ArrayList<>();
     private MessagesListAdapter<Message> adapter;
     private BroadcastReceiver newLocalityInformationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            System.out.println("Invoked Locality Receiver!");
             if (intent.getAction().equals(BroadcastFilters.new_locality_info_update.toString())) {
-                // TODO change this, the screen refreshes completely D:
-                // clear the messages and reload
-                loadMessages();
+                RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, JSONUtils.getIdPayload(getActivity()),
+                        new BaseJsonHttpResponseHandler<JSONArray>() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                                try {
+                                    JSONObject latestPayload = response.getJSONObject(response.length() - 1);
+                                    User sender = new User(latestPayload.getJSONObject("user"));
+                                    Message message = new Message(sender, latestPayload);
+                                    adapter.addToStart(message, true);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+
+                            }
+
+                            @Override
+                            protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                return new JSONArray(rawJsonData);
+                            }
+                        });
+                // on new messages received
+                // loadMessages();
             }
         }
     };
@@ -71,7 +96,6 @@ public class LocalityConversationFrag extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.conversation_frag, container, false);
-
         setupAdapter(view);
         loadMessages();
 
@@ -90,14 +114,13 @@ public class LocalityConversationFrag extends Fragment {
 
     @Override
     public void onPause() {
-        LocalBroadcastManager.getInstance(getActivity())
-                .unregisterReceiver(newLocalityInformationReceiver);
+        getActivity().unregisterReceiver(newLocalityInformationReceiver);
         super.onPause();
     }
 
     private void setupAdapter(View view) {
-        MessagesListAdapter.HoldersConfig holdersConfig = new MessagesListAdapter.HoldersConfig();
-        holdersConfig.setIncoming(IncomingMessage.class, R.layout.chat_message_layout);
+        MessageHolders holdersConfig = new MessageHolders();
+        holdersConfig.setIncomingTextConfig(IncomingMessage.class, R.layout.chat_message_layout);
 
         adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), holdersConfig, loadImage());
         MessagesList messagesList = (MessagesList) view.findViewById(R.id.messages_list);
@@ -136,7 +159,6 @@ public class LocalityConversationFrag extends Fragment {
 
                                         @Override
                                         protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                            System.out.println(rawJsonData);
                                             return new JSONObject(rawJsonData);
                                         }
                                     });
@@ -167,9 +189,12 @@ public class LocalityConversationFrag extends Fragment {
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         try {
                             String localityName = response.getString("locality");
-                            int nearbyUsers = response.getInt("count") + 1;
-                            String title = localityName + " (" + nearbyUsers + " anseo)";
-                            getActivity().setTitle(title);
+                            int nearbyUsers = response.getInt("count");
+                            String localUsers = nearbyUsers + " eile anseo";
+
+                            // set title and subtitle
+                            getActivity().setTitle(localityName);
+                            ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(localUsers);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -194,7 +219,7 @@ public class LocalityConversationFrag extends Fragment {
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
-                        ArrayList<Message> messages = new ArrayList<>();
+                        messages.clear();
                         for (int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject userMessage = response.getJSONObject(i);
@@ -205,6 +230,8 @@ public class LocalityConversationFrag extends Fragment {
                                 User user = new User(userMessage.getJSONObject("user"));
                                 Message message = new Message(id, user, timeSent, messageContent);
                                 messages.add(message);
+
+                                lastLoadedMessageId = id;
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -232,7 +259,6 @@ public class LocalityConversationFrag extends Fragment {
                 final String fileName = url.split("/")[3];
 
                 if (!CachingUtil.doesImageExist(getActivity(), fileName)) {
-                    System.out.println("Does not exist!");
                     new GetImage(new NetworkCallback<Bitmap>() {
                         @Override
                         public void onResponse(Bitmap response) {
@@ -247,11 +273,20 @@ public class LocalityConversationFrag extends Fragment {
                         }
                     }, url, true).execute();
                 } else {
-                    System.out.println("Exists!");
                     Bitmap cachedImage = CachingUtil.getCachedImage(getActivity(), fileName);
                     imageView.setImageBitmap(cachedImage);
                 }
             }
         };
+    }
+
+    @Override
+    public void onLoadMore(int page, int totalItemsCount) {
+
+    }
+
+    @Override
+    public void onSelectionChanged(int count) {
+
     }
 }
