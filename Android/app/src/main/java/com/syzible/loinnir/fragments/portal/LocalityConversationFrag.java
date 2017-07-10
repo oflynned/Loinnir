@@ -84,8 +84,6 @@ public class LocalityConversationFrag extends Fragment implements
                                 return new JSONArray(rawJsonData);
                             }
                         });
-                // on new messages received
-                // loadMessages();
             }
         }
     };
@@ -193,7 +191,7 @@ public class LocalityConversationFrag extends Fragment implements
                             String localUsers = nearbyUsers + " eile anseo";
 
                             // set title and subtitle
-                            getActivity().setTitle(localityName);
+                            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(localityName);
                             ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(localUsers);
                         } catch (JSONException e) {
                             e.printStackTrace();

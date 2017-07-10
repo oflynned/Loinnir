@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -150,7 +151,8 @@ public class PartnerConversationFrag extends Fragment {
 
         loadMessages();
 
-        getActivity().setTitle(partner.getName());
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(partner.getName());
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(null);
         registerBroadcastReceiver(BroadcastFilters.new_partner_message);
 
         return view;

@@ -3,6 +3,7 @@ package com.syzible.loinnir.fragments.portal;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +39,8 @@ public class RouletteFrag extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.roulette_frag, container, false);
-        getActivity().setTitle(getResources().getString(R.string.app_name));
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.app_name);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(null);
 
         unmatchedUserCountTextView = (TextView) view.findViewById(R.id.unmatched_count_roulette);
 
