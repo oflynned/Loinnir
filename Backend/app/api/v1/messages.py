@@ -2,33 +2,36 @@ from flask import Blueprint, request
 import time
 
 from app.app import mongo
+from app.api.v1.users import User
 from app.helpers.helper import Helper
+from app.helpers.fcm import FCM
+
 from Loinnir import mode
 
 messages_endpoint = Blueprint("messages", __name__)
 
 
-# POST {from_id: ..., to_id: ..., message: "..."}
-# GET {success: true}
+# POST { from_id: <string>, to_id: <string>, message: <string> }
+# RETURN { success: <boolean> }
 @messages_endpoint.route('/send-partner-message', methods=["POST"])
 def send_partner_message():
     data = request.json
 
-    message = dict()
-    message["from_id"] = str(data["from_id"])
-    message["to_id"] = str(data["to_id"])
-    message["time"] = int(round(time.time() * 1000))
-    message["message"] = str(data["message"])
+    message = {
+        "from_id": str(data["from_id"]),
+        "to_id": str(data["to_id"]),
+        "time": Helper.get_current_time_in_millis(),
+        "message": str(data["message"])
+    }
 
-    partner_col = mongo.db.partner_conversations
-    partner_col.insert(message)
+    mongo.db.partner_conversations.insert(message)
+    FCM.notify_partner_chat_update(data["from_id"], data["to_id"], mode)
 
-    Helper.notify_partner_chat_update(data["from_id"], data["to_id"], mode)
-
-    return Helper.get_json({"success": True, "message": message})
+    return Helper.get_json({"success": True})
 
 
-# POST {fb_id: ..., message: "..."}
+# POST { fb_id: <string>, message: <string> }
+# RETURN { success: <boolean> }
 @messages_endpoint.route('/send-locality-message', methods=["POST"])
 def send_locality_message():
     data = request.json
@@ -39,33 +42,35 @@ def send_locality_message():
     user = list(user)[0]
     locality = user["locality"]
 
-    message = dict()
-    message["fb_id"] = str(data["fb_id"])
-    message["locality"] = str(locality)
-    message["time"] = int(round(time.time() * 1000))
-    message["message"] = str(data["message"])
+    message = {
+        "fb_id": str(data["fb_id"]),
+        "locality": str(locality),
+        "time": Helper.get_current_time_in_millis(),
+        "message": str(data["message"])
+    }
 
-    locality_col = mongo.db.locality_conversations
-    locality_col.insert(message)
-
-    Helper.notify_locality_chat_update(fb_id, mode)
+    mongo.db.locality_conversations.insert(message)
+    FCM.notify_locality_chat_update(fb_id, mode)
 
     return Helper.get_json({"success": True})
 
 
 # get messages between partners that have matched via roulette
-# POST {my_id: ..., partner_id: ...}
-# GET [{...},{...}]
+# POST { my_id: <string>, partner_id: <string> }
+# RETURN [ <message>, ... ]
 @messages_endpoint.route("/get-partner-messages", methods=["POST"])
 def get_partner_messages():
     data = request.json
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
 
-    partner_col = mongo.db.partner_conversations
+    # TODO pagination
+    from_range = 0
+    to_range = 50
+
     participants = [my_id, partner_id]
     query = {"from_id": {"$in": participants}, "to_id": {"$in": participants}}
-    messages = list(partner_col.find(query).sort("time", -1))
+    messages = list(mongo.db.partner_conversations.find(query).sort("time", -1))
 
     returned_messages = []
 
@@ -79,63 +84,32 @@ def get_partner_messages():
     return Helper.get_json(sorted_list)
 
 
-# POST {my_id: ..., partner_id: ...}
-# GET [{...},{...}]
+# POST { my_id: <string>, partner_id: <string> }
+# RETURN { count: <int> }
 @messages_endpoint.route("/get-partner-messages-count", methods=["POST"])
 def get_partner_messages_count():
     data = request.json
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
 
-    partner_col = mongo.db.partner_conversations
-    messages = list(partner_col.find({"participants": [my_id, partner_id]}))
-
+    messages = list(mongo.db.partner_conversations.find({"participants": [my_id, partner_id]}))
     return Helper.get_json({"count": len(messages)})
-
-
-# TODO dev
-@messages_endpoint.route("/get-messages", methods=["GET"])
-def get_all_messages():
-    messages = list(mongo.db.conversations.find())
-    return Helper.get_json(messages)
-
-
-@messages_endpoint.route("/get-all-locality-messages", methods=["GET"])
-def get_all_locality_messages():
-    messages = mongo.db.locality_conversations.find()
-    return Helper.get_json(list(messages))
-
-
-@messages_endpoint.route("/get-all-partner-messages", methods=["GET"])
-def get_all_partner_messages():
-    messages = mongo.db.partner_conversations.find()
-    return Helper.get_json(list(messages))
 
 
 # get all messages residing within the locality for the user's record provided
 # POST {fb_id: ...}
-# GET [{...},{...}]
+# RETURN [ <message>, ... ]
 @messages_endpoint.route("/get-locality-messages", methods=["POST"])
 def get_locality_messages():
     data = request.json
     fb_id = str(data["fb_id"])
-    user = list(mongo.db.users.find({"fb_id": fb_id}))[0]
+
+    user = User.get_user(fb_id)
     locality = str(user["locality"])
-
-    locality_col = mongo.db.locality_conversations
-
-    # get user doc under conversations to see if it's been generated from sending a message yet
-    user_querying_blocked_users = list(mongo.db.conversations.find({"fb_id": fb_id}))
-    blocked_users = []
-
-    # don't show blocked users' messages
-    if len(user_querying_blocked_users) > 0:
-        if "blocked" in user_querying_blocked_users[0]:
-            blocked_users = user_querying_blocked_users[0]["blocked"]
+    blocked_users = user["blocked"]
 
     # aggregate over the messages to get the fb user details
-    messages = locality_col.find({"locality": locality, "fb_id": {"$nin": blocked_users}})
-    messages = list(messages)
+    messages = list(mongo.db.locality_conversations.find({"locality": locality, "fb_id": {"$nin": blocked_users}}))
 
     for i, message in enumerate(messages):
         fb_id = message["fb_id"]
@@ -146,83 +120,53 @@ def get_locality_messages():
     return Helper.get_json(list(messages))
 
 
-# POST {fb_id: ...}
-# GET [partner_id_1, partner_id_2, ...]
+# POST { fb_id: <string> }
+# RETURN [ <fb id>, ... ]
 @messages_endpoint.route("/get-partner-ids", methods=["POST"])
 def get_conversations():
     data = request.json
     fb_id = str(data["fb_id"])
-
-    conversations_col = mongo.db.conversations
-    conversations = conversations_col.find({"fb_id": fb_id})
-
-    return Helper.get_json(list(conversations)[0]["partners"])
+    partner_ids = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]["partners"]
+    return Helper.get_json(partner_ids)
 
 
-# POST {my_id: ..., partner_id: ...}
+# POST { my_id: <string>, partner_id: <string> }
+# RETURN { success: <boolean> }
 @messages_endpoint.route("/subscribe-partner", methods=["POST"])
 def subscribe_conversations():
     data = request.json
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
 
-    conversations_col = mongo.db.conversations
-    # have I ever talked to anyone before?
-    conversation = conversations_col.find({"fb_id": my_id})
-    if conversation.count() > 0:
-        # okay cool, I've talked to someone before, I just have to check the partner id now
-        conversation = conversations_col.find({"fb_id": my_id, "partners": partner_id})
-        if conversation.count() > 0:
-            # I've talked to you before, nothing else to do?
-            return Helper.get_json({"success": True, "action": "already subscribed to partner"})
-        else:
-            # never talked to you before, just add the id to the list
-            conversations_col.update({"fb_id": my_id}, {"$push": {"partners": partner_id}})
-            conversations_col.update({"fb_id": partner_id}, {"$push": {"partners": my_id}})
-            return Helper.get_json({"success": True, "action": "added new partner to list"})
-    else:
-        # first conversation ever, update both fb_id and partner list
-        conversation = dict()
-        conversation["fb_id"] = my_id
-        conversation["partners"] = [partner_id]
-        conversations_col.insert(conversation)
+    mongo.db.users.update({"fb_id": my_id}, {"$push": {"partners": partner_id}})
+    mongo.db.users.update({"fb_id": partner_id}, {"$push": {"partners": my_id}})
 
-        conversation = dict()
-        conversation["fb_id"] = partner_id
-        conversation["partners"] = [my_id]
-        conversations_col.insert(conversation)
-
-        return Helper.get_json({"success": True, "action": "created first ever conversation and subscribed partner"})
+    return Helper.get_json({"success": True})
 
 
-# POST {"my_id":..., "partner_id":...}
+# POST { my_id: <string>, partner_id: <string> }
+# RETURN { success: <boolean>, partners: [ <fb id>, ... ] }
 @messages_endpoint.route("/unsubscribe-partner", methods=["POST"])
 def unsubscribe_user():
     data = request.json
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
 
-    conversations_col = mongo.db.conversations
-    conversations_col.update({"fb_id": my_id}, {"$pull": {"partners": partner_id}})
-    conversations_col.update({"fb_id": partner_id}, {"$pull": {"partners": my_id}})
+    mongo.db.users.update({"fb_id": my_id}, {"$pull": {"partners": partner_id}})
+    mongo.db.users.update({"fb_id": partner_id}, {"$pull": {"partners": my_id}})
 
-    new_subscription_list = conversations_col.find({"fb_id": my_id})
-
-    return Helper.get_json({"success": True, "subscriptions": new_subscription_list})
+    new_partners_list = User.get_user(my_id)["partners"]
+    return Helper.get_json({"success": True, "partners": new_partners_list})
 
 
-# POST {fb_id: ...}
-# GET [{fb_id:..., last_message_time:..., last_message_content:...}, {...}, ...]
+# POST { fb_id: <string> }
+# RETURN [ <message>, ... ]
 @messages_endpoint.route("/get-past-conversation-previews", methods=["POST"])
 def get_conversations_previews():
     data = request.json
     fb_id = str(data["fb_id"])
 
-    conversations_col = mongo.db.conversations
-    partners = list(conversations_col.find({"fb_id": fb_id}))
-
-    if len(partners) > 0:
-        partners = partners[0]["partners"]
+    partners = User.get_user(fb_id)["partners"]
     messages_preview = []
 
     for partner in partners:

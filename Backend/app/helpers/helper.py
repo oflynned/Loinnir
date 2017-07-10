@@ -9,7 +9,7 @@ from flask import Response
 class Helper:
     @staticmethod
     def get_current_time_in_millis():
-        return time.time() * 1000
+        return int(round(time.time() * 1000))
 
     @staticmethod
     def get_json(data):
