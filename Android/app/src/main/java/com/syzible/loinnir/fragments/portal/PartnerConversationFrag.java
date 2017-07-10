@@ -28,6 +28,7 @@ import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
+import com.syzible.loinnir.utils.BroadcastFilters;
 import com.syzible.loinnir.utils.EncodingUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
@@ -50,6 +51,7 @@ public class PartnerConversationFrag extends Fragment {
     private Date lastLoadedDate;
     private int loadedCount;
 
+    private BroadcastReceiver newPartnerMessageReceiver;
     private MessagesListAdapter<Message> adapter;
     private User partner;
 
@@ -149,16 +151,16 @@ public class PartnerConversationFrag extends Fragment {
         loadMessages();
 
         getActivity().setTitle(partner.getName());
-        registerBroadcastReceiver(MainActivity.BroadcastFilters.new_partner_message);
+        registerBroadcastReceiver(BroadcastFilters.new_partner_message);
 
         return view;
     }
 
-    private void registerBroadcastReceiver(MainActivity.BroadcastFilters filter) {
+    private void registerBroadcastReceiver(BroadcastFilters filter) {
         getActivity().registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(MainActivity.BroadcastFilters.new_partner_message.name())) {
+                if (intent.getAction().equals(BroadcastFilters.new_partner_message.name())) {
                     // clear the messages and reload
                     loadMessages();
                 }

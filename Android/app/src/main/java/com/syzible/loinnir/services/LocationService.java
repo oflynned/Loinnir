@@ -14,6 +14,7 @@ import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.utils.BroadcastFilters;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONException;
@@ -27,12 +28,10 @@ import cz.msebera.android.httpclient.Header;
 
 public class LocationService extends Service {
 
-    /**
-     * TODO need to fix battery drain! 12%+ being spent on GPS alone
-     */
+    // TODO need to fix battery drain! 12%+ being spent on GPS alone!
 
     private LocationManager locationManager = null;
-    private static final int LOCATION_INTERVAL = 1000; //
+    private static final int LOCATION_INTERVAL = 1000 * 15; // obtain fix interval
     private static final float LOCATION_DISTANCE = 100f; // 100m
 
     private class LocationListener implements android.location.LocationListener {
@@ -110,28 +109,9 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        startPollingLocation();
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
-    }
-
-    private void registerBroadcastReceiver(MainActivity.BroadcastFilters filter) {
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(MainActivity.BroadcastFilters.start_location_polling.name())) {
-                    System.out.println("Polling start location");
-                    startPollingLocation();
-                } else if (intent.getAction().equals(MainActivity.BroadcastFilters.end_location_polling.name())) {
-                    stopPollingLocation();
-                }
-            }
-        }, new IntentFilter(filter.name()));
-    }
-
-    @Override
-    public void onCreate() {
-        startPollingLocation();
-        super.onCreate();
     }
 
     private void startPollingLocation() {
@@ -165,11 +145,9 @@ public class LocationService extends Service {
         }
     }
 
-
     @Override
     public void onDestroy() {
         stopPollingLocation();
-        this.stopSelf();
         super.onDestroy();
     }
 

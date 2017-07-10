@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,6 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 import com.syzible.loinnir.R;
-import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
@@ -28,6 +28,7 @@ import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
+import com.syzible.loinnir.utils.BroadcastFilters;
 import com.syzible.loinnir.utils.EncodingUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
@@ -51,7 +52,16 @@ public class LocalityConversationFrag extends Fragment {
     private int loadedCount;
 
     private MessagesListAdapter<Message> adapter;
-    private BroadcastReceiver newLocalityInformationReceiver;
+    private BroadcastReceiver newLocalityInformationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(BroadcastFilters.new_locality_info_update.name())) {
+                // TODO change this, the screen refreshes completely D:
+                // clear the messages and reload
+                loadMessages();
+            }
+        }
+    };
 
     private View view;
 
@@ -62,21 +72,26 @@ public class LocalityConversationFrag extends Fragment {
 
         setupAdapter(view);
         loadMessages();
-        registerBroadcastReceiver(MainActivity.BroadcastFilters.new_locality_information);
 
         return view;
     }
 
     @Override
     public void onResume() {
-        super.onResume();
-
         setupAdapter(view);
         loadMessages();
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(newLocalityInformationReceiver,
+                        new IntentFilter(BroadcastFilters.new_locality_info_update.toString()));
+
+        super.onResume();
+
     }
 
     @Override
     public void onPause() {
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(newLocalityInformationReceiver);
         super.onPause();
     }
 
@@ -170,18 +185,6 @@ public class LocalityConversationFrag extends Fragment {
                         return new JSONObject(rawJsonData);
                     }
                 });
-    }
-
-    private void registerBroadcastReceiver(MainActivity.BroadcastFilters filter) {
-        getActivity().registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(MainActivity.BroadcastFilters.new_locality_information.name())) {
-                    // clear the messages and reload
-                    loadMessages();
-                }
-            }
-        }, new IntentFilter(filter.name()));
     }
 
     private void loadMessages() {

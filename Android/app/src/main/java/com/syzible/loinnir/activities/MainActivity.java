@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -39,6 +40,7 @@ import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.LocationService;
 import com.syzible.loinnir.services.MessagingService;
 import com.syzible.loinnir.utils.BitmapUtils;
+import com.syzible.loinnir.utils.BroadcastFilters;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.JSONUtils;
@@ -56,48 +58,15 @@ public class MainActivity extends AppCompatActivity
 
     private View headerView;
 
-    private BroadcastReceiver finishMainActivityReceiver;
-    private BroadcastReceiver startLocationPollingReceiver, endLocationPollingReceiver;
-
-    // TODO move to conversation fragment and allow a global context if app is in background
-    private BroadcastReceiver newPartnerMessageReceiver;
-
-    public enum BroadcastFilters {
-        finish_main_activity {
-            @Override
-            public String toString() {
-                return "com.syzible.loinnir.finish_main_activity";
-            }
-        },
-
-        start_location_polling {
-            @Override
-            public String toString() {
-                return "com.syzible.loinnir.start_location_polling";
-            }
-        },
-
-        end_location_polling {
-            @Override
-            public String toString() {
-                return "com.syzible.loinnir.end_location_polling";
-            }
-        },
-
-        new_locality_information {
-            @Override
-            public String toString() {
-                return "com.syzible.loinnir.new_locality_information";
-            }
-        },
-
-        new_partner_message {
-            @Override
-            public String toString() {
-                return "com.syzible.loinnir.new_partner_message";
+    private BroadcastReceiver finishMainActivityReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            assert finishMainActivityReceiver != null;
+            if (intent.getAction().equals(BroadcastFilters.finish_main_activity.name())) {
+                finish();
             }
         }
-    }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,63 +129,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onPause() {
-        sendBroadcast(new Intent(BroadcastFilters.end_location_polling.name()));
-        stopService(new Intent(this, LocationService.class));
+    protected void onResume() {
+        registerBroadcastReceivers();
+        startService(new Intent(getApplicationContext(), LocationService.class));
+        super.onResume();
+    }
 
-        unregisterReceiver(startLocationPollingReceiver);
-        unregisterReceiver(endLocationPollingReceiver);
+    @Override
+    protected void onPause() {
+        stopService(new Intent(this, LocationService.class));
         unregisterReceiver(finishMainActivityReceiver);
         super.onPause();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onStart() {
-        startService(new Intent(this, LocationService.class));
-        startService(new Intent(this, MessagingService.class));
-        registerBroadcastReceivers();
-        sendBroadcast(new Intent(BroadcastFilters.start_location_polling.name()));
-
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
     private void registerBroadcastReceivers() {
-        finishMainActivityReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(BroadcastFilters.finish_main_activity.name())) {
-                    finish();
-                }
-            }
-        };
-
-        startLocationPollingReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                startService(new Intent(getApplicationContext(), LocationService.class));
-            }
-        };
-
-        endLocationPollingReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                stopService(new Intent(getApplicationContext(), LocationService.class));
-            }
-        };
-
-        registerReceiver(finishMainActivityReceiver, new IntentFilter(BroadcastFilters.finish_main_activity.name()));
-        registerReceiver(startLocationPollingReceiver, new IntentFilter(BroadcastFilters.start_location_polling.name()));
-        registerReceiver(endLocationPollingReceiver, new IntentFilter(BroadcastFilters.end_location_polling.name()));
+        LocalBroadcastManager.getInstance(this).registerReceiver(finishMainActivityReceiver,
+                new IntentFilter(BroadcastFilters.finish_main_activity.toString()));
     }
 
     private void greetUser() {

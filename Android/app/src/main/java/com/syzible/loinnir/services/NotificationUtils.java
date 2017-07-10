@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
@@ -34,31 +35,11 @@ import cz.msebera.android.httpclient.Header;
 
 public class NotificationUtils {
 
-    public static void generateNotification(Context context, RemoteMessage remoteMessage) {
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+    private static final int VIBRATION_INTENSITY = 500;
 
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(context)
-                        .setLargeIcon(icon)
-                        .setSmallIcon(R.drawable.logo_small)
-                        .setContentTitle(remoteMessage.getNotification().getTitle())
-                        .setContentText(remoteMessage.getNotification().getBody());
-
-        Intent resultingIntent = new Intent(context, MainActivity.class);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultingIntent);
-
-        PendingIntent resultingPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        notificationBuilder.setContentIntent(resultingPendingIntent);
-
-        NotificationManager manager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        manager.notify(0, notificationBuilder.build());
+    private static void vibrate(Context context) {
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(VIBRATION_INTENSITY);
     }
 
     public static void generateNotification(Context context, String title, String content) {
@@ -86,6 +67,7 @@ public class NotificationUtils {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         manager.notify(0, notificationBuilder.build());
+        vibrate(context);
     }
 
     public static void generateMessageNotification(final Context context, final User user,
@@ -122,6 +104,7 @@ public class NotificationUtils {
                 // TODO all facebook ids seem to be too big to be integers?
                 // TODO crashes notification as it's greater than Integer.MAX_VALUE
                 manager.notify(1, notificationBuilder.build());
+                vibrate(context);
             }
 
             @Override
