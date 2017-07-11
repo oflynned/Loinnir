@@ -1,6 +1,7 @@
 from flask_pyfcm import FCMNotification
 
 from app.app import mongo
+from app.api.v1.users import User
 from app.helpers.helper import Helper
 from app.helpers.datasets import Datasets
 
@@ -8,14 +9,14 @@ from app.helpers.datasets import Datasets
 class FCM:
     @staticmethod
     def notify_partner_chat_update(my_id, partner_id, mode):
-        me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
-        partner = dict(list(mongo.db.users.find({"fb_id": partner_id}))[0])
+        me = dict(User.get_user(my_id))
+        partner = dict(User.get_user(partner_id))
 
         me.pop("_id")
         partner.pop("_id")
 
         registration_id = partner["fcm_token"]
-        message_title = Helper.get_decoded_name(str(me["name"]))
+        message_title = Helper.get_decoded_name(str(me["forename"] + " " + me["surname"]))
         message_avatar = me["profile_pic"]
 
         # get latest message from you to notify partner

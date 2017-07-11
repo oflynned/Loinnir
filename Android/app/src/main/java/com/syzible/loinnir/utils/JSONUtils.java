@@ -61,4 +61,17 @@ public class JSONUtils {
 
         return o;
     }
+
+
+    public static JSONObject getPartnerInteractionPayload(String partnerId, Context context) {
+        JSONObject o = new JSONObject();
+        try {
+            o.put("my_id", LocalStorage.getID(context));
+            o.put("partner_id", partnerId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return o;
+    }
 }

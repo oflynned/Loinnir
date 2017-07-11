@@ -75,8 +75,7 @@ def get_partner_messages():
     returned_messages = []
 
     for message in messages:
-        user = list(mongo.db.users.find({"fb_id": message["from_id"]}))[0]
-        returned_messages.append({"message": message, "user": user})
+        returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
 
     # sort by descending time
     sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)

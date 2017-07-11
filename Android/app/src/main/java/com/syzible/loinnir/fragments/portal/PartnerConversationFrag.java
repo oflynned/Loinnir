@@ -16,6 +16,7 @@ import android.widget.ImageView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.stfalcon.chatkit.commons.ImageLoader;
+import com.stfalcon.chatkit.messages.MessageHolders;
 import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
@@ -30,8 +31,10 @@ import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.BroadcastFilters;
+import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EncodingUtils;
 import com.syzible.loinnir.utils.JSONUtils;
+import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONArray;
@@ -52,16 +55,91 @@ public class PartnerConversationFrag extends Fragment {
     private Date lastLoadedDate;
     private int loadedCount;
 
-    private BroadcastReceiver newPartnerMessageReceiver;
-    private MessagesListAdapter<Message> adapter;
     private User partner;
+    private View view;
+    private MessagesListAdapter<Message> adapter;
+    private ArrayList<Message> messages = new ArrayList<>();
+    private BroadcastReceiver newPartnerMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(BroadcastFilters.new_partner_message.toString())) {
+                String partnerId = intent.getStringExtra("partner_id");
+                RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES,
+                        JSONUtils.getPartnerInteractionPayload(partnerId, getActivity()),
+                        new BaseJsonHttpResponseHandler<JSONArray>() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                                try {
+                                    JSONObject latestPayload = response.getJSONObject(response.length() - 1);
+                                    User sender = new User(latestPayload.getJSONObject("user"));
+                                    Message message = new Message(sender, latestPayload);
+                                    adapter.addToStart(message, true);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+
+                            }
+
+                            @Override
+                            protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                return new JSONArray(rawJsonData);
+                            }
+                        });
+            }
+        }
+    };
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.conversation_frag, container, false);
+        view = inflater.inflate(R.layout.conversation_frag, container, false);
+        setupAdapter(view);
+        loadMessages();
 
-        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(partner.getName());
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(partner.getLocality());
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        loadMessages();
+        getActivity().registerReceiver(newPartnerMessageReceiver,
+                new IntentFilter(BroadcastFilters.new_partner_message.toString()));
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        getActivity().unregisterReceiver(newPartnerMessageReceiver);
+        super.onPause();
+    }
+
+
+    private void setupAdapter(View view) {
+        MessageHolders holdersConfig = new MessageHolders();
+        holdersConfig.setIncomingTextConfig(IncomingMessage.class, R.layout.chat_message_layout);
+
+        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), holdersConfig, loadImage());
+        adapter.setOnMessageViewLongClickListener(new MessagesListAdapter.OnMessageViewLongClickListener<Message>() {
+            @Override
+            public void onMessageViewLongClick(View view, final Message message) {
+                // should not be able to block yourself
+                if (!message.getUser().getId().equals(LocalStorage.getID(getActivity())))
+                    DisplayUtils.generateBlockDialog(getActivity(), (User) message.getUser(), new DisplayUtils.OnCallback() {
+                        @Override
+                        public void onCallback() {
+                            DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc go rathúil ar " + LanguageUtils.lenite(((User) message.getUser()).getForename()));
+                            loadMessages();
+                        }
+                    });
+            }
+        });
         MessagesList messagesList = (MessagesList) view.findViewById(R.id.messages_list);
         messagesList.setAdapter(adapter);
 
@@ -101,12 +179,12 @@ public class PartnerConversationFrag extends Fragment {
                                                 RestClient.post(getActivity(), Endpoints.SEND_PARTNER_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
                                                     @Override
                                                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-
+                                                        System.out.println(response);
                                                     }
 
                                                     @Override
                                                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
+                                                        System.out.println(rawJsonData);
                                                     }
 
                                                     @Override
@@ -121,7 +199,7 @@ public class PartnerConversationFrag extends Fragment {
 
                                         @Override
                                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
+                                            Log.
                                         }
 
                                         @Override
@@ -148,43 +226,22 @@ public class PartnerConversationFrag extends Fragment {
                 return true;
             }
         });
-
-        loadMessages();
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(partner.getName());
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(null);
-        registerBroadcastReceiver(BroadcastFilters.new_partner_message);
-
-        return view;
-    }
-
-    private void registerBroadcastReceiver(BroadcastFilters filter) {
-        getActivity().registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(BroadcastFilters.new_partner_message.name())) {
-                    // clear the messages and reload
-                    loadMessages();
-                }
-            }
-        }, new IntentFilter(filter.name()));
     }
 
     private void loadMessages() {
-        adapter.clear();
+        setupAdapter(view);
         RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES,
                 JSONUtils.getPartnerInteractionPayload(partner, getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
-                        ArrayList<Message> messages = new ArrayList<>();
+                        messages.clear();
                         for (int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject data = response.getJSONObject(i);
                                 JSONObject dataMessage = data.getJSONObject("message");
                                 User sender = new User(data.getJSONObject("user"));
                                 Message message = new Message(sender, dataMessage);
-
                                 messages.add(message);
                             } catch (JSONException e) {
                                 e.printStackTrace();

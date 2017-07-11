@@ -50,7 +50,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
         android:gravity="center_horizontal"
-        android:text="Contae an úsáideora" />
+        android:text="Ceantar an úsáideora" />
 
     <LinearLayout
         android:id="@+id/roulette_outcome_actions"
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="4dp"
             android:layout_weight="0.5"
-            android:text="Rúiléid"
+            android:text="Déan rúiléid"
             fancy:fb_borderWidth="1dp"
             fancy:fb_textColor="@color/colorPrimary"
             fancy:fb_borderColor="@color/colorPrimary"
