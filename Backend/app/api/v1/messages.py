@@ -176,11 +176,11 @@ def get_conversations_previews():
         my_messages_query = {"$and": [{"from_id": {"$in": [fb_id]}}, {"to_id": {"$in": [partner]}}]}
         partner_messages_query = {"$and": [{"from_id": {"$in": [partner]}}, {"to_id": {"$in": [fb_id]}}]}
 
-        messages_from_me = list(mongo.db.partner_conversations.find(my_messages_query))
-        messages_from_partner = list(mongo.db.partner_conversations.find(partner_messages_query))
+        messages_from_me = mongo.db.partner_conversations.find(my_messages_query)
+        messages_from_partner = mongo.db.partner_conversations.find(partner_messages_query)
 
-        my_messages_count = len(messages_from_me)
-        partner_messages_count = len(messages_from_partner)
+        my_messages_count = messages_from_me.count()
+        partner_messages_count = messages_from_partner.count()
 
         # remember that a connection is only made on sending a message
         # both being 0 shouldn't be possible if they're partners

@@ -22,14 +22,16 @@ class FCM:
 
         # get latest message from you to notify partner
         my_messages_query = {"$and": [{"from_id": {"$in": [my_id]}}, {"to_id": {"$in": [partner_id]}}]}
-        message = list(mongo.db.partner_conversations.find(my_messages_query).limit(1))[0]
+        message = list(mongo.db.partner_conversations.find(my_messages_query).sort("time", -1).limit(1))[0]
 
         # sanitise the _id as we need it to create a notification for the user
         # or to update the chat screen and append it with its uid
         message_id = str(message["_id"])
+        print(message["_id"])
         message.pop("_id")
         message["_id"] = message_id
-
+        print(message)
+        
         data_content = {
             "notification_type": "new_partner_message",
             "message_title": message_title,
