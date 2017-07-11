@@ -53,6 +53,8 @@ public class MessagingService extends FirebaseMessagingService {
 
     private void onPartnerMessage(RemoteMessage remoteMessage) throws JSONException {
         System.out.println("onPartnerMessage");
+        String notificationTitle = remoteMessage.getData().get("message_title");
+        String notificationBody = remoteMessage.getData().get("")
 
         // on message received in the foreground
         User from = new User(new JSONObject(remoteMessage.getData().get("from_details")));

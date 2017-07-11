@@ -33,7 +33,7 @@ class FCM:
         }
 
         # if user gets a block enforced in a chat the messages shouldn't get delivered or notified
-        blocked_users = list(mongo.db.users.find({"fb_id": partner_id}))[0]["blocked"]
+        blocked_users = User.get_user(partner_id)["blocked"]
         if my_id not in blocked_users:
             key = Datasets.get_fcm_api_key(mode)
             push_service = FCMNotification(api_key=key)
