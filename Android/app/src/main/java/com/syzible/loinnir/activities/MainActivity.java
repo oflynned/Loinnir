@@ -203,8 +203,8 @@ public class MainActivity extends AppCompatActivity
                     });
             }
         } else {
-            //setFragment(getFragmentManager(), new MapFrag());
-            setFragment(getFragmentManager(), new LocalityConversationFrag());
+            setFragment(getFragmentManager(), new MapFrag());
+            //setFragment(getFragmentManager(), new ConversationsListFrag());
         }
     }
 
@@ -324,6 +324,7 @@ public class MainActivity extends AppCompatActivity
                     new BaseJsonHttpResponseHandler<JSONArray>() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                            System.out.println(response);
                             setFragment(getFragmentManager(), new ConversationsListFrag().setResponse(response));
                         }
 

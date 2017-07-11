@@ -137,8 +137,11 @@ def subscribe_conversations():
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
 
-    mongo.db.users.update({"fb_id": my_id}, {"$push": {"partners": partner_id}})
-    mongo.db.users.update({"fb_id": partner_id}, {"$push": {"partners": my_id}})
+    if partner_id not in User.get_user(my_id)["partners"]:
+        mongo.db.users.update({"fb_id": my_id}, {"$push": {"partners": partner_id}})
+
+    if my_id not in User.get_user(partner_id)["partners"]:
+        mongo.db.users.update({"fb_id": partner_id}, {"$push": {"partners": my_id}})
 
     return Helper.get_json({"success": True})
 
@@ -159,7 +162,7 @@ def unsubscribe_user():
 
 
 # POST { fb_id: <string> }
-# RETURN [ <message>, ... ]
+# RETURN [ { <message>, <user> }, ... ]
 @messages_endpoint.route("/get-past-conversation-previews", methods=["POST"])
 def get_conversations_previews():
     data = request.json
@@ -170,15 +173,14 @@ def get_conversations_previews():
 
     for partner in partners:
         # check if only one message exists in the conversation
-        messages_col = mongo.db.partner_conversations
         my_messages_query = {"$and": [{"from_id": {"$in": [fb_id]}}, {"to_id": {"$in": [partner]}}]}
         partner_messages_query = {"$and": [{"from_id": {"$in": [partner]}}, {"to_id": {"$in": [fb_id]}}]}
 
-        messages_from_me = messages_col.find(my_messages_query)
-        messages_from_partner = messages_col.find(partner_messages_query)
+        messages_from_me = list(mongo.db.partner_conversations.find(my_messages_query))
+        messages_from_partner = list(mongo.db.partner_conversations.find(partner_messages_query))
 
-        my_messages_count = messages_from_me.count()
-        partner_messages_count = messages_from_partner.count()
+        my_messages_count = len(messages_from_me)
+        partner_messages_count = len(messages_from_partner)
 
         # remember that a connection is only made on sending a message
         # both being 0 shouldn't be possible if they're partners
@@ -192,10 +194,9 @@ def get_conversations_previews():
         else:
             # both parties have communicated with each other
             query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}
-            last_message_in_chat = list(messages_col.find(query).sort("time", -1).limit(1))[0]
+            last_message_in_chat = list(mongo.db.partner_conversations.find(query).sort("time", -1).limit(1))[0]
 
-        user_details = list(mongo.db.users.find({"fb_id": partner}))[0]
-        messages_preview.append({"message": last_message_in_chat, "user": user_details})
+        messages_preview.append({"message": last_message_in_chat, "user": User.get_user(partner)})
 
     # sort list by last sent time of the message fragments
     sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=False)

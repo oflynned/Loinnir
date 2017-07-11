@@ -57,10 +57,11 @@ public class ConversationsListFrag extends Fragment implements
     private DialogsList dialogsList;
     private JSONArray response;
 
+    private View view;
+
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
-        View view;
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.app_name);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(null);
 
@@ -76,6 +77,13 @@ public class ConversationsListFrag extends Fragment implements
         }
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+
+
+        super.onResume();
     }
 
     public ConversationsListFrag setResponse(JSONArray response) {

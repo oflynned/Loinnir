@@ -59,6 +59,7 @@ public class PartnerConversationFrag extends Fragment {
     private View view;
     private MessagesListAdapter<Message> adapter;
     private ArrayList<Message> messages = new ArrayList<>();
+
     private BroadcastReceiver newPartnerMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -98,7 +99,6 @@ public class PartnerConversationFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.conversation_frag, container, false);
         setupAdapter(view);
-        loadMessages();
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(partner.getName());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(partner.getLocality());
@@ -199,7 +199,7 @@ public class PartnerConversationFrag extends Fragment {
 
                                         @Override
                                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                                            Log.
+                                            System.out.println(rawJsonData);
                                         }
 
                                         @Override
