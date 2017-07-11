@@ -297,8 +297,9 @@ public class LocalityConversationFrag extends Fragment
                         @Override
                         public void onResponse(Bitmap response) {
                             Bitmap croppedImage = BitmapUtils.getCroppedCircle(response);
-                            CachingUtil.cacheImage(getActivity(), fileName, croppedImage);
-                            imageView.setImageBitmap(croppedImage);
+                            Bitmap scaledAvatar = BitmapUtils.scaleBitmap(croppedImage, BitmapUtils.BITMAP_SIZE_SMALL);
+                            imageView.setImageBitmap(scaledAvatar);
+                            CachingUtil.cacheImage(getActivity(), fileName, scaledAvatar);
                         }
 
                         @Override

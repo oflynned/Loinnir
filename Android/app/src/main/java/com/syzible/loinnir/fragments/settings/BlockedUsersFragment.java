@@ -26,6 +26,7 @@ import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
@@ -86,7 +87,7 @@ public class BlockedUsersFragment extends Fragment {
             }
         };
 
-        for (int i=0; i<blockedUserIds.size(); i++) {
+        for (int i = 0; i < blockedUserIds.size(); i++) {
             JSONObject payload = new JSONObject();
             try {
                 payload.put("fb_id", blockedUserIds.get(i));
@@ -156,54 +157,59 @@ public class BlockedUsersFragment extends Fragment {
                 view = convertView;
             }
 
-            new GetImage(new NetworkCallback<Bitmap>() {
+            viewHolder.name.setText(blockedUser.getName());
+            viewHolder.unblockUser.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onResponse(Bitmap response) {
-                    viewHolder.name.setText(blockedUser.getName());
-
-                    Bitmap avatar = BitmapUtils.getCroppedCircle(response);
-                    Bitmap scaledAvatar = BitmapUtils.scaleBitmap(avatar, BitmapUtils.BITMAP_SIZE_SMALL);
-
-                    viewHolder.profilePicture.setImageBitmap(scaledAvatar);
-                    viewHolder.unblockUser.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    RestClient.post(context, Endpoints.UNBLOCK_USER, JSONUtils.getPartnerInteractionPayload(blockedUser, context), new BaseJsonHttpResponseHandler<JSONObject>() {
                         @Override
-                        public void onClick(View v) {
-                            RestClient.post(context, Endpoints.UNBLOCK_USER, JSONUtils.getPartnerInteractionPayload(blockedUser, context), new BaseJsonHttpResponseHandler<JSONObject>() {
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                                    DisplayUtils.generateSnackbar(getActivity(), "Baineadh an cosc de " + LanguageUtils.lenite(blockedUser.getName()));
+                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                            DisplayUtils.generateSnackbar(getActivity(), "Baineadh an cosc de " + LanguageUtils.lenite(blockedUser.getName()));
 
-                                    // now remove the selected blocked user and invalidate the list
-                                    System.out.println(position);
-                                    blockedUsers.remove(position);
-                                    ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+                            // now remove the selected blocked user and invalidate the list
+                            blockedUsers.remove(position);
+                            ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
-                                    if (blockedUsers.size() == 0) {
-                                        // now refresh the fragment to display the "no blocked users" frag if required
-                                        SettingsActivity.removeFragment(getFragmentManager());
-                                        SettingsActivity.setFragmentBackstack(getFragmentManager(), new BlockedUsersFragment().setCount(0));
-                                    }
-                                }
+                            if (blockedUsers.size() == 0) {
+                                // now refresh the fragment to display the "no blocked users" frag if required
+                                SettingsActivity.removeFragment(getFragmentManager());
+                                SettingsActivity.setFragmentBackstack(getFragmentManager(), new BlockedUsersFragment().setCount(0));
+                            }
+                        }
 
-                                @Override
-                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
 
-                                }
+                        }
 
-                                @Override
-                                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                    return new JSONObject(rawJsonData);
-                                }
-                            });
+                        @Override
+                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                            return new JSONObject(rawJsonData);
                         }
                     });
                 }
+            });
 
-                @Override
-                public void onFailure() {
-                    DisplayUtils.generateSnackbar(getActivity(), "This earáid amach " + EmojiUtils.getEmoji(EmojiUtils.SAD));
-                }
-            }, blockedUser.getAvatar(), true).execute();
+            if (!CachingUtil.doesImageExist(getActivity(), blockedUser.getId())) {
+                new GetImage(new NetworkCallback<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap response) {
+                        Bitmap avatar = BitmapUtils.getCroppedCircle(response);
+                        Bitmap scaledAvatar = BitmapUtils.scaleBitmap(avatar, BitmapUtils.BITMAP_SIZE_SMALL);
+                        viewHolder.profilePicture.setImageBitmap(scaledAvatar);
+                        CachingUtil.cacheImage(getActivity(), blockedUser.getId(), scaledAvatar);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        DisplayUtils.generateSnackbar(getActivity(), "This earáid amach " + EmojiUtils.getEmoji(EmojiUtils.SAD));
+                    }
+                }, blockedUser.getAvatar(), true).execute();
+            } else {
+                Bitmap avatar = CachingUtil.getCachedImage(getActivity(), blockedUser.getId());
+                Bitmap scaledAvatar = BitmapUtils.scaleBitmap(avatar, BitmapUtils.BITMAP_SIZE_SMALL);
+                viewHolder.profilePicture.setImageBitmap(scaledAvatar);
+            }
 
             return view;
         }
@@ -219,6 +225,7 @@ public class BlockedUsersFragment extends Fragment {
         this.count = count;
         return this;
     }
+
     public BlockedUsersFragment setBlockedUsers(ArrayList<String> blockedUserIds) {
         this.blockedUserIds = blockedUserIds;
         return this;
