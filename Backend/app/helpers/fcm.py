@@ -44,7 +44,7 @@ class FCM:
         if my_id not in blocked_users:
             key = Datasets.get_fcm_api_key(mode)
             push_service = FCMNotification(api_key=key)
-            push_service.notify_single_device(registration_id=registration_id, data_message=json.dumps(data_content))
+            push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
             return Helper.get_json({"success": True})
 
@@ -79,7 +79,7 @@ class FCM:
             # perhaps should not notify users on a new locality message @ spam
             key = Datasets.get_fcm_api_key(mode)
             push_service = FCMNotification(api_key=key)
-            push_service.notify_multiple_devices(registration_ids=ids, data_message=json.dumps(data_content))
+            push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
 
             return Helper.get_json({"success": True})
         else:
