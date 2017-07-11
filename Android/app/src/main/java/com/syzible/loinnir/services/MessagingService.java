@@ -47,7 +47,7 @@ public class MessagingService extends FirebaseMessagingService {
         }
 
         // background notifications if the app is dead or not in focus
-        if (remoteMessage.getNotification() != null) {
+        /*if (remoteMessage.getNotification() != null) {
             String partnerId = remoteMessage.getNotification().getBody();
             RestClient.post(getApplicationContext(), Endpoints.GET_PARTNER_CONVERSATION_PREVIEW,
                     JSONUtils.getPartnerInteractionPayload(partnerId, getApplicationContext()),
@@ -74,7 +74,7 @@ public class MessagingService extends FirebaseMessagingService {
                         }
                     }
             );
-        }
+        }*/
 
         super.onMessageReceived(remoteMessage);
     }

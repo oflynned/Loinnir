@@ -57,15 +57,14 @@ public class PartnerConversationFrag extends Fragment {
 
     private User partner;
     private View view;
-    private MessagesListAdapter<Message> adapter;
-    private ArrayList<Message> messages = new ArrayList<>();
 
+    private ArrayList<Message> messages = new ArrayList<>();
+    private MessagesListAdapter<Message> adapter;
     private BroadcastReceiver newPartnerMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastFilters.new_partner_message.toString())) {
                 String partnerId = intent.getStringExtra("partner_id");
-                System.out.println(partnerId + " has sent you a new message");
 
                 RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES,
                         JSONUtils.getPartnerInteractionPayload(partnerId, getActivity()),
@@ -75,8 +74,10 @@ public class PartnerConversationFrag extends Fragment {
                                 try {
                                     JSONObject latestPayload = response.getJSONObject(response.length() - 1);
                                     User sender = new User(latestPayload.getJSONObject("user"));
-                                    Message message = new Message(sender, latestPayload);
+                                    Message message = new Message(sender, latestPayload.getJSONObject("message"));
                                     adapter.addToStart(message, true);
+
+                                    System.out.println(sender.getName() + " has sent you a new message");
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -84,7 +85,7 @@ public class PartnerConversationFrag extends Fragment {
 
                             @Override
                             public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
-
+                                System.out.println(rawJsonData);
                             }
 
                             @Override
