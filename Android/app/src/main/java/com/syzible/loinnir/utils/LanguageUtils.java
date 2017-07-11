@@ -95,13 +95,57 @@ public class LanguageUtils {
     }
 
     private static boolean isVowel(String letter) {
-        return letter.matches("a|e|i|o|u|á|é|í|ó|ú");
+        return letter.toLowerCase().matches("a|e|i|o|u|á|é|í|ó|ú");
     }
 
     private static String palatalise(String input) {
         // Seán -> Seáin
         int wordLength = input.length();
         return input.substring(0, wordLength - 1) + "i" + input.substring(wordLength - 1, wordLength);
+    }
+
+    public static String getPrepositionalForm(String preposition, String noun) {
+        String firstLetter = String.valueOf(noun.charAt(0));
+
+        System.out.println(firstLetter);
+        System.out.println(preposition);
+
+        switch (preposition.toLowerCase()) {
+            case "le":
+                return preposition + (isVowel(firstLetter) ? " h-" : " ") + noun;
+
+            case "de":
+            case "do":
+                return isVowel(firstLetter) ? "d'" + noun : preposition + " " + lenite(noun);
+
+            case "ar":
+            case "faoi":
+            case "idir":
+            case "ionsar":
+            case "ó":
+            case "roimh":
+            case "trí":
+                return preposition + " " + lenite(noun);
+
+            case "thar":
+                switch (firstLetter.toLowerCase()) {
+                    case "c":
+                    case "d":
+                    case "f":
+                    case "g":
+                    case "s":
+                    case "t":
+                        return preposition + " " + lenite(noun);
+                }
+                return preposition + " " + noun;
+
+            case "i":
+                return preposition + " " + eclipse(noun);
+            default:
+                break;
+        }
+
+        return preposition + " " + noun;
     }
 
     public static String getVocative(String input) {

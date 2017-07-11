@@ -20,6 +20,7 @@ import com.syzible.loinnir.objects.User;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.util.LangUtils;
 
 /**
  * Created by ed on 13/05/2017.
@@ -42,8 +43,8 @@ public class DisplayUtils {
 
     public static AlertDialog generateBlockDialog(final Activity activity, final User blockee, final OnCallback callback) {
         return new AlertDialog.Builder(activity)
-                .setTitle("Cosc a Chur ar " + LanguageUtils.lenite(blockee.getForename()) + "?")
-                .setMessage("Má chuireann tú cosc ar úsáideoir araile, ní féidir leat nó le " + blockee.getForename() + " dul i dteagmháil lena chéile. " +
+                .setTitle("Cosc a Chur " + LanguageUtils.getPrepositionalForm("ar", LanguageUtils.lenite(blockee.getForename())) + "?")
+                .setMessage("Má chuireann tú cosc ar úsáideoir araile, ní féidir leat nó " + LanguageUtils.getPrepositionalForm("le", blockee.getForename()) + " dul i dteagmháil lena chéile. " +
                         "Bain úsáid as seo amháin go bhfuil tú cinnte nach dteastaíonn uait faic a chloisteáil a thuilleadh ón úsáideoir seo. " +
                         "Cur cosc ar dhuine má imrítear bulaíocht ort, nó mura dteastaíonn uait tuilleadh teagmhála. " +
                         "Má athraíonn tú do mheabhair ar ball, téigh chuig na socruithe agus bainistigh cé atá curtha ar cosc.")
