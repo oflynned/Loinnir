@@ -52,7 +52,7 @@ public class MessagingService extends FirebaseMessagingService {
     }
 
     private void onPartnerMessage(RemoteMessage remoteMessage) throws JSONException {
-        System.out.println("onPartnerMessage");
+        System.out.println("Dispatching onPartnerMessage()");
         String notificationTitle = remoteMessage.getData().get("message_title");
         String notificationAvatar = remoteMessage.getData().get("message_avatar");
         String notificationBody = remoteMessage.getData().get("message");

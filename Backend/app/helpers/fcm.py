@@ -22,6 +22,7 @@ class FCM:
         # get latest message from you to notify partner
         my_messages_query = {"$and": [{"from_id": {"$in": [my_id]}}, {"to_id": {"$in": [partner_id]}}]}
         message = list(mongo.db.partner_conversations.find(my_messages_query).limit(1))
+        message.pop("_id")
 
         data_content = {
             "notification_type": "new_partner_message",
