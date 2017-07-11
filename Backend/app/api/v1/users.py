@@ -110,8 +110,11 @@ def get_nearby_users_count():
     fb_id = str(data["fb_id"])
 
     # find local users and exclude self from lookup
-    my_locality = list(mongo.db.users.find({"fb_id": fb_id}))[0]["locality"]
-    nearby_users = list(mongo.db.users.find({"fb_id": {"$ne": fb_id}, "locality": my_locality}))
+    my_profile = User.get_user(fb_id)
+    my_locality = my_profile["locality"]
+    excluded_users = my_profile["blocked"]
+    excluded_users.append(fb_id)
+    nearby_users = list(mongo.db.users.find({"fb_id": {"$nin": excluded_users}, "locality": my_locality}))
     return Helper.get_json({"count": len(nearby_users), "locality": my_locality})
 
 
