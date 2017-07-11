@@ -40,6 +40,12 @@ public class MessagingService extends FirebaseMessagingService {
             }
         }
 
+        if (remoteMessage.getNotification() != null) {
+            NotificationUtils.generateNotification(getApplicationContext(),
+                    remoteMessage.getData().get("message_title"),
+                    remoteMessage.getData());
+        }
+
         super.onMessageReceived(remoteMessage);
     }
 
@@ -53,15 +59,8 @@ public class MessagingService extends FirebaseMessagingService {
 
     private void onPartnerMessage(RemoteMessage remoteMessage) throws JSONException {
         System.out.println("Dispatching onPartnerMessage()");
-        String notificationTitle = remoteMessage.getData().get("message_title");
-        String notificationAvatar = remoteMessage.getData().get("message_avatar");
         String notificationBody = remoteMessage.getData().get("message");
         User sender = new User(new JSONObject(remoteMessage.getData().get("from_details")));
-
-        System.out.println(notificationTitle);
-        System.out.println(notificationAvatar);
-        System.out.println(notificationBody);
-        System.out.println(sender.getName());
 
         // on message received in the foreground
         Message message = new Message(sender, new JSONObject(notificationBody));
@@ -72,6 +71,6 @@ public class MessagingService extends FirebaseMessagingService {
         newDataIntent.putExtra("partner_id", sender.getId());
         getApplicationContext().sendBroadcast(newDataIntent);
 
-        NotificationUtils.generateMessageNotification(getApplicationContext(), sender, message);
+        // NotificationUtils.generateMessageNotification(getApplicationContext(), sender, message);
     }
 }

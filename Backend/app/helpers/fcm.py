@@ -27,10 +27,8 @@ class FCM:
         # sanitise the _id as we need it to create a notification for the user
         # or to update the chat screen and append it with its uid
         message_id = str(message["_id"])
-        print(message["_id"])
         message.pop("_id")
         message["_id"] = message_id
-        print(message)
         
         data_content = {
             "notification_type": "new_partner_message",
@@ -46,7 +44,12 @@ class FCM:
         if my_id not in blocked_users:
             key = Datasets.get_fcm_api_key(mode)
             push_service = FCMNotification(api_key=key)
+            # notify a screen refresh and polling for new messages
             push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
+
+            # notify to create a notification if the app is not in focus or dead
+            push_service.notify_single_device(registration_id=registration_id, message_title=message_title,
+                                              message_body=partner_id["fb_id"])
 
             return Helper.get_json({"success": True})
 
