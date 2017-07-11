@@ -65,6 +65,8 @@ public class PartnerConversationFrag extends Fragment {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastFilters.new_partner_message.toString())) {
                 String partnerId = intent.getStringExtra("partner_id");
+                System.out.println(partnerId + " has sent you a new message");
+
                 RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES,
                         JSONUtils.getPartnerInteractionPayload(partnerId, getActivity()),
                         new BaseJsonHttpResponseHandler<JSONArray>() {
