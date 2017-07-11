@@ -54,18 +54,24 @@ public class MessagingService extends FirebaseMessagingService {
     private void onPartnerMessage(RemoteMessage remoteMessage) throws JSONException {
         System.out.println("onPartnerMessage");
         String notificationTitle = remoteMessage.getData().get("message_title");
-        String notificationBody = remoteMessage.getData().get("")
+        String notificationAvatar = remoteMessage.getData().get("message_avatar");
+        String notificationBody = remoteMessage.getData().get("message");
+        User sender = new User(new JSONObject(remoteMessage.getData().get("from_details")));
+
+        System.out.println(notificationTitle);
+        System.out.println(notificationAvatar);
+        System.out.println(notificationBody);
+        System.out.println(sender.getName());
 
         // on message received in the foreground
-        User from = new User(new JSONObject(remoteMessage.getData().get("from_details")));
-        Message message = new Message(from, new JSONObject(remoteMessage.getData().get("message")));
+        // Message message = new Message(sender, notificationBody);
 
         // for updating UI or creating notifications on receiving a message
-        String newMessageIntent = BroadcastFilters.new_partner_message.toString();
-        Intent newDataIntent = new Intent(newMessageIntent);
-        newDataIntent.putExtra("partner_id", from.getId());
-        getApplicationContext().sendBroadcast(newDataIntent);
+        //String newMessageIntent = BroadcastFilters.new_partner_message.toString();
+        //Intent newDataIntent = new Intent(newMessageIntent);
+        //newDataIntent.putExtra("partner_id", from.getId());
+        //getApplicationContext().sendBroadcast(newDataIntent);
 
-        NotificationUtils.generateMessageNotification(getApplicationContext(), from, message);
+        //NotificationUtils.generateMessageNotification(getApplicationContext(), from, message);
     }
 }
