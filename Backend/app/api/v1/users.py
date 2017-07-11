@@ -223,7 +223,7 @@ def block_user():
 
     # now add the partner's id to this user's blocked list
     mongo.db.users.update({"fb_id": my_id}, {"$push": {"blocked": partner_id}})
-    return Helper.get_json(list(mongo.db.users.find({"fb_id": my_id}))[0])
+    return Helper.get_json(User.get_user(my_id))
 
 
 # POST { fb_id: <string> }
@@ -232,8 +232,7 @@ def block_user():
 def get_blocked_users():
     data = request.json
     fb_id = str(data["fb_id"])
-    users = mongo.db.conversations.find({"fb_id": fb_id})
-    return Helper.get_json(users)
+    return Helper.get_json(User.get_user(fb_id)["blocked"])
 
 
 # POST { my_id: <string>, partner_id: <string> }
@@ -246,4 +245,4 @@ def unblock_user():
 
     # now remove the partner's id from this user's blocked list
     mongo.db.users.update({"fb_id": my_id}, {"$pull": {"blocked": partner_id}})
-    return Helper.get_json(list(mongo.db.users.find({"fb_id": my_id}))[0])
+    return Helper.get_json(User.get_user(my_id))

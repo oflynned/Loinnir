@@ -16,6 +16,7 @@ import android.widget.ImageView;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.stfalcon.chatkit.commons.ImageLoader;
+import com.stfalcon.chatkit.commons.models.IUser;
 import com.stfalcon.chatkit.dialogs.DialogsList;
 import com.stfalcon.chatkit.dialogs.DialogsListAdapter;
 import com.syzible.loinnir.R;
@@ -32,6 +33,7 @@ import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LanguageUtils;
+import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -113,10 +115,16 @@ public class ConversationsListFrag extends Fragment implements
 
     @Override
     public void onDialogLongClick(final Conversation conversation) {
-        final String blockee = conversation.getDialogName().split(" ")[0];
+        User blockee = null;
+        for (IUser user : conversation.getUsers()) {
+            if (!user.getId().equals(LocalStorage.getID(getActivity()))) {
+                blockee = (User) user;
+            }
+        }
 
+        final User finalBlockee = blockee;
         new AlertDialog.Builder(getActivity())
-                .setTitle("Cosc a Chur ar " + LanguageUtils.lenite(conversation.getDialogName()) + "?")
+                .setTitle("Cosc a Chur ar " + LanguageUtils.lenite(blockee.getForename()) + "?")
                 .setMessage("Má chuireann tú cosc ar úsáideoir araile, ní féidir leat nó le " + blockee + " dul i dteagmháil lena chéile. " +
                         "Bain úsáid as seo amháin go bhfuil tú cinnte nach dteastaíonn uait faic a chloisteáil a thuilleadh ón úsáideoir seo. " +
                         "Cur cosc ar dhuine má imrítear bulaíocht ort, nó mura dteastaíonn uait tuilleadh teagmhála. " +
@@ -124,14 +132,12 @@ public class ConversationsListFrag extends Fragment implements
                 .setPositiveButton("Cur cosc i bhfeidhm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, final int which) {
-                        final User userBlockee = (User) conversation.getUsers().get(0);
-
                         RestClient.post(getActivity(), Endpoints.BLOCK_USER,
-                                JSONUtils.getPartnerInteractionPayload(userBlockee, getActivity()),
+                                JSONUtils.getPartnerInteractionPayload(finalBlockee, getActivity()),
                                 new BaseJsonHttpResponseHandler<JSONObject>() {
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                                        DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc ar " + LanguageUtils.lenite(blockee) + ".");
+                                        DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc ar " + LanguageUtils.lenite(finalBlockee.getForename()) + ".");
 
                                         conversations.remove(which + 1);
 

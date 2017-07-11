@@ -30,8 +30,10 @@ import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.BroadcastFilters;
+import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EncodingUtils;
 import com.syzible.loinnir.utils.JSONUtils;
+import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONArray;
@@ -47,8 +49,10 @@ import cz.msebera.android.httpclient.Header;
  * Created by ed on 07/05/2017.
  */
 
-public class LocalityConversationFrag extends Fragment implements
-        MessagesListAdapter.SelectionListener, MessagesListAdapter.OnLoadMoreListener {
+public class LocalityConversationFrag extends Fragment
+        implements MessagesListAdapter.OnLoadMoreListener {
+
+    private View view;
 
     private Date lastLoadedDate;
     private int loadedCount;
@@ -88,8 +92,6 @@ public class LocalityConversationFrag extends Fragment implements
         }
     };
 
-    private View view;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -106,7 +108,6 @@ public class LocalityConversationFrag extends Fragment implements
         loadMessages();
         getActivity().registerReceiver(newLocalityInformationReceiver,
                 new IntentFilter(BroadcastFilters.new_locality_info_update.toString()));
-
         super.onResume();
     }
 
@@ -121,6 +122,20 @@ public class LocalityConversationFrag extends Fragment implements
         holdersConfig.setIncomingTextConfig(IncomingMessage.class, R.layout.chat_message_layout);
 
         adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), holdersConfig, loadImage());
+        adapter.setOnMessageViewLongClickListener(new MessagesListAdapter.OnMessageViewLongClickListener<Message>() {
+            @Override
+            public void onMessageViewLongClick(View view, final Message message) {
+                // should not be able to block yourself
+                if (!message.getUser().getId().equals(LocalStorage.getID(getActivity())))
+                DisplayUtils.generateBlockDialog(getActivity(), (User) message.getUser(), new DisplayUtils.OnCallback() {
+                    @Override
+                    public void onCallback() {
+                        DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc go rathúil ar " + LanguageUtils.lenite(((User) message.getUser()).getForename()));
+                        loadMessages();
+                    }
+                });
+            }
+        });
         MessagesList messagesList = (MessagesList) view.findViewById(R.id.messages_list);
         messagesList.setAdapter(adapter);
 
@@ -134,20 +149,42 @@ public class LocalityConversationFrag extends Fragment implements
                             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                                 try {
                                     final User me = new User(response);
-                                    String messageContent = input.toString();
-
-                                    Message message = new Message(LocalStorage.getID(getActivity()), me, System.currentTimeMillis(), messageContent);
-                                    adapter.addToStart(message, true);
+                                    final String messageContent = input.toString().trim();
 
                                     // send to server
                                     JSONObject messagePayload = new JSONObject();
                                     messagePayload.put("fb_id", LocalStorage.getID(getActivity()));
-                                    messagePayload.put("message", EncodingUtils.encodeText(message.getText()));
+                                    messagePayload.put("message", EncodingUtils.encodeText(messageContent));
 
                                     RestClient.post(getActivity(), Endpoints.SEND_LOCALITY_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                                             System.out.println("Message submitted to locality (" + me.getLocality() + ")");
+
+                                            RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, JSONUtils.getIdPayload(getActivity()), new BaseJsonHttpResponseHandler<JSONArray>() {
+                                                @Override
+                                                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                                                    try {
+                                                        JSONObject latestMessage = response.getJSONObject(response.length() - 1);
+                                                        User sender = new User(latestMessage.getJSONObject("user"));
+                                                        Message message = new Message(latestMessage.getString("_id"), sender,
+                                                                System.currentTimeMillis(), latestMessage.getString("message"));
+                                                        adapter.addToStart(message, true);
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+
+                                                }
+
+                                                @Override
+                                                protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                                    return new JSONArray(rawJsonData);
+                                                }
+                                            });
                                         }
 
                                         @Override
@@ -212,7 +249,6 @@ public class LocalityConversationFrag extends Fragment implements
 
     private void loadMessages() {
         setupAdapter(view);
-
         RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, JSONUtils.getIdPayload(getActivity()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
@@ -280,11 +316,6 @@ public class LocalityConversationFrag extends Fragment implements
 
     @Override
     public void onLoadMore(int page, int totalItemsCount) {
-
-    }
-
-    @Override
-    public void onSelectionChanged(int count) {
 
     }
 }

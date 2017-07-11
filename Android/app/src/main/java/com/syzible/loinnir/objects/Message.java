@@ -2,6 +2,7 @@ package com.syzible.loinnir.objects;
 
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
+import com.stfalcon.chatkit.messages.MessagesListAdapter;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.EncodingUtils;
 
