@@ -49,7 +49,7 @@ class FCM:
 
             # notify to create a notification if the app is not in focus or dead
             push_service.notify_single_device(registration_id=registration_id, message_title=message_title,
-                                              message_body=partner_id["fb_id"])
+                                              message_body=partner_id)
 
             return Helper.get_json({"success": True})
 

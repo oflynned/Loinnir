@@ -4,14 +4,18 @@ import android.content.Intent;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.utils.BroadcastFilters;
+import com.syzible.loinnir.utils.JSONUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by ed on 26/05/2017.
@@ -24,7 +28,7 @@ public class MessagingService extends FirebaseMessagingService {
     }
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(final RemoteMessage remoteMessage) {
         System.out.println("Received FCM update");
 
         if (remoteMessage.getData().size() > 0) {
@@ -44,13 +48,32 @@ public class MessagingService extends FirebaseMessagingService {
 
         // background notifications if the app is dead or not in focus
         if (remoteMessage.getNotification() != null) {
-            String partnerId = remoteMessage.getData().get("message_body");
-            RestClient.post(getApplicationContext(), Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
-                    );
+            String partnerId = remoteMessage.getNotification().getBody();
+            RestClient.post(getApplicationContext(), Endpoints.GET_PARTNER_CONVERSATION_PREVIEW,
+                    JSONUtils.getPartnerInteractionPayload(partnerId, getApplicationContext()),
+                    new BaseJsonHttpResponseHandler<JSONObject>() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                            try {
+                                NotificationUtils.generateNotification(getApplicationContext(),
+                                        remoteMessage.getNotification().getTitle(),
+                                        response.getJSONObject("message").getString("message"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
-            NotificationUtils.generateNotification(getApplicationContext(),
-                    remoteMessage.getData().get("message_title"),
-                    remoteMessage.getData());
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                        }
+
+                        @Override
+                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                            return new JSONObject(rawJsonData);
+                        }
+                    }
+            );
         }
 
         super.onMessageReceived(remoteMessage);
