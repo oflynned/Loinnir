@@ -202,3 +202,37 @@ def get_conversations_previews():
     sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=False)
 
     return Helper.get_json(sorted_list)
+
+
+# POST { my_id: <string>, partner_id: <string> }
+# RETURN { <message>, <user> }
+@messages_endpoint.route("/get-partner-conversation-preview", methods=["POST"])
+def get_partner_conversation_preview():
+    data = request.json
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])  # check if only one message exists in the conversation
+
+    my_messages_query = {"$and": [{"from_id": {"$in": [my_id]}}, {"to_id": {"$in": [partner_id]}}]}
+    partner_messages_query = {"$and": [{"from_id": {"$in": [partner_id]}}, {"to_id": {"$in": [my_id]}}]}
+
+    messages_from_me = mongo.db.partner_conversations.find(my_messages_query)
+    messages_from_partner = mongo.db.partner_conversations.find(partner_messages_query)
+
+    my_messages_count = messages_from_me.count()
+    partner_messages_count = messages_from_partner.count()
+
+    # remember that a connection is only made on sending a message
+    # both being 0 shouldn't be possible if they're partners
+
+    if my_messages_count > 0 and partner_messages_count == 0:
+        # I sent messages but no replies were sent back
+        last_message_in_chat = list(messages_from_me.sort("time", -1).limit(1))[0]
+    elif my_messages_count == 0 and partner_messages_count > 0:
+        # partner sent me messages and I haven't replied
+        last_message_in_chat = list(messages_from_partner.sort("time", -1).limit(1))[0]
+    else:
+        # both parties have communicated with each other
+        query = {"$and": [{"to_id": {"$in": [my_id, partner_id]}}, {"from_id": {"$in": [my_id, partner_id]}}]}
+        last_message_in_chat = list(mongo.db.partner_conversations.find(query).sort("time", -1).limit(1))[0]
+
+    return Helper.get_json({"message": last_message_in_chat, "user": User.get_user(partner_id)})

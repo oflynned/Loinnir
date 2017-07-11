@@ -4,6 +4,8 @@ import android.content.Intent;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.syzible.loinnir.network.Endpoints;
+import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.utils.BroadcastFilters;
@@ -40,7 +42,12 @@ public class MessagingService extends FirebaseMessagingService {
             }
         }
 
+        // background notifications if the app is dead or not in focus
         if (remoteMessage.getNotification() != null) {
+            String partnerId = remoteMessage.getData().get("message_body");
+            RestClient.post(getApplicationContext(), Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
+                    );
+
             NotificationUtils.generateNotification(getApplicationContext(),
                     remoteMessage.getData().get("message_title"),
                     remoteMessage.getData());
