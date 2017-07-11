@@ -47,8 +47,8 @@ public class LocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            System.out.println("New location!");
-            lastLocation.set(location);
+            if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getApplicationContext()))
+                lastLocation.set(location);
             syncWithServer(location);
         }
 
@@ -68,7 +68,8 @@ public class LocationService extends Service {
                 RestClient.post(getApplicationContext(), Endpoints.UPDATE_USER_LOCATION, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                        getApplicationContext().sendBroadcast(new Intent("updated_location"));
+                        if (LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getApplicationContext()))
+                            getApplicationContext().sendBroadcast(new Intent("com.syzible.loinnir.updated_location"));
                     }
 
                     @Override

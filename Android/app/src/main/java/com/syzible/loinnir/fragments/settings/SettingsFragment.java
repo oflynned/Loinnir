@@ -104,9 +104,9 @@ public class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 shouldShareLocation.setChecked(!LocalStorage.getBooleanPref(LocalStorage.Pref.should_share_location, getActivity()));
-                LocalStorage.setBooleanPref(LocalStorage.Pref.should_share_location, (Boolean) newValue, context);
+                LocalStorage.setBooleanPref(LocalStorage.Pref.should_share_location, (boolean) newValue, context);
 
-                RestClient.post(context, Endpoints.EDIT_USER, JSONUtils.getLocationChangePayload(context, (Boolean) newValue), new BaseJsonHttpResponseHandler<JSONObject>() {
+                RestClient.post(context, Endpoints.EDIT_USER, JSONUtils.getLocationChangePayload(context, (boolean) newValue), new BaseJsonHttpResponseHandler<JSONObject>() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         DisplayUtils.generateSnackbar(context, "Nuashonraíodh an socrú ceantair go rathúil");
@@ -127,7 +127,6 @@ public class SettingsFragment extends PreferenceFragment {
         });
     }
 
-    // TODO make custom list fragment to list users and action to unblock
     private void setListenerBlockedUsers() {
         final BlockedUsersFragment fragment = new BlockedUsersFragment();
 

@@ -203,13 +203,13 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("updated_location")) {
+                if (intent.getAction().equals("com.syzible.loinnir.updated_location")) {
                     getWebServerLocation();
                 }
             }
         };
 
-        getActivity().registerReceiver(receiver, new IntentFilter("updated_location"));
+        getActivity().registerReceiver(receiver, new IntentFilter("com.syzible.loinnir.updated_location"));
     }
 
     @Override
