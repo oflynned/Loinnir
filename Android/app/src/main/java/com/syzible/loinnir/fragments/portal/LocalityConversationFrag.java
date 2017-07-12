@@ -96,15 +96,11 @@ public class LocalityConversationFrag extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.conversation_frag, container, false);
-        setupAdapter(view);
-        loadMessages();
-
         return view;
     }
 
     @Override
     public void onResume() {
-        setupAdapter(view);
         loadMessages();
         getActivity().registerReceiver(newLocalityInformationReceiver,
                 new IntentFilter(BroadcastFilters.new_locality_info_update.toString()));
