@@ -153,7 +153,7 @@ def get_random_user():
                 ]}))
 
             if len(users) > 1:
-                random_index = randint(0, len(users) - 1)
+                random_index = randint(0, len(users))
                 return Helper.get_json(users[random_index])
             elif len(users) == 1:
                 return Helper.get_json(users[0])

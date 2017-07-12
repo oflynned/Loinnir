@@ -31,7 +31,7 @@ def get_fake_users():
 
 @services_endpoint.route("/create-fake-users", methods=["GET"])
 def create_fake_users():
-    for user in FakeDatasets.generate_fake_users():
+    for user in FakeDatasets.generate_fake_users(1):
         mongo.db.users.insert(user)
 
     return Helper.get_json({"success": True})

@@ -18,8 +18,10 @@ import com.syzible.loinnir.activities.SettingsActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.utils.DisplayUtils;
+import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
 import com.syzible.loinnir.utils.JSONUtils;
+import com.syzible.loinnir.utils.LanguageUtils;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONArray;
@@ -39,7 +41,7 @@ public class SettingsFragment extends PreferenceFragment {
     SwitchPreference shouldShareLocation;
     Preference manageBlockedUsers, shareApp, aboutLoinnir, visitWebsite;
     Preference appVersion, licences, privacyPolicy, termsOfService;
-    Preference logOut, cleanAccount, deleteAccount;
+    Preference logOut, deleteAccount;
 
     private Activity context;
 
@@ -78,7 +80,6 @@ public class SettingsFragment extends PreferenceFragment {
 
         // danger area
         setListenerLogOut();
-        setListenerCleanAccount();
         setListenerDeleteAccount();
     }
 
@@ -93,7 +94,6 @@ public class SettingsFragment extends PreferenceFragment {
         privacyPolicy = findPreference("pref_privacy_policy");
         termsOfService = findPreference("pref_tos");
         logOut = findPreference("pref_log_out");
-        cleanAccount = findPreference("pref_clean_account");
         deleteAccount = findPreference("pref_delete_account");
     }
 
@@ -282,27 +282,24 @@ public class SettingsFragment extends PreferenceFragment {
         });
     }
 
-    private void setListenerCleanAccount() {
-        cleanAccount.setSummary("Á lódáil ...");
-
-        RestClient.post(context, Endpoints.GET_MATCHED_COUNT, JSONUtils.getIdPayload(context),
+    private void setListenerDeleteAccount() {
+        RestClient.post(getActivity(), Endpoints.GET_MATCHED_COUNT, JSONUtils.getIdPayload(getActivity()),
                 new BaseJsonHttpResponseHandler<JSONObject>() {
                     @Override
-                    public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers,
-                                          String rawJsonResponse, JSONObject response) {
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         try {
                             int count = response.getInt("count");
-                            String summary = count + " úsáideoir lena raibh teagmháil agat";
-                            cleanAccount.setSummary(summary);
+                            deleteAccount.setSummary("Rabhadh! Caillfidh tú " +
+                                    count + " " + LanguageUtils.getCountForm(count, "nasc") +
+                                    ". " + EmojiUtils.getEmoji(EmojiUtils.SAD));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
 
                     @Override
-                    public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers,
-                                          Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                        cleanAccount.setSummary("0 úsáideoir lena raibh teagmháil agat");
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
                     }
 
                     @Override
@@ -311,27 +308,6 @@ public class SettingsFragment extends PreferenceFragment {
                     }
                 });
 
-        cleanAccount.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.DangerAppTheme))
-                        .setTitle("Do Chúntas Loinnir a Ghlanadh?")
-                        .setMessage("Glanfar do chuid chúntais ionas nach mbeidh aon duine faoi mheaitseáil agat mar a bhí ag am súiteáil na h-aipe. Bainfear na daoine ar fad de do chúntas. Ní bheidh tú in ann aisdul tar éis an ghnímh seo.")
-                        .setPositiveButton("Deimhnigh an Glanadh", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                DisplayUtils.generateToast(context, "Glanadh do chúntas");
-                            }
-                        })
-                        .setNegativeButton("Ná glan!", null)
-                        .create()
-                        .show();
-                return false;
-            }
-        });
-    }
-
-    private void setListenerDeleteAccount() {
         deleteAccount.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

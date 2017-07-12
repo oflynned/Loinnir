@@ -61,10 +61,6 @@
             android:title="Logáil Amach" />
 
         <Preference
-            android:key="pref_clean_account"
-            android:title="Glan mo Chuid Chúntais" />
-
-        <Preference
             android:key="pref_delete_account"
             android:title="Scrios do Chúntas Loinnir" />
     </PreferenceCategory>

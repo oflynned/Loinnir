@@ -49,22 +49,21 @@ public class RouletteFrag extends Fragment {
                 new BaseJsonHttpResponseHandler<JSONObject>() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                        int count = 0;
                         try {
-                            count = response.getInt("count");
+                            int count = response.getInt("count");
+                            String usersLeftMessage;
+
+                            if (count == 0)
+                                usersLeftMessage = "Níl aon daoine nua ann le nasc a chruthú! " + EmojiUtils.getEmoji(EmojiUtils.SAD);
+                            else if (count == 1)
+                                usersLeftMessage = "Tá " + count + " úsáideoir eile ag baint úsáide as an aip seo nár bhuail tú leis/léi go fóill " + EmojiUtils.getEmoji(EmojiUtils.COOL);
+                            else
+                                usersLeftMessage = "Tá " + count + " úsáideoir eile ag baint úsáide as an aip seo nár bhuail tú leo go fóill " + EmojiUtils.getEmoji(EmojiUtils.COOL);
+
+                            unmatchedUserCountTextView.setText(usersLeftMessage);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-                        String usersLeftMessage;
-                        if (count == 0)
-                            usersLeftMessage = "Níl aon daoine nua ann le nasc a chruthú leo! " + EmojiUtils.getEmoji(EmojiUtils.SAD);
-                        else if (count == 1)
-                            usersLeftMessage = "Tá " + count + " úsáideoir eile ag baint úsáide as an aip seo nár bhuail tú leis/léi go fóill " + EmojiUtils.getEmoji(EmojiUtils.COOL);
-                        else
-                            usersLeftMessage = "Tá " + count + " úsáideoir eile ag baint úsáide as an aip seo nár bhuail tú leo go fóill " + EmojiUtils.getEmoji(EmojiUtils.COOL);
-
-                        unmatchedUserCountTextView.setText(usersLeftMessage);
                     }
 
                     @Override

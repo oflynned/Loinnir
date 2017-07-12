@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -75,10 +76,18 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onResume() {
+        registerBroadcastReceiver();
         setMapPosition();
+
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.app_name);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(null);
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        getActivity().unregisterReceiver(receiver);
+        super.onPause();
     }
 
     private void setMapPosition() {
@@ -96,7 +105,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.map_frag, container, false);
-
         MapFragment mapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -210,17 +218,5 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
         };
 
         getActivity().registerReceiver(receiver, new IntentFilter("com.syzible.loinnir.updated_location"));
-    }
-
-    @Override
-    public void onStart() {
-        registerBroadcastReceiver();
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        getActivity().unregisterReceiver(receiver);
-        super.onStop();
     }
 }
