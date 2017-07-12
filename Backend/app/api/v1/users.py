@@ -192,10 +192,8 @@ def get_matched_user_count():
 # RETURN { success: <boolean> }
 @user_endpoint.route('/delete', methods=["DELETE"])
 def delete_user():
-    users_col = mongo.db["users"]
-    data = json.loads(request.data)
-    fb_id = str(data["fb_id"])
-    users_col.remove({"fb_id": fb_id})
+    fb_id = str(request.data["fb_id"])
+    mongo.db.users.remove({"fb_id": fb_id})
     return Helper.get_json({"success": True})
 
 
