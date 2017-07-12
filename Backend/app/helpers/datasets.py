@@ -23,6 +23,11 @@ class Datasets:
             return data["features"]
 
     @staticmethod
+    def open_json_file(file_name):
+        with open("app/datasets/" + file_name + ".json", "r") as f:
+            return json.loads(f.read())
+
+    @staticmethod
     def groom_population_dataset():
         dataset = Datasets.get_populated_areas()
         groomed_set = []

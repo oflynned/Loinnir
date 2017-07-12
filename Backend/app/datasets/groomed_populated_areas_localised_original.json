@@ -1,511 +1,511 @@
 [
   {
-    "town": "Cavan",
+    "town": "An Cabhán",
     "lat": 53.992698999103155,
     "lng": -7.359436500000186
   },
   {
-    "town": "Letterkenny",
+    "town": "Leitir Cheanainn",
     "lat": 54.954749999113496,
     "lng": -7.726656500000186
   },
   {
-    "town": "Dundalk",
+    "town": "Dún Dealgain",
     "lat": 54.00267049910329,
     "lng": -6.403016000000179
   },
   {
-    "town": "Drogheda",
+    "town": "Droichead Átha",
     "lat": 53.71408099910037,
     "lng": -6.349417000000187
   },
   {
-    "town": "Monaghan",
+    "town": "Muineachán",
     "lat": 54.2477759991058,
     "lng": -6.970840000000181
   },
   {
-    "town": "Carrickmacross",
+    "town": "Carraig Mhachaire Rois",
     "lat": 53.97656299910298,
     "lng": -6.721484500000201
   },
   {
-    "town": "Sligo",
+    "town": "Sligeach",
     "lat": 54.272605999106034,
     "lng": -8.473643500000179
   },
   {
-    "town": "Portlaoise",
+    "town": "Port Laoise",
     "lat": 53.033138499093866,
     "lng": -7.294919500000192
   },
   {
-    "town": "Portarlington",
+    "town": "Cúil an tSúdaire",
     "lat": 53.16025149909503,
     "lng": -7.187446000000193
   },
   {
-    "town": "Longford",
+    "town": "An Longfort",
     "lat": 53.727317999100464,
     "lng": -7.80043600000019
   },
   {
-    "town": "Tullamore",
+    "town": "Tulach Mhór",
     "lat": 53.275211499096116,
     "lng": -7.492410500000204
   },
   {
-    "town": "Edenderry",
+    "town": "Éadan Doire",
     "lat": 53.34318899909677,
     "lng": -7.051534500000202
   },
   {
-    "town": "Mullingar",
+    "town": "An Muileann gCearr",
     "lat": 53.52589399909853,
     "lng": -7.3396380000001775
   },
   {
-    "town": "Athlone",
+    "town": "Baile Átha Luain",
     "lat": 53.42947199909758,
     "lng": -7.929345500000182
   },
   {
-    "town": "Galway",
+    "town": "Gaillimh",
     "lat": 53.282241999096165,
     "lng": -9.038160500000203
   },
   {
-    "town": "Tuam",
+    "town": "Tuaim",
     "lat": 53.51487749909841,
     "lng": -8.851342000000187
   },
   {
-    "town": "Ballinasloe",
+    "town": "Béal Átha na Sluaighe",
     "lat": 53.330835499096644,
     "lng": -8.225113000000194
   },
   {
-    "town": "Loughrea",
+    "town": "Baile Locha Riach",
     "lat": 53.198993499095394,
     "lng": -8.56527700000018
   },
   {
-    "town": "Castlebar",
+    "town": "Caisleán an Bharraigh",
     "lat": 53.85444399910175,
     "lng": -9.297275000000184
   },
   {
-    "town": "Ballina",
+    "town": "Béal an Átha",
     "lat": 54.11353999910439,
     "lng": -9.164756000000182
   },
   {
-    "town": "Westport",
+    "town": "Cathair na Mart",
     "lat": 53.80113199910121,
     "lng": -9.52247600000018
   },
   {
-    "town": "Roscommon",
+    "town": "Ros Comáin",
     "lat": 53.63140099909955,
     "lng": -8.190756000000192
   },
   {
-    "town": "Dublin",
+    "town": "Baile Átha Cliath",
     "lat": 53.332225999096664,
     "lng": -6.274997000000183
   },
   {
-    "town": "Swords",
+    "town": "Soird",
     "lat": 53.45925499909787,
     "lng": -6.219589500000183
   },
   {
-    "town": "Balbriggan",
+    "town": "Baile Brigín",
     "lat": 53.6058004990993,
     "lng": -6.183738000000204
   },
   {
-    "town": "Malahide",
+    "town": "Mullach Íde",
     "lat": 53.450725499097786,
     "lng": -6.153397500000181
   },
   {
-    "town": "Portmarnock",
+    "town": "Port Mearnóg",
     "lat": 53.430788999097594,
     "lng": -6.133777500000207
   },
   {
-    "town": "Skerries",
+    "town": "Sceirí",
     "lat": 53.57934949909903,
     "lng": -6.110322000000195
   },
   {
-    "town": "Rush",
+    "town": "An Ros",
     "lat": 53.52190849909849,
     "lng": -6.09110850000019
   },
   {
-    "town": "Donabate",
+    "town": "Domhnach Bat",
     "lat": 53.486522499098115,
     "lng": -6.148388000000182
   },
   {
-    "town": "Lusk",
+    "town": "Lusca",
     "lat": 53.525653999098495,
     "lng": -6.165365500000207
   },
   {
-    "town": "Kildare",
+    "town": "Cill Dara",
     "lat": 53.156844999095,
     "lng": -6.9109460000001945
   },
   {
-    "town": "Naas",
+    "town": "An Nás",
     "lat": 53.219341499095584,
     "lng": -6.661660500000181
   },
   {
-    "town": "Newbridge",
+    "town": "An Droichead Nua",
     "lat": 53.180125999095225,
     "lng": -6.798189500000206
   },
   {
-    "town": "Celbridge",
+    "town": "Cill Droichid",
     "lat": 53.338302499096706,
     "lng": -6.5396335000001775
   },
   {
-    "town": "Leixlip",
+    "town": "Léim an Bhradáin",
     "lat": 53.364246499096964,
     "lng": -6.487948000000187
   },
   {
-    "town": "Maynooth",
+    "town": "Maigh Nuad",
     "lat": 53.38154599909713,
     "lng": -6.590726000000188
   },
   {
-    "town": "Athy",
+    "town": "Baile Átha Í",
     "lat": 52.99345499909351,
     "lng": -6.9717180000001795
   },
   {
-    "town": "Clane",
+    "town": "Claonadh",
     "lat": 53.29290749909629,
     "lng": -6.686743500000206
   },
   {
-    "town": "Navan",
+    "town": "An Uaimh",
     "lat": 53.65198899909975,
     "lng": -6.687893500000199
   },
   {
-    "town": "Dunboyne",
+    "town": "Dún Búinne",
     "lat": 53.419593999097486,
     "lng": -6.4759965000001785
   },
   {
-    "town": "Rathoath",
+    "town": "An Ráth Tó",
     "lat": 53.507262999098344,
     "lng": -6.463791000000185
   },
   {
-    "town": "Dunshaughlin",
+    "town": "Dún Seachlainn",
     "lat": 53.51376349909839,
     "lng": -6.540641500000191
   },
   {
-    "town": "Kells",
+    "town": "Ceanannas",
     "lat": 53.726581499100476,
     "lng": -6.877548500000189
   },
   {
-    "town": "Greystones",
+    "town": "Na Clocha Liatha",
     "lat": 53.149802999094945,
     "lng": -6.0796050000001856
   },
   {
-    "town": "Wicklow",
+    "town": "Cill Mhantáin",
     "lat": 52.98073949909337,
     "lng": -6.046497000000187
   },
   {
-    "town": "Bray",
+    "town": "Bré",
     "lat": 53.20350549909544,
     "lng": -6.106044000000196
   },
   {
-    "town": "Arklow",
+    "town": "An tInbhear Mór",
     "lat": 52.797705499091734,
     "lng": -6.158623500000203
   },
   {
-    "town": "Ennis",
+    "town": "Inis",
     "lat": 52.85057449909222,
     "lng": -8.980395500000183
   },
   {
-    "town": "Shannon",
+    "town": "Sionainn",
     "lat": 52.71239549909098,
     "lng": -8.873342000000179
   },
   {
-    "town": "Limerick",
+    "town": "Luimneach",
     "lat": 52.660728499090524,
     "lng": -8.620904000000195
   },
   {
-    "town": "Nenagh",
+    "town": "An tAonach",
     "lat": 52.862724499092316,
     "lng": -8.199535500000195
   },
   {
-    "town": "Thurles",
+    "town": "Durlas",
     "lat": 52.6771009990907,
     "lng": -7.812783000000196
   },
   {
-    "town": "Carlow",
+    "town": "Ceatharlach",
     "lat": 52.83588799909208,
     "lng": -6.92450150000019
   },
   {
-    "town": "Kilkenny",
+    "town": "Cill Ceannaigh",
     "lat": 52.65478149909049,
     "lng": -7.246371500000179
   },
   {
-    "town": "Clonmel",
+    "town": "Cluain Meala",
     "lat": 52.3557624990879,
     "lng": -7.704430500000198
   },
   {
-    "town": "Tipperary",
+    "town": "Tiobráid Árainn",
     "lat": 52.473872999088904,
     "lng": -8.159248500000189
   },
   {
-    "town": "Carrick-on-Suir",
+    "town": "Carraig na Siúire",
     "lat": 52.34922799908786,
     "lng": -7.414776500000185
   },
   {
-    "town": "Waterford",
+    "town": "Port Láirge",
     "lat": 52.25154499908705,
     "lng": -7.116945500000185
   },
   {
-    "town": "Tramore",
+    "town": "Trá Mhór",
     "lat": 52.15795899908627,
     "lng": -7.158691000000204
   },
   {
-    "town": "Dungarvan",
+    "town": "Dún Garbháin",
     "lat": 52.09200649908574,
     "lng": -7.6334100000001985
   },
   {
-    "town": "Wexford",
+    "town": "Loch Garman",
     "lat": 52.3400954990878,
     "lng": -6.470715000000184
   },
   {
-    "town": "Enniscorthy",
+    "town": "Inis Córthaidh",
     "lat": 52.50231949908915,
     "lng": -6.565619000000196
   },
   {
-    "town": "New Ross",
+    "town": "Ros Mhic Thriúin",
     "lat": 52.39572549908824,
     "lng": -6.945286500000178
   },
   {
-    "town": "Gorey",
+    "town": "Guaire",
     "lat": 52.67520499909065,
     "lng": -6.29577550000019
   },
   {
-    "town": "Cork",
+    "town": "Corcaigh",
     "lat": 51.89372949908415,
     "lng": -8.472541000000177
   },
   {
-    "town": "Ballincollig",
+    "town": "Baile an Chollaigh",
     "lat": 51.8872299990841,
     "lng": -8.60045550000018
   },
   {
-    "town": "Cobh",
+    "town": "Cóbh",
     "lat": 51.8506604990838,
     "lng": -8.299172500000195
   },
   {
-    "town": "Carrigaline",
+    "town": "Carraig Uí Leighin",
     "lat": 51.81630699908355,
     "lng": -8.391350500000186
   },
   {
-    "town": "Middleton",
+    "town": "Mainistir na Corann",
     "lat": 51.91410049908431,
     "lng": -8.172805000000183
   },
   {
-    "town": "Mallow",
+    "town": "Magh Ealla",
     "lat": 52.14188399908613,
     "lng": -8.653842000000196
   },
   {
-    "town": "Youghal",
+    "town": "Eochaill",
     "lat": 51.95610249908463,
     "lng": -7.851030000000179
   },
   {
-    "town": "Fermoy",
+    "town": "Mainistir Fhear Maí",
     "lat": 52.14044199908612,
     "lng": -8.2759810000002
   },
   {
-    "town": "Blarney",
+    "town": "An Bhlarna",
     "lat": 51.93386799908448,
     "lng": -8.563691500000203
   },
   {
-    "town": "Tralee",
+    "town": "Trá Lí",
     "lat": 52.26888649908719,
     "lng": -9.702961000000185
   },
   {
-    "town": "Killarney",
+    "town": "Cill Áirne",
     "lat": 52.05987949908548,
     "lng": -9.504205000000184
   },
   {
-    "town": "Julianstown",
+    "town": "Baile na nGileánach",
     "lat": 53.66814949909989,
     "lng": -6.278922000000194
   },
   {
-    "town": "Kilmacanoge",
+    "town": "Cill Mocheanóg",
     "lat": 53.16868199909512,
     "lng": -6.135273000000184
   },
   {
-    "town": "Delgany",
+    "town": "Deilgne",
     "lat": 53.132838499094795,
     "lng": -6.091437500000183
   },
   {
-    "town": "Virginia",
+    "town": "Achadh an Iúir",
     "lat": 53.834335499101556,
     "lng": -7.077236000000198
   },
   {
-    "town": "Bailieborough",
+    "town": "Coill an Chollaigh",
     "lat": 53.915954499102355,
     "lng": -6.9687630000001946
   },
   {
-    "town": "Kingscourt",
+    "town": "Dún an Rí",
     "lat": 53.906459999102275,
     "lng": -6.804990000000203
   },
   {
-    "town": "Cootehill",
+    "town": "Muinchille",
     "lat": 54.07295999910399,
     "lng": -7.083173000000188
   },
   {
-    "town": "Ballyjamesduff",
+    "town": "Baile Shéamais Dhuibh",
     "lat": 53.86367049910185,
     "lng": -7.2070595000001845
   },
   {
-    "town": "Belturbet",
+    "town": "Béal Tairbirt",
     "lat": 54.10158549910427,
     "lng": -7.442105500000194
   },
   {
-    "town": "Bellananagh",
+    "town": "Béal Átha na nEach",
     "lat": 53.93227399910254,
     "lng": -7.408069500000182
   },
   {
-    "town": "Ballyconnell",
+    "town": "Baile Átha Conaill",
     "lat": 54.11630249910445,
     "lng": -7.584008500000182
   },
   {
-    "town": "Killishandra",
+    "town": "Cill na Seanrátha",
     "lat": 54.0160939991034,
     "lng": -7.5292020000002
   },
   {
-    "town": "Donegal",
+    "town": "Dún na nGall",
     "lat": 54.65349949911013,
     "lng": -8.110807500000192
   },
   {
-    "town": "Stranorlar",
+    "town": "Srath an Urláir",
     "lat": 54.80505749911181,
     "lng": -7.768233500000176
   },
   {
-    "town": "Buncrana",
+    "town": "Bun Cranncha",
     "lat": 55.13223649911551,
     "lng": -7.455384000000182
   },
   {
-    "town": "Ballyshannon",
+    "town": "Baile Átha Seanaidh",
     "lat": 54.5016174991085,
     "lng": -8.190342000000186
   },
   {
-    "town": "Bundoran",
+    "town": "Bun Dobhráin",
     "lat": 54.48027649910826,
     "lng": -8.275026500000195
   },
   {
-    "town": "Convoy",
+    "town": "Conmhaigh",
     "lat": 54.859962499112406,
     "lng": -7.6646640000001875
   },
   {
-    "town": "Killybegs",
+    "town": "Na Cealla Beaga",
     "lat": 54.63691699910997,
     "lng": -8.444140500000202
   },
   {
-    "town": "Rathmelton",
+    "town": "Ráth Mealtain",
     "lat": 55.03515999911441,
     "lng": -7.650039500000191
   },
   {
-    "town": "Moville",
+    "town": "Bun an Phobail",
     "lat": 55.18897999911616,
     "lng": -7.04061250000018
   },
   {
-    "town": "Annagary",
+    "town": "Anagaire",
     "lat": 55.02214049911424,
     "lng": -8.320911500000193
   },
   {
-    "town": "Gleneely",
+    "town": "Gleann Aola",
     "lat": 55.23943399911675,
     "lng": -7.147265500000203
   },
   {
-    "town": "Castlefin",
+    "town": "Caisleán an Finne",
     "lat": 54.80291349911179,
     "lng": -7.593897500000197
   },
   {
-    "town": "Fahan",
+    "town": "Fathain",
     "lat": 55.09236149911505,
     "lng": -7.4785825000001855
   },
   {
-    "town": "Ardara",
+    "town": "Ard an Rátha",
     "lat": 54.76459499911136,
     "lng": -8.410623500000185
   },
@@ -515,377 +515,377 @@
     "lng": -7.684330500000185
   },
   {
-    "town": "Carndonagh",
+    "town": "Cúil na gCuirridín",
     "lat": 55.25112149911686,
     "lng": -7.261704000000179
   },
   {
-    "town": "Saint Johnstown",
+    "town": "Baile Suingean",
     "lat": 54.93247999911322,
     "lng": -7.46199900000019
   },
   {
-    "town": "Gortahork",
+    "town": "Gort an Choirce",
     "lat": 55.12067799911535,
     "lng": -8.1338480000002
   },
   {
-    "town": "Raphoe",
+    "town": "Ráth Bhoth",
     "lat": 54.873824999112585,
     "lng": -7.602222500000181
   },
   {
-    "town": "Ballyliffin",
+    "town": "Baile Lifín",
     "lat": 55.2797469991172,
     "lng": -7.393941500000181
   },
   {
-    "town": "Lifford",
+    "town": "Leifear",
     "lat": 54.84114449911222,
     "lng": -7.496182000000203
   },
   {
-    "town": "Dunglow",
+    "town": "An Clochán Liath",
     "lat": 54.950343999113436,
     "lng": -8.358142000000186
   },
   {
-    "town": "Millford",
+    "town": "Baile na nGallóglach",
     "lat": 55.08734499911497,
     "lng": -7.698112000000178
   },
   {
-    "town": "Glenties",
+    "town": "Na Gleannta",
     "lat": 54.79795999911175,
     "lng": -8.28392150000019
   },
   {
-    "town": "Carrick-on-Shannon",
+    "town": "Cora Droma Rúisc",
     "lat": 53.9469529991027,
     "lng": -8.091995000000196
   },
   {
-    "town": "Manorhamilton",
+    "town": "Baile Hamaltúin",
     "lat": 54.305038499106374,
     "lng": -8.176661500000193
   },
   {
-    "town": "Mohill",
+    "town": "Maothail",
     "lat": 53.921691999102435,
     "lng": -7.866107500000195
   },
   {
-    "town": "Louth",
+    "town": "Lú",
     "lat": 53.95151149910274,
     "lng": -6.5386230000002
   },
   {
-    "town": "Ardee",
+    "town": "Baile Átha Fhirdhia",
     "lat": 53.85533499910175,
     "lng": -6.538851000000194
   },
   {
-    "town": "Blackrock",
+    "town": "Na Creagacha Dubha",
     "lat": 53.96602199910288,
     "lng": -6.373763000000196
   },
   {
-    "town": "Dunleer",
+    "town": "Dún Léire",
     "lat": 53.830535999101535,
     "lng": -6.393764500000203
   },
   {
-    "town": "Carlingford",
+    "town": "Cairlinn",
     "lat": 54.04040899910365,
     "lng": -6.187284500000202
   },
   {
-    "town": "Castlebellingham",
+    "town": "Baile an Ghearlánaigh",
     "lat": 53.897563999102196,
     "lng": -6.389182000000204
   },
   {
-    "town": "Clogherhead",
+    "town": "Ceann Chlochair",
     "lat": 53.79152299910115,
     "lng": -6.23864950000018
   },
   {
-    "town": "Collon",
+    "town": "Collann",
     "lat": 53.77764899910097,
     "lng": -6.486342500000204
   },
   {
-    "town": "Termonfeckin",
+    "town": "Tearmann Feichín",
     "lat": 53.76225399910084,
     "lng": -6.268683500000179
   },
   {
-    "town": "Castleblayney",
+    "town": "Baile na Lorgan",
     "lat": 54.120158999104454,
     "lng": -6.738686500000199
   },
   {
-    "town": "Clones",
+    "town": "Cluain Eois",
     "lat": 54.1792524991051,
     "lng": -7.232342500000187
   },
   {
-    "town": "Ballybay",
+    "town": "Béal Átha Beithe",
     "lat": 54.12896349910456,
     "lng": -6.902786000000191
   },
   {
-    "town": "Emyvale",
+    "town": "Scairbh na gCaorach",
     "lat": 54.33952699910676,
     "lng": -6.959653500000201
   },
   {
-    "town": "Inishkeen",
+    "town": "Inis Caoin",
     "lat": 54.00338199910327,
     "lng": -6.578760500000186
   },
   {
-    "town": "Tobercurry",
+    "town": "Tobar an Choire",
     "lat": 54.05450449910379,
     "lng": -8.729444500000199
   },
   {
-    "town": "Drumcliff",
+    "town": "Droim Chliabh",
     "lat": 54.32752999910662,
     "lng": -8.499629000000198
   },
   {
-    "town": "Collooney",
+    "town": "Cúil Mhuine",
     "lat": 54.1832009991051,
     "lng": -8.486114500000184
   },
   {
-    "town": "Ballysadare",
+    "town": "Baile Easa Dara",
     "lat": 54.210288999105416,
     "lng": -8.508583000000186
   },
   {
-    "town": "Ballymote",
+    "town": "Baile an Mhóta",
     "lat": 54.089874499104155,
     "lng": -8.517469500000203
   },
   {
-    "town": "Cliffony",
+    "town": "Cliafuine",
     "lat": 54.43037799910774,
     "lng": -8.454036000000201
   },
   {
-    "town": "Mountmellick",
+    "town": "Móinteach Mílic",
     "lat": 53.116790999094626,
     "lng": -7.3256650000001855
   },
   {
-    "town": "Abbeyleix",
+    "town": "Mainistir Laoise",
     "lat": 52.91384099909279,
     "lng": -7.348685000000187
   },
   {
-    "town": "Mountrath",
+    "town": "Maighean Rátha",
     "lat": 53.00317399909358,
     "lng": -7.474931500000196
   },
   {
-    "town": "Durrow",
+    "town": "Darú",
     "lat": 52.84494799909217,
     "lng": -7.396877000000188
   },
   {
-    "town": "Rathdowney",
+    "town": "Ráth Domhnaigh",
     "lat": 52.85548399909227,
     "lng": -7.584774000000181
   },
   {
-    "town": "Stradbally",
+    "town": "An Sráidbhaile",
     "lat": 53.01758199909372,
     "lng": -7.152066500000188
   },
   {
-    "town": "Ballymahon",
+    "town": "Bale Uí Mhatháin",
     "lat": 53.56265249909888,
     "lng": -7.763127500000195
   },
   {
-    "town": "Edgeworthstown",
+    "town": "Meathas Troim",
     "lat": 53.69505699910018,
     "lng": -7.6078080000002055
   },
   {
-    "town": "Granard",
+    "town": "An Garrán Ard",
     "lat": 53.77926249910101,
     "lng": -7.492009500000193
   },
   {
-    "town": "Birr",
+    "town": "Biorra",
     "lat": 53.096183999094464,
     "lng": -7.910714000000184
   },
   {
-    "town": "Clara",
+    "town": "Clárach",
     "lat": 53.34277749909676,
     "lng": -7.6143620000002
   },
   {
-    "town": "Banagher",
+    "town": "Beannchar",
     "lat": 53.189697499095324,
     "lng": -7.986871000000179
   },
   {
-    "town": "Ferbane",
+    "town": "An Féar Bán",
     "lat": 53.27109899909609,
     "lng": -7.827796500000203
   },
   {
-    "town": "Kilcormac",
+    "town": "Cill Chormaic",
     "lat": 53.17632299909517,
     "lng": -7.728687500000177
   },
   {
-    "town": "Killeigh",
+    "town": "Cill Aichidh",
     "lat": 53.213733499095554,
     "lng": -7.447643000000199
   },
   {
-    "town": "Daingean",
+    "town": "An Daingean",
     "lat": 53.29748549909634,
     "lng": -7.290919500000202
   },
   {
-    "town": "Geashill",
+    "town": "Géisill",
     "lat": 53.23571399909573,
     "lng": -7.322426500000205
   },
   {
-    "town": "Moate",
+    "town": "An Móta",
     "lat": 53.39504599909724,
     "lng": -7.712276000000201
   },
   {
-    "town": "Kinnegad",
+    "town": "Cionn Átha Gad",
     "lat": 53.454780499097815,
     "lng": -7.101203500000195
   },
   {
-    "town": "Kilbeggan",
+    "town": "Cill Bheagáin",
     "lat": 53.36815999909701,
     "lng": -7.498251000000181
   },
   {
-    "town": "Killucan",
+    "town": "Cill Liúcainne",
     "lat": 53.51452649909841,
     "lng": -7.1417725000002
   },
   {
-    "town": "Athenry",
+    "town": "Baile Átha an Rí",
     "lat": 53.30074299909635,
     "lng": -8.745517500000176
   },
   {
-    "town": "Clarinbridge",
+    "town": "Droichead an Chláirín",
     "lat": 53.229179499095686,
     "lng": -8.880844000000195
   },
   {
-    "town": "Oughterard",
+    "town": "Uachtar Ard",
     "lat": 53.42855449909757,
     "lng": -9.319651500000191
   },
   {
-    "town": "Barna",
+    "town": "An Bhearna",
     "lat": 53.25185799909589,
     "lng": -9.147010000000193
   },
   {
-    "town": "Gort",
+    "town": "An Gort",
     "lat": 53.06586349909417,
     "lng": -8.817862500000189
   },
   {
-    "town": "Moycullen",
+    "town": "Maigh Cuilinn",
     "lat": 53.33843599909671,
     "lng": -9.18124850000018
   },
   {
-    "town": "Clifden",
+    "town": "An Clochán",
     "lat": 53.48908249909816,
     "lng": -10.020597500000179
   },
   {
-    "town": "Portumna",
+    "town": "Port Omna",
     "lat": 53.091277999094416,
     "lng": -8.2229825000002
   },
   {
-    "town": "Furbogh",
+    "town": "Na Forbacha",
     "lat": 53.249385999095864,
     "lng": -9.214499500000187
   },
   {
-    "town": "Spiddle",
+    "town": "An Spidéal",
     "lat": 53.24413699909582,
     "lng": -9.305527500000181
   },
   {
-    "town": "Headford",
+    "town": "Áth Cinn",
     "lat": 53.469375499097964,
     "lng": -9.107321500000182
   },
   {
-    "town": "Craughwell",
+    "town": "Creachmhaoil",
     "lat": 53.2302704990957,
     "lng": -8.734970000000205
   },
   {
-    "town": "Inishmore",
+    "town": "Árainn",
     "lat": 53.11799499909464,
     "lng": -9.674155500000182
   },
   {
-    "town": "Claremorris",
+    "town": "Clár Chlainne Mhuiris",
     "lat": 53.72052399910042,
     "lng": -8.999100500000196
   },
   {
-    "town": "Swinford",
+    "town": "Béal Átha na Muice",
     "lat": 53.94369899910266,
     "lng": -8.950155500000193
   },
   {
-    "town": "Ballinrobe",
+    "town": "Baile an Róba",
     "lat": 53.61982349909941,
     "lng": -9.220628000000175
   },
   {
-    "town": "Ballyhaunis",
+    "town": "Béal Átha hAmhnais",
     "lat": 53.76311849910087,
     "lng": -8.765024000000182
   },
   {
-    "town": "Crossmolina",
+    "town": "Crois Mhaoilíona",
     "lat": 54.10015499910427,
     "lng": -9.320488000000184
   },
   {
-    "town": "Kiltamagh",
+    "town": "Coillte Mach",
     "lat": 53.8490944991017,
     "lng": -9.000488500000188
   },
   {
-    "town": "Turlough",
+    "town": "Turlach",
     "lat": 53.88376999910204,
     "lng": -9.202812000000193
   },
   {
-    "town": "Belmullet",
+    "town": "Béal an Mhuirthead",
     "lat": 54.223907499105536,
     "lng": -9.987871000000181
   },
   {
-    "town": "Killala",
+    "town": "Cill Ala",
     "lat": 54.21247499910543,
     "lng": -9.220199500000177
   },
@@ -895,672 +895,672 @@
     "lng": -9.130563500000191
   },
   {
-    "town": "Castlereagh",
+    "town": "An Caisleán Riabhach",
     "lat": 53.769592499100916,
     "lng": -8.495452000000201
   },
   {
-    "town": "Boyle",
+    "town": "Mainistir na Búille",
     "lat": 53.97172149910295,
     "lng": -8.303022500000198
   },
   {
-    "town": "Ballaghaderreen",
+    "town": "Bealach an Doirín",
     "lat": 53.90159249910225,
     "lng": -8.579784500000187
   },
   {
-    "town": "Strokestown",
+    "town": "Béal na mBuillí",
     "lat": 53.77698499910097,
     "lng": -8.103720500000179
   },
   {
-    "town": "Kinsaley",
+    "town": "Cionn Sáile",
     "lat": 53.428447499097565,
     "lng": -6.177799000000192
   },
   {
-    "town": "Kilsallaghan",
+    "town": "Cill Shalcháin",
     "lat": 53.47544499909804,
     "lng": -6.319029500000198
   },
   {
-    "town": "Garristown",
+    "town": "Baile Gháire",
     "lat": 53.56753549909892,
     "lng": -6.382979500000204
   },
   {
-    "town": "Rathcoole",
+    "town": "Ráth Cúil",
     "lat": 53.28128699909619,
     "lng": -6.468990500000189
   },
   {
-    "town": "Saggart",
+    "town": "Teach Sagard",
     "lat": 53.28098149909616,
     "lng": -6.444988500000192
   },
   {
-    "town": "Newcastle",
+    "town": "An Caisleán Nua",
     "lat": 53.29953399909636,
     "lng": -6.496504500000185
   },
   {
-    "town": "Kilcock",
+    "town": "Cill Choca",
     "lat": 53.399596999097284,
     "lng": -6.668526500000183
   },
   {
-    "town": "Kill",
+    "town": "An Chill",
     "lat": 53.24755649909585,
     "lng": -6.591888000000182
   },
   {
-    "town": "Straffan",
+    "town": "Teach Strafáin",
     "lat": 53.31173249909645,
     "lng": -6.608601000000192
   },
   {
-    "town": "Robertstown",
+    "town": "Baile Riobaird",
     "lat": 53.26911949909606,
     "lng": -6.815777500000195
   },
   {
-    "town": "Castledermot",
+    "town": "Díseart Diarmada",
     "lat": 52.91195699909275,
     "lng": -6.837463000000185
   },
   {
-    "town": "Monasterevin",
+    "town": "Mainistir Eimhín",
     "lat": 53.13810349909483,
     "lng": -7.0626625000001875
   },
   {
-    "town": "Kilcullen",
+    "town": "Cill Chuilinn",
     "lat": 53.13030599909478,
     "lng": -6.745472500000205
   },
   {
-    "town": "Innfield",
+    "town": "An Bóthar Buí",
     "lat": 53.41565299909746,
     "lng": -6.836652500000184
   },
   {
-    "town": "Stamullin",
+    "town": "Steach Maoilín",
     "lat": 53.62899399909952,
     "lng": -6.261891500000189
   },
   {
-    "town": "Duleek",
+    "town": "Damhliag",
     "lat": 53.656310999099794,
     "lng": -6.414686500000187
   },
   {
-    "town": "Kentstown",
+    "town": "Baile an Cheantaigh",
     "lat": 53.627509999099495,
     "lng": -6.5329745000001935
   },
   {
-    "town": "Donaghpatrick",
+    "town": "Domhnach Phádraig",
     "lat": 53.69436249910016,
     "lng": -6.759740500000192
   },
   {
-    "town": "Kilmessan",
+    "town": "Cill Mheasáin",
     "lat": 53.558543499098825,
     "lng": -6.657957500000179
   },
   {
-    "town": "Slane",
+    "town": "Baile Shláine",
     "lat": 53.7085724991003,
     "lng": -6.543124500000204
   },
   {
-    "town": "Skreen",
+    "town": "An Scrín",
     "lat": 53.58611099909909,
     "lng": -6.5622460000001865
   },
   {
-    "town": "Ardcath",
+    "town": "Ard Cath",
     "lat": 53.60706849909929,
     "lng": -6.392214000000195
   },
   {
-    "town": "Summerhill",
+    "town": "Cnoc an Línsigh",
     "lat": 53.480151999098055,
     "lng": -6.7321980000001815
   },
   {
-    "town": "Trim",
+    "town": "Baile Átha Troim",
     "lat": 53.55235649909877,
     "lng": -6.7864510000001985
   },
   {
-    "town": "Tara",
+    "town": "Teamhair",
     "lat": 53.56772599909893,
     "lng": -6.579845500000204
   },
   {
-    "town": "Oldcastle",
+    "town": "An Seanchaisleán",
     "lat": 53.769347999100894,
     "lng": -7.162428500000203
   },
   {
-    "town": "Athboy",
+    "town": "Baile Átha Buí",
     "lat": 53.62154399909943,
     "lng": -6.921092500000185
   },
   {
-    "town": "Enniskerry",
+    "town": "Áth na Sceire",
     "lat": 53.19264999909535,
     "lng": -6.1698140000002
   },
   {
-    "town": "Ballymore Eustace",
+    "town": "An Baile Mór",
     "lat": 53.168735499095106,
     "lng": -6.534959500000184
   },
   {
-    "town": "Carnew",
+    "town": "Carn an Bhua",
     "lat": 52.70968649909094,
     "lng": -6.497931500000192
   },
   {
-    "town": "Tinahely",
+    "town": "Tigh na hÉille",
     "lat": 52.79899599909175,
     "lng": -6.4640415000002065
   },
   {
-    "town": "Dunlavin",
+    "town": "Dún Luáin",
     "lat": 53.05754099909411,
     "lng": -6.701649000000202
   },
   {
-    "town": "Aughrim",
+    "town": "Eachroim",
     "lat": 52.853252499092214,
     "lng": -6.3285550000001916
   },
   {
-    "town": "Glenealy",
+    "town": "Gleann Fhaidhle",
     "lat": 52.96755999909328,
     "lng": -6.140030500000193
   },
   {
-    "town": "Rathdrum",
+    "town": "Ráth Droma",
     "lat": 52.928619499092896,
     "lng": -6.230876000000193
   },
   {
-    "town": "Kilrush",
+    "town": "Cill Rois",
     "lat": 52.63944249909034,
     "lng": -9.485278000000193
   },
   {
-    "town": "Ballyvaughan",
+    "town": "Baile Uí Bheacháin",
     "lat": 53.11556249909462,
     "lng": -9.149515000000179
   },
   {
-    "town": "Milltown Malbay",
+    "town": "Sráid na Cathrach",
     "lat": 52.85456099909226,
     "lng": -9.401587500000176
   },
   {
-    "town": "Ennistimon",
+    "town": "Inis Díomáin",
     "lat": 52.939182499093015,
     "lng": -9.293502000000187
   },
   {
-    "town": "Sixmilebridge",
+    "town": "Droichead Abhann Ó gCearnaigh",
     "lat": 52.74187449909125,
     "lng": -8.772444500000177
   },
   {
-    "town": "Killaloe",
+    "town": "Cill Dalua",
     "lat": 52.80720499909182,
     "lng": -8.440370500000197
   },
   {
-    "town": "Scarriff",
+    "town": "An Scairbh",
     "lat": 52.910964999092755,
     "lng": -8.532015000000198
   },
   {
-    "town": "Kilkee",
+    "town": "Cill Chaoi",
     "lat": 52.681468999090725,
     "lng": -9.645531500000203
   },
   {
-    "town": "Cratloe",
+    "town": "An Chreatalach",
     "lat": 52.69959649909087,
     "lng": -8.766587500000183
   },
   {
-    "town": "Newcastle",
+    "town": "An Caisleán Nua Thiar",
     "lat": 52.44921499908871,
     "lng": -9.05017000000018
   },
   {
-    "town": "Castleconnell",
+    "town": "Caisleán Uí Chonaill",
     "lat": 52.70944999909096,
     "lng": -8.490719000000182
   },
   {
-    "town": "Abbeyfeale",
+    "town": "Mainistir na Féile",
     "lat": 52.385040499088156,
     "lng": -9.300981500000177
   },
   {
-    "town": "Rathkeale",
+    "town": "Ráth Caola",
     "lat": 52.52325049908934,
     "lng": -8.938968500000186
   },
   {
-    "town": "Doon",
+    "town": "An Dún",
     "lat": 52.604213499090044,
     "lng": -8.248510500000181
   },
   {
-    "town": "Patrickswell",
+    "town": "Tobar Phádraig",
     "lat": 52.59802249908998,
     "lng": -8.707125500000187
   },
   {
-    "town": "Croom",
+    "town": "Cromadh",
     "lat": 52.519183999089314,
     "lng": -8.716662500000185
   },
   {
-    "town": "Caherconlish",
+    "town": "Cathair Chinn Lis",
     "lat": 52.594123999089966,
     "lng": -8.472400500000191
   },
   {
-    "town": "Clarina",
+    "town": "Clár Aidhne",
     "lat": 52.63392999909031,
     "lng": -8.72201050000018
   },
   {
-    "town": "Askeaton",
+    "town": "Eas Géitine",
     "lat": 52.60045999908999,
     "lng": -8.974751500000195
   },
   {
-    "town": "Bruff",
+    "town": "An Brú",
     "lat": 52.47540649908893,
     "lng": -8.547503500000206
   },
   {
-    "town": "Kilmallock",
+    "town": "Cill Mocheallóg",
     "lat": 52.39847949908827,
     "lng": -8.571766000000197
   },
   {
-    "town": "Oola",
+    "town": "Úlla",
     "lat": 52.52891549908939,
     "lng": -8.258881500000202
   },
   {
-    "town": "Fedamore",
+    "town": "Feadamair",
     "lat": 52.547145999089544,
     "lng": -8.596530000000199
   },
   {
-    "town": "Hospital",
+    "town": "An tOspidéal",
     "lat": 52.47079449908888,
     "lng": -8.432282500000184
   },
   {
-    "town": "Pallaskenry",
+    "town": "Pailís Chaonraí",
     "lat": 52.639378499090355,
     "lng": -8.866845000000183
   },
   {
-    "town": "Kilfinnane",
+    "town": "Cill Fhíonáin",
     "lat": 52.35893999908795,
     "lng": -8.468281500000188
   },
   {
-    "town": "Roscrea",
+    "town": "Ros Cré",
     "lat": 52.95766049909317,
     "lng": -7.797579000000184
   },
   {
-    "town": "Templemore",
+    "town": "An Teampall Mór",
     "lat": 52.79730999909173,
     "lng": -7.831266000000199
   },
   {
-    "town": "Littleton",
+    "town": "An Baile Beag",
     "lat": 52.63914499909035,
     "lng": -7.738179000000201
   },
   {
-    "town": "Borrisokane",
+    "town": "Buiríos Uí Chéin",
     "lat": 52.99787899909355,
     "lng": -8.126931000000186
   },
   {
-    "town": "Borrisoleigh",
+    "town": "Buiríos Ó Luigheach",
     "lat": 52.75196099909134,
     "lng": -7.956365000000206
   },
   {
-    "town": "Bagenalstown",
+    "town": "Muine Bheag",
     "lat": 52.700576999090885,
     "lng": -6.9570310000002005
   },
   {
-    "town": "Tullow",
+    "town": "An Tulach",
     "lat": 52.803489499091796,
     "lng": -6.733808500000179
   },
   {
-    "town": "Hacketstown",
+    "town": "Baile Haicéid",
     "lat": 52.86557749909234,
     "lng": -6.558708000000195
   },
   {
-    "town": "Leighlinbridge",
+    "town": "Leithghlinn an Droichid",
     "lat": 52.736083999091186,
     "lng": -6.9758015000001885
   },
   {
-    "town": "Callan",
+    "town": "Callainn",
     "lat": 52.544425999089526,
     "lng": -7.390181500000182
   },
   {
-    "town": "Thomastown",
+    "town": "Baile Thomáis",
     "lat": 52.52611549908936,
     "lng": -7.138490500000189
   },
   {
-    "town": "Castlecomer",
+    "town": "Caisleán an Chomair",
     "lat": 52.80525599909181,
     "lng": -7.2101505000001955
   },
   {
-    "town": "Piltown",
+    "town": "Baile an Phoill",
     "lat": 52.34973899908785,
     "lng": -7.3250040000001775
   },
   {
-    "town": "Ballyragget",
+    "town": "Béal Átha Ragad",
     "lat": 52.78842149909163,
     "lng": -7.3344300000001965
   },
   {
-    "town": "Freshford",
+    "town": "Achadh Úr",
     "lat": 52.73239499909115,
     "lng": -7.397983500000179
   },
   {
-    "town": "Graiguenamanagh",
+    "town": "Gráig na Manach",
     "lat": 52.542369999089495,
     "lng": -6.956364500000206
   },
   {
-    "town": "Cashel",
+    "town": "Caiseal",
     "lat": 52.517413999089285,
     "lng": -7.886774500000199
   },
   {
-    "town": "Caher",
+    "town": "An Chathair",
     "lat": 52.37437049908806,
     "lng": -7.924424500000186
   },
   {
-    "town": "Kilsheelan",
+    "town": "Cill Síoláin",
     "lat": 52.36110299908797,
     "lng": -7.580327000000182
   },
   {
-    "town": "Ardfinnan",
+    "town": "Ard Fhíonáin",
     "lat": 52.30905899908753,
     "lng": -7.884606000000191
   },
   {
-    "town": "Lismore",
+    "town": "An Lios Mór",
     "lat": 52.13833599908611,
     "lng": -7.93196850000018
   },
   {
-    "town": "Clonea",
+    "town": "Cluain Fhia",
     "lat": 52.27894599908728,
     "lng": -7.437203500000179
   },
   {
-    "town": "Portlaw",
+    "town": "Port Lách",
     "lat": 52.28993549908737,
     "lng": -7.312734500000204
   },
   {
-    "town": "Kilmacthomas",
+    "town": "Coill Mhic Thomáisín",
     "lat": 52.20533749908667,
     "lng": -7.426701500000179
   },
   {
-    "town": "Tallow",
+    "town": "Tulach an Iarainn",
     "lat": 52.09337999908576,
     "lng": -8.010259500000188
   },
   {
-    "town": "Ringville",
+    "town": "An Rinn",
     "lat": 52.04619199908537,
     "lng": -7.570372000000189
   },
   {
-    "town": "Cappoquin",
+    "town": "Ceapach Choinn",
     "lat": 52.14600349908618,
     "lng": -7.843968000000188
   },
   {
-    "town": "Rosslare",
+    "town": "Ros Láir",
     "lat": 52.26538449908717,
     "lng": -6.393939000000189
   },
   {
-    "town": "Kilmore",
+    "town": "An Chill Mhór",
     "lat": 52.20658499908667,
     "lng": -6.545458500000194
   },
   {
-    "town": "Clonroche",
+    "town": "Cluain an Róistigh",
     "lat": 52.44970699908872,
     "lng": -6.71678700000018
   },
   {
-    "town": "Ballyhack",
+    "town": "Baile Hac",
     "lat": 52.24826049908701,
     "lng": -6.964079500000196
   },
   {
-    "town": "Taghmon",
+    "town": "Teach Munna",
     "lat": 52.322219999087636,
     "lng": -6.649472000000202
   },
   {
-    "town": "Ferns",
+    "town": "Fearna",
     "lat": 52.58977899908993,
     "lng": -6.496040000000193
   },
   {
-    "town": "Monkstown",
+    "town": "Baile an Mhanaigh",
     "lat": 51.849185999083794,
     "lng": -8.331826000000177
   },
   {
-    "town": "Mitchelstown",
+    "town": "Baile Mhistéil",
     "lat": 52.2689474990872,
     "lng": -8.270454500000199
   },
   {
-    "town": "Bantry",
+    "town": "Beanntraí",
     "lat": 51.68269749908253,
     "lng": -9.446845000000195
   },
   {
-    "town": "Carrigtohill",
+    "town": "Carraig Thuathail",
     "lat": 51.90657399908425,
     "lng": -8.260772000000202
   },
   {
-    "town": "Kanturk",
+    "town": "Ceann Toirc",
     "lat": 52.17736799908642,
     "lng": -8.90472600000018
   },
   {
-    "town": "Kinsale",
+    "town": "Cionn tSáile",
     "lat": 51.70622999908267,
     "lng": -8.523388000000182
   },
   {
-    "town": "Ballygarvan",
+    "town": "Baile Garbháin",
     "lat": 51.8233604990836,
     "lng": -8.46437850000018
   },
   {
-    "town": "Bandon",
+    "town": "Droichead na Bandan",
     "lat": 51.74560949908299,
     "lng": -8.735175000000195
   },
   {
-    "town": "Matehy",
+    "town": "Maigh Teichigh",
     "lat": 51.95302849908462,
     "lng": -8.65499700000018
   },
   {
-    "town": "Newmarket",
+    "town": "Áth Trasna",
     "lat": 52.21464549908674,
     "lng": -8.999136000000192
   },
   {
-    "town": "Cloyne",
+    "town": "Cluain",
     "lat": 51.862998999083906,
     "lng": -8.1208800000002
   },
   {
-    "town": "Whitechurch",
+    "town": "An Teampall Geal",
     "lat": 51.98240799908486,
     "lng": -8.512657000000189
   },
   {
-    "town": "Clonakilty",
+    "town": "Cloich na Coillte",
     "lat": 51.62312299908206,
     "lng": -8.891290500000196
   },
   {
-    "town": "Rathluirc",
+    "town": "An Ráth",
     "lat": 52.355552499087906,
     "lng": -8.684147000000195
   },
   {
-    "town": "Macroom",
+    "town": "Maigh Chromtha",
     "lat": 51.90459049908423,
     "lng": -8.959428000000202
   },
   {
-    "town": "Skibbereen",
+    "town": "An Sciobairín",
     "lat": 51.54888149908149,
     "lng": -9.268237000000198
   },
   {
-    "town": "Buttevant",
+    "town": "Cill na Manach",
     "lat": 52.23363899908689,
     "lng": -8.670041000000197
   },
   {
-    "town": "Ovens",
+    "town": "Na hUamhanna",
     "lat": 51.878356999084026,
     "lng": -8.64715000000018
   },
   {
-    "town": "Inishannon",
+    "town": "Inis Eonáin",
     "lat": 51.76406499908314,
     "lng": -8.655369000000178
   },
   {
-    "town": "Carrignavar",
+    "town": "Carraigh na bhFear",
     "lat": 51.98804149908491,
     "lng": -8.477447500000181
   },
   {
-    "town": "Doneraile",
+    "town": "Dún ar Aill",
     "lat": 52.21466449908674,
     "lng": -8.586315000000184
   },
   {
-    "town": "Ballycottin",
+    "town": "Baile Choitín",
     "lat": 51.83041399908367,
     "lng": -8.014215500000205
   },
   {
-    "town": "Dunmanway",
+    "town": "Dún Mánmhaí",
     "lat": 51.719028499082775,
     "lng": -9.113136500000195
   },
   {
-    "town": "Skull",
+    "town": "An Scoil",
     "lat": 51.526576999081314,
     "lng": -9.545418000000181
   },
   {
-    "town": "Dripsey",
+    "town": "An Druipseach",
     "lat": 51.914626999084334,
     "lng": -8.742557500000203
   },
   {
-    "town": "Listowel",
+    "town": "Lios Tuathail",
     "lat": 52.44575099908868,
     "lng": -9.485865500000187
   },
   {
-    "town": "Killorglin",
+    "town": "Cill Orglan",
     "lat": 52.10585899908585,
     "lng": -9.792517000000203
   },
   {
-    "town": "Castleisland",
+    "town": "Oileán Chiarraí",
     "lat": 52.230994999086874,
     "lng": -9.4638985000002
   },
   {
-    "town": "Dingle",
+    "town": "Daingean Uí Chúis",
     "lat": 52.13853849908612,
     "lng": -10.2708815000002
   },
   {
-    "town": "Kenmare",
+    "town": "Neidín",
     "lat": 51.879821999084044,
     "lng": -9.583692500000183
   },
   {
-    "town": "Ballyheige",
+    "town": "Baile Uí Thaidhg",
     "lat": 52.39046099908821,
     "lng": -9.827970500000191
   },
   {
-    "town": "Rathmore",
+    "town": "An Ráth Mhór",
     "lat": 52.084064499085684,
     "lng": -9.218588000000182
   },
   {
-    "town": "Kilcummin",
+    "town": "Cill Chuimín",
     "lat": 52.0991299990858,
     "lng": -9.467287500000197
   },
   {
-    "town": "Milltown",
+    "town": "Baile an Mhuilinn",
     "lat": 52.14490149908617,
     "lng": -9.717540500000183
   },
   {
-    "town": "Cahersiveen",
+    "town": "Cathair Saidhbhín",
     "lat": 51.94586649908457,
     "lng": -10.226428500000194
   },
   {
-    "town": "Newcastle",
+    "town": "An Caisleán Nua",
     "lat": 53.070461499094236,
     "lng": -6.062979000000184
   }

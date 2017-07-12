@@ -36,8 +36,11 @@ def create_user():
     users_col = mongo.db.users
     data = request.json
     data["fb_id"] = str(data["fb_id"])
-    data["locality"] = Geo.get_locality(float(data["lat"]), float(data["lng"]))
     data["gender"] = "female" if (data["gender"] == "female") else "male"
+
+    locality = Geo.get_locality(float(data["lat"]), float(data["lng"]))
+    data["locality"] = locality["town"]
+    data["county"] = locality["county"]
 
     # blank lists -- will be populated as the user interacts with profiles
     data["blocked"] = []
@@ -206,7 +209,10 @@ def update_location():
     user = list(mongo.db.users.find({"fb_id": fb_id}))[0]
     user["lat"] = data["lat"]
     user["lng"] = data["lng"]
-    user["locality"] = Geo.get_locality(data["lat"], data["lng"])
+
+    locality = Geo.get_locality(data["lat"], data["lng"])
+    user["locality"] = locality["town"]
+    user["county"] = locality["county"]
 
     mongo.db.users.save(user)
     return Helper.get_json({"success": True, "user": user})

@@ -20,7 +20,7 @@ class FakeDatasets:
                 surnames = list(json.loads(f.read()))
                 surname = surnames[randint(0, len(surnames) - 1)]
 
-            with open("app/datasets/groomed_populated_areas_localised.json", "r") as f:
+            with open("app/datasets/groomed_populated_areas_localised_original.json", "r") as f:
                 localities = list(json.loads(f.read()))
                 locality = localities[randint(0, len(localities) - 1)]
 
@@ -52,7 +52,8 @@ class FakeDatasets:
                 "show_location": show_location,
                 "lat": new_lat_location,
                 "lng": new_lng_location,
-                "locality": new_locality,
+                "locality": new_locality["town"],
+                "county": new_locality["county"],
                 "profile_pic": profile_pic
             })
 

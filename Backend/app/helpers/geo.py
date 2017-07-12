@@ -12,6 +12,7 @@ class Geo:
     def get_locality(lat, lng):
         dataset = Datasets.get_groomed_populated_areas()
 
+        county = 0
         nearest_town = 0
         shortest_distance = 0
 
@@ -23,12 +24,14 @@ class Geo:
             if i == 0:
                 shortest_distance = distance
                 nearest_town = town["town"]
+                county = town["county"]
 
             if distance < shortest_distance:
                 shortest_distance = distance
                 nearest_town = town["town"]
+                county = town["county"]
 
-        return nearest_town
+        return {"town": nearest_town, "county": county}
 
     @staticmethod
     def add_dist_to_lat(dist_in_km, lat):
