@@ -37,4 +37,11 @@
         android:layout_below="@+id/nav_header_name"
         android:text="Baile Reatha" />
 
+    <TextView
+        android:id="@+id/nav_header_county"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/nav_header_locality"
+        android:text="Contae Reatha" />
+
 </RelativeLayout>

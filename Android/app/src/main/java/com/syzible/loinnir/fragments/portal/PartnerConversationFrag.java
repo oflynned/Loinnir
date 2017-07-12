@@ -104,7 +104,8 @@ public class PartnerConversationFrag extends Fragment {
         setupAdapter(view);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(partner.getName());
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(partner.getLocality());
+        ((AppCompatActivity) getActivity()).getSupportActionBar()
+                .setSubtitle(partner.getLocality() + ", " + partner.getCounty());
 
         return view;
     }

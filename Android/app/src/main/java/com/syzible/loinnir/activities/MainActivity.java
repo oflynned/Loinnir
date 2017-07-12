@@ -215,8 +215,9 @@ public class MainActivity extends AppCompatActivity
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                 try {
                     TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
-                    String locality = response.getString("locality");
-                    localityName.setText(locality);
+                    TextView countyName = (TextView) headerView.findViewById(R.id.nav_header_county);
+                    localityName.setText(response.getString("locality"));
+                    countyName.setText(response.getString("county"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

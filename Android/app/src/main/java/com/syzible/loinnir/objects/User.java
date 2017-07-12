@@ -25,7 +25,7 @@ public class User implements IUser {
     private String forename;
     private String surname;
     private String avatar;
-    private String locality;
+    private String locality, county;
     private boolean isFemale;
 
     public User(JSONObject data) throws JSONException {
@@ -37,6 +37,7 @@ public class User implements IUser {
         this.surname = EncodingUtils.decodeText(data.getString("surname"));
         this.avatar = data.getString("profile_pic");
         this.locality = data.getString("locality");
+        this.county = data.getString("county");
         this.isFemale = data.getString("gender").equals("female");
     }
 
@@ -69,6 +70,10 @@ public class User implements IUser {
 
     public String getLocality() {
         return locality;
+    }
+
+    public String getCounty() {
+        return county;
     }
 
     public String getForename() {

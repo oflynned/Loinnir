@@ -72,7 +72,7 @@ public class RouletteOutcomeFrag extends Fragment {
         profilePictureImageView.setImageBitmap(BitmapUtils.getCroppedCircle(profilePic));
 
         usernameTextView.setText(partner.getName());
-        countyTextView.setText(partner.getLocality());
+        countyTextView.setText(partner.getLocality() + ", " + partner.getCounty());
 
         String outcome = "Is féidir an rúiléid a atriail, ach caillfidh tú an nasc leis an duine seo mura thosaíonn tú comhrá ";
         outcome += partner.isFemale() ? "léi" : "leis";
