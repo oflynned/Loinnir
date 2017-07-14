@@ -20,7 +20,7 @@ class FakeDatasets:
                 surnames = list(json.loads(f.read()))
                 surname = surnames[randint(0, len(surnames) - 1)]
 
-            with open("app/datasets/groomed_populated_areas_localised_original.json", "r") as f:
+            with open("app/datasets/groomed_populated_areas_localised.json", "r") as f:
                 localities = list(json.loads(f.read()))
                 locality = localities[randint(0, len(localities) - 1)]
 
@@ -56,5 +56,67 @@ class FakeDatasets:
                 "county": new_locality["county"],
                 "profile_pic": profile_pic
             })
+
+        return users
+
+    @staticmethod
+    def generate_all_counties_fake_users():
+        users = []
+        counties_added = []
+        place_index = 0
+
+        with open("app/datasets/forenames.json", "r") as f:
+            forenames = list(json.loads(f.read()))
+
+        with open("app/datasets/surnames.json", "r") as f:
+            surnames = list(json.loads(f.read()))
+
+        with open("app/datasets/groomed_populated_areas_localised.json", "r") as f:
+            localities = list(json.loads(f.read()))
+
+        for i in range(26):
+            forename = forenames[randint(0, len(forenames) - 1)]
+            surname = surnames[randint(0, len(surnames) - 1)]
+
+            was_county_added = False
+
+            print(counties_added)
+
+            while not was_county_added:
+                locality = localities[place_index]
+                county = locality["county"]
+
+                print(county)
+
+                if county not in counties_added:
+                    locality_lat = locality["lat"]
+                    locality_lng = locality["lng"]
+                    town = locality["town"]
+
+                    print(county)
+
+                    profile_pic = "http://c1.thejournal.ie/media/2015/10/1916-easter-rising-commemoration-2-390x285.jpg"
+                    gender = "male" if randint(0, 1) == 0 else "female"
+                    fb_id = str(randint(0, sys.maxsize - 1))
+                    show_location = True
+
+                    users.append({
+                        "fcm_id": 0,
+                        "fb_id": fb_id,
+                        "forename": forename,
+                        "surname": surname,
+                        "gender": gender,
+                        "show_location": show_location,
+                        "lat": locality_lat,
+                        "lng": locality_lng,
+                        "locality": town,
+                        "county": county,
+                        "profile_pic": profile_pic
+                    })
+
+                    counties_added.append(county)
+                    was_county_added = True
+
+                place_index += 1
 
         return users

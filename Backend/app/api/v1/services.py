@@ -37,6 +37,19 @@ def create_fake_users():
     return Helper.get_json({"success": True})
 
 
+@services_endpoint.route("/create-all-counties-fake-users", methods=["GET"])
+def create_all_counties_fake_users():
+    for user in FakeDatasets.generate_all_counties_fake_users():
+        mongo.db.users.insert(user)
+
+    return Helper.get_json({"success": True})
+
+
+@services_endpoint.route("/get-all-counties-fake-users", methods=["GET"])
+def get_all_counties_fake_users():
+    return Helper.get_json(FakeDatasets.generate_all_counties_fake_users())
+
+
 class Services:
     @staticmethod
     def groom_counties():

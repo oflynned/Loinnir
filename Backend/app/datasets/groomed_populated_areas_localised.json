@@ -285,7 +285,7 @@
     "town": "An tInbhear M\u00f3r",
     "lat": 52.797705499091734,
     "lng": -6.158623500000203,
-    "county": "An Cl\u00e1r"
+    "county": "Cill Mhant\u00e1in"
   },
   {
     "town": "Inis",
@@ -297,13 +297,13 @@
     "town": "Sionainn",
     "lat": 52.71239549909098,
     "lng": -8.873342000000179,
-    "county": "Luimneach"
+    "county": "An Cl\u00e1r"
   },
   {
     "town": "Luimneach",
     "lat": 52.660728499090524,
     "lng": -8.620904000000195,
-    "county": "Tiobr\u00e1id \u00c1rann"
+    "county": "Luimneach"
   },
   {
     "town": "An tAonach",
@@ -315,19 +315,19 @@
     "town": "Durlas",
     "lat": 52.6771009990907,
     "lng": -7.812783000000196,
-    "county": "Ceatharlach"
+    "county": "Tiobr\u00e1id \u00c1rann"
   },
   {
     "town": "Ceatharlach",
     "lat": 52.83588799909208,
     "lng": -6.92450150000019,
-    "county": "Cill Cheannaigh"
+    "county": "Ceatharlach"
   },
   {
     "town": "Cill Ceannaigh",
     "lat": 52.65478149909049,
     "lng": -7.246371500000179,
-    "county": "Tiobr\u00e1id \u00c1rann"
+    "county": "Cill Ceannaigh"
   },
   {
     "town": "Cluain Meala",
@@ -345,7 +345,7 @@
     "town": "Carraig na Si\u00faire",
     "lat": 52.34922799908786,
     "lng": -7.414776500000185,
-    "county": "Port L\u00e1irge"
+    "county": "Tiobr\u00e1id \u00c1rann"
   },
   {
     "town": "Port L\u00e1irge",
@@ -363,7 +363,7 @@
     "town": "D\u00fan Garbh\u00e1in",
     "lat": 52.09200649908574,
     "lng": -7.6334100000001985,
-    "county": "Loch Garman"
+    "county": "Port L\u00e1irge"
   },
   {
     "town": "Loch Garman",
@@ -441,7 +441,7 @@
     "town": "An Bhlarna",
     "lat": 51.93386799908448,
     "lng": -8.563691500000203,
-    "county": "Ciarra\u00ed"
+    "county": "Corcaigh"
   },
   {
     "town": "Tr\u00e1 L\u00ed",
@@ -453,7 +453,7 @@
     "town": "Cill \u00c1irne",
     "lat": 52.05987949908548,
     "lng": -9.504205000000184,
-    "county": "An Mh\u00ed"
+    "county": "Ciarra\u00ed"
   },
   {
     "town": "Baile na nGile\u00e1nach",
@@ -687,7 +687,7 @@
     "town": "Maothail",
     "lat": 53.921691999102435,
     "lng": -7.866107500000195,
-    "county": "L\u00fa"
+    "county": "Liatroim"
   },
   {
     "town": "L\u00fa",
