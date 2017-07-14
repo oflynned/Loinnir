@@ -77,6 +77,7 @@ public class NotificationUtils {
                         .setContentText(EncodingUtils.decodeText(message.getText()));
 
         if (!MainActivity.isActivityVisible()) {
+            notificationBuilder.setDefaults(Notification.DEFAULT_ALL);
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
             vibrate(context);
         }
