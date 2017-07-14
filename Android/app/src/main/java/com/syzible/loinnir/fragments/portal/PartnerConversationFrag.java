@@ -76,8 +76,7 @@ public class PartnerConversationFrag extends Fragment {
                                     User sender = new User(latestPayload.getJSONObject("user"));
                                     Message message = new Message(sender, latestPayload.getJSONObject("message"));
                                     adapter.addToStart(message, true);
-
-                                    System.out.println(sender.getName() + " has sent you a new message");
+                                    markSeen();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -104,10 +103,13 @@ public class PartnerConversationFrag extends Fragment {
         setupAdapter(view);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(partner.getName());
-        ((AppCompatActivity) getActivity()).getSupportActionBar()
-                .setSubtitle(partner.getLocality() + ", " + partner.getCounty());
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(formatSubtitle());
 
         return view;
+    }
+
+    private String formatSubtitle() {
+        return partner.getLocality() + ", " + partner.getCounty();
     }
 
     @Override
@@ -265,8 +267,11 @@ public class PartnerConversationFrag extends Fragment {
                     }
                 });
 
-        // also demarcate any messages seen up to this point
-        RestClient.post(getActivity(), Endpoints.MARK_SEEN,
+        markSeen();
+    }
+
+    private void markSeen() {
+        RestClient.post(getActivity(), Endpoints.MARK_PARTNER_MESSAGES_SEEN,
                 JSONUtils.getPartnerInteractionPayload(partner, getActivity()),
                 new BaseJsonHttpResponseHandler<JSONObject>() {
                     @Override

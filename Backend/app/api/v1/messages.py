@@ -99,17 +99,6 @@ def mark_message_seen():
     return Helper.get_json({"success": True})
 
 
-# POST { my_id: <string>, partner_id: <string> }
-# RETURN { count: <int> }
-@messages_endpoint.route("/get-partner-messages-count", methods=["POST"])
-def get_partner_messages_count():
-    data = request.json
-    my_id = str(data["my_id"])
-    partner_id = str(data["partner_id"])
-    messages = list(mongo.db.partner_conversations.find({"participants": [my_id, partner_id]}))
-    return Helper.get_json({"count": len(messages)})
-
-
 # get all messages residing within the locality for the user's record provided
 # POST { fb_id: <string> }
 # RETURN [ <message>, ... ]
@@ -211,7 +200,9 @@ def get_conversations_previews():
             query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}
             last_message_in_chat = list(mongo.db.partner_conversations.find(query).sort("time", -1).limit(1))[0]
 
-        messages_preview.append({"message": last_message_in_chat, "user": User.get_user(partner)})
+        # now get the count of unread messages
+        unread_messages = list(mongo.db.partner_conversations.find({"from_id": partner, "to_id": fb_id, "was_seen": False}))
+        messages_preview.append({"count": len(unread_messages), "message": last_message_in_chat, "user": User.get_user(partner)})
 
     # sort list by last sent time of the message fragments
     sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=True)

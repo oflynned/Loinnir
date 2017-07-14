@@ -21,6 +21,7 @@ public class Message implements IMessage {
     private User sender;
     private long time;
     private String contents;
+    private boolean wasSeen;
 
     public Message(User sender, JSONObject messageObject) {
         try {
@@ -28,6 +29,7 @@ public class Message implements IMessage {
             this.sender = sender;
             this.time = messageObject.getLong("time");
             this.contents = messageObject.getString("message");
+            this.wasSeen = messageObject.getBoolean("was_seen");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -58,5 +60,9 @@ public class Message implements IMessage {
     @Override
     public Date getCreatedAt() {
         return new Date(time);
+    }
+
+    public boolean wasSeen() {
+        return wasSeen;
     }
 }

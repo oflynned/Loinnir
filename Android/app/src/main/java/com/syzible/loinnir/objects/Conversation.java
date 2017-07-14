@@ -3,6 +3,7 @@ package com.syzible.loinnir.objects;
 import com.stfalcon.chatkit.commons.models.IDialog;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
+import com.syzible.loinnir.network.RestClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,9 +61,13 @@ public class Conversation implements IDialog {
         this.lastMessage = message;
     }
 
+    public Conversation setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
+        return this;
+    }
+
     @Override
     public int getUnreadCount() {
-        // TODO implement on server
-        return 0;
+        return 1;
     }
 }
