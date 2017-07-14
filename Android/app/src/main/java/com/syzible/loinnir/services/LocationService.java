@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
@@ -28,14 +29,17 @@ import cz.msebera.android.httpclient.Header;
 
 public class LocationService extends Service {
 
-    // TODO need to fix battery drain! 12%+ being spent on GPS alone!
-
-    private LocationManager locationManager = null;
+    public static final LatLng ATHLONE = new LatLng(53.4232575, -7.9402598);
+    public static final float INITIAL_LOCATION_ZOOM = 6.0f;
+    public static final float MY_LOCATION_ZOOM = 14.0f;
+    public static final int USER_LOCATION_RADIUS = 500;
 
     // obtain fix interval every 5 minutes while the app is in the foreground
-    private static final int LOCATION_INTERVAL = 1000 * 60 * 5;
+    private static final int LOCATION_INTERVAL = 1000; // * 60 * 5;
     // update every time 500m of a distance change is observed
     private static final float LOCATION_DISTANCE = 500f;
+
+    private LocationManager locationManager = null;
 
     private class LocationListener implements android.location.LocationListener {
 

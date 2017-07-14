@@ -1,12 +1,9 @@
 package com.syzible.loinnir.fragments.authentication;
 
-import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +18,9 @@ import com.facebook.login.widget.LoginButton;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.MainActivity;
-import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.services.LocationService;
 import com.syzible.loinnir.services.TokenService;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
@@ -33,9 +30,6 @@ import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -102,8 +96,8 @@ public class LoginFrag extends Fragment {
                                     postData.put("show_location", true);
 
                                     // temp location until the phone updates
-                                    postData.put("lat", LocationClient.ATHLONE.latitude);
-                                    postData.put("lng", LocationClient.ATHLONE.longitude);
+                                    postData.put("lat", LocationService.ATHLONE.latitude);
+                                    postData.put("lng", LocationService.ATHLONE.longitude);
 
                                     LocalStorage.setStringPref(LocalStorage.Pref.id, id, getActivity());
                                     LocalStorage.setStringPref(LocalStorage.Pref.forename, forename, getActivity());

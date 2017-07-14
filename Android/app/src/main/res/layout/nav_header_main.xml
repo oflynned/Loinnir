@@ -37,11 +37,24 @@
         android:layout_below="@+id/nav_header_name"
         android:text="Baile Reatha" />
 
-    <TextView
-        android:id="@+id/nav_header_county"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/nav_header_locality"
-        android:text="Contae Reatha" />
+        android:layout_below="@+id/nav_header_locality">
+
+        <TextView
+            android:id="@+id/nav_header_county"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contae Reatha" />
+
+        <ImageView
+            android:id="@+id/nav_header_county_flag"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/nav_header_county"
+            app:srcCompat="@drawable/cill_dara" />
+    </RelativeLayout>
 
 </RelativeLayout>

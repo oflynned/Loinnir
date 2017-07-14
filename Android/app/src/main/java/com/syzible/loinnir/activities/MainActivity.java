@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.icu.text.Normalizer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -217,7 +219,15 @@ public class MainActivity extends AppCompatActivity
                     TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
                     TextView countyName = (TextView) headerView.findViewById(R.id.nav_header_county);
                     localityName.setText(response.getString("locality"));
-                    countyName.setText(response.getString("county"));
+
+                    String county = response.getString("county");
+                    String countyFlagFile = county.toLowerCase().replace(" ", "_").replace("á", "a")
+                            .replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u");
+                    countyName.setText(county);
+
+                    int flagDrawable = getResources().getIdentifier(countyFlagFile, "drawable", getPackageName());
+                    ImageView countyFlag = (ImageView) findViewById(R.id.nav_header_county_flag);
+                    countyFlag.setImageResource(flagDrawable);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

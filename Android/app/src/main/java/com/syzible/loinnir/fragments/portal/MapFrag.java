@@ -40,10 +40,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
-import com.syzible.loinnir.location.LocationClient;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.services.LocationService;
 import com.syzible.loinnir.utils.Constants;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
@@ -96,7 +96,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                 getWebServerLocation();
             } else {
                 googleMap.clear();
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        LocationService.ATHLONE, LocationService.INITIAL_LOCATION_ZOOM));
             }
         }
     }
@@ -118,7 +119,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
         if (Constants.DEV_MODE)
             this.googleMap.getUiSettings().setZoomControlsEnabled(true);
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LocationClient.ATHLONE, LocationClient.INITIAL_LOCATION_ZOOM));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                LocationService.ATHLONE, LocationService.INITIAL_LOCATION_ZOOM));
         setMapPosition();
     }
 
@@ -160,7 +162,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                             User me = new User(response);
                             LatLng location = new LatLng(me.getLatitude(), me.getLongitude());
                             addUserCircle(location, true);
-                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, LocationClient.MY_LOCATION_ZOOM));
+                            googleMap.animateCamera(CameraUpdateFactory
+                                    .newLatLngZoom(location, LocationService.MY_LOCATION_ZOOM));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -191,7 +194,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
     private void addUserCircle(final LatLng latLng, boolean isMe) {
         googleMap.addCircle(new CircleOptions()
                 .center(latLng)
-                .radius(LocationClient.USER_LOCATION_RADIUS)
+                .radius(LocationService.USER_LOCATION_RADIUS)
                 .strokeColor(GREEN_500)
                 .fillColor(getFillColour()));
 
@@ -201,7 +204,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                 @Override
                 public void run() {
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                            latLng, LocationClient.MY_LOCATION_ZOOM));
+                            latLng, LocationService.MY_LOCATION_ZOOM));
                 }
             }, 1000);
         }
