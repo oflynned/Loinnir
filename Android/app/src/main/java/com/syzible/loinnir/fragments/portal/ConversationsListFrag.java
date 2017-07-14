@@ -33,6 +33,7 @@ import com.syzible.loinnir.objects.Conversation;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
+import com.syzible.loinnir.services.NotificationUtils;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.BroadcastFilters;
 import com.syzible.loinnir.utils.DisplayUtils;
@@ -73,6 +74,7 @@ public class ConversationsListFrag extends Fragment implements
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
                                 loadMessages(response);
+                                NotificationUtils.dismissNotifications(getActivity(), conversations);
                             }
 
                             @Override
@@ -254,8 +256,7 @@ public class ConversationsListFrag extends Fragment implements
                     new GetImage(new NetworkCallback<Bitmap>() {
                         @Override
                         public void onResponse(Bitmap response) {
-                            Bitmap croppedImage = BitmapUtils.getCroppedCircle(response);
-                            Bitmap scaledAvatar = BitmapUtils.scaleBitmap(croppedImage, BitmapUtils.BITMAP_SIZE_SMALL);
+                            Bitmap scaledAvatar = BitmapUtils.generateMetUserAvatar(response);
                             imageView.setImageBitmap(scaledAvatar);
                             CachingUtil.cacheImage(getActivity(), fileName, scaledAvatar);
                         }

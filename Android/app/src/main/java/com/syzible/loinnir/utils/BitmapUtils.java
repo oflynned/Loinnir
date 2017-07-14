@@ -37,4 +37,9 @@ public class BitmapUtils {
         return Bitmap.createScaledBitmap(bitmap, width, height, true);
 
     }
+
+    public static Bitmap generateMetUserAvatar(Bitmap originalImage) {
+        Bitmap croppedImage = BitmapUtils.getCroppedCircle(originalImage);
+        return BitmapUtils.scaleBitmap(croppedImage, BitmapUtils.BITMAP_SIZE_SMALL);
+    }
 }

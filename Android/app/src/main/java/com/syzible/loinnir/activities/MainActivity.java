@@ -45,6 +45,7 @@ import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.services.LocationService;
 import com.syzible.loinnir.services.MessagingService;
+import com.syzible.loinnir.services.NotificationUtils;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.BroadcastFilters;
 import com.syzible.loinnir.utils.DisplayUtils;
@@ -191,6 +192,7 @@ public class MainActivity extends AppCompatActivity
                                         .setPartner(partner);
                                 MainActivity.clearBackstack(getFragmentManager());
                                 MainActivity.setFragment(getFragmentManager(), frag);
+                                NotificationUtils.dismissNotification(getApplicationContext(), partner);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

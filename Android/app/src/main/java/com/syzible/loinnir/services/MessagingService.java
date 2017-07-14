@@ -101,6 +101,6 @@ public class MessagingService extends FirebaseMessagingService {
         newDataIntent.putExtra("partner_id", sender.getId());
         getApplicationContext().sendBroadcast(newDataIntent);
 
-        // NotificationUtils.generateMessageNotification(getApplicationContext(), sender, message);
+        NotificationUtils.generateMessageNotification(getApplicationContext(), sender, message);
     }
 }

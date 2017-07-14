@@ -29,6 +29,7 @@ import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
+import com.syzible.loinnir.services.NotificationUtils;
 import com.syzible.loinnir.utils.BitmapUtils;
 import com.syzible.loinnir.utils.BroadcastFilters;
 import com.syzible.loinnir.utils.DisplayUtils;
@@ -77,6 +78,7 @@ public class PartnerConversationFrag extends Fragment {
                                     Message message = new Message(sender, latestPayload.getJSONObject("message"));
                                     adapter.addToStart(message, true);
                                     markSeen();
+                                    NotificationUtils.dismissNotification(getActivity(), partner);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

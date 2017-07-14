@@ -19,6 +19,7 @@ import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.objects.Conversation;
 import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.utils.BitmapUtils;
@@ -26,6 +27,8 @@ import com.syzible.loinnir.utils.EncodingUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -35,24 +38,47 @@ import cz.msebera.android.httpclient.Header;
 
 public class NotificationUtils {
 
-    private static final int VIBRATION_INTENSITY = 500;
+    private static final int VIBRATION_INTENSITY = 150;
 
     private static void vibrate(Context context) {
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(VIBRATION_INTENSITY);
     }
 
-    public static void generateNotification(Context context, String title, String content) {
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+    public static void generateMessageNotification(final Context context, final User user,
+                                                   final Message message) throws JSONException {
+        if (CachingUtil.doesImageExist(context, user.getId())) {
+            Bitmap avatar = CachingUtil.getCachedImage(context, user.getId());
+            notifyUser(context, avatar, user, message);
+        } else {
+            new GetImage(new NetworkCallback<Bitmap>() {
+                @Override
+                public void onResponse(Bitmap response) {
+                    Bitmap scaledAvatar = BitmapUtils.generateMetUserAvatar(response);
+                    CachingUtil.cacheImage(context, user.getId(), scaledAvatar);
+                    notifyUser(context, scaledAvatar, user, message);
+                }
 
+                @Override
+                public void onFailure() {
+
+                }
+            }, user.getAvatar(), true).execute();
+        }
+    }
+
+    private static void notifyUser(Context context, Bitmap avatar, User user, Message message) {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context)
-                        .setLargeIcon(icon)
+                        .setLargeIcon(avatar)
                         .setSmallIcon(R.drawable.logo_small)
-                        .setContentTitle(title)
-                        .setContentText(content);
+                        .setContentTitle(user.getName())
+                        .setContentText(EncodingUtils.decodeText(message.getText()));
 
+        // intent for opening partner conversation window
         Intent resultingIntent = new Intent(context, MainActivity.class);
+        resultingIntent.putExtra("invoker", "notification");
+        resultingIntent.putExtra("user", user.getId());
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addParentStack(MainActivity.class);
@@ -60,57 +86,30 @@ public class NotificationUtils {
 
         PendingIntent resultingPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
         notificationBuilder.setContentIntent(resultingPendingIntent);
-
         NotificationManager manager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        manager.notify(0, notificationBuilder.build());
-        vibrate(context);
+        manager.notify(getNotificationId(user), notificationBuilder.build());
+
+        // TODO crash?
+        //vibrate(context);
     }
 
-    public static void generateMessageNotification(final Context context, final User user,
-                                                   final Message message) throws JSONException {
-        new GetImage(new NetworkCallback<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap icon) {
-                Bitmap circularIcon = BitmapUtils.getCroppedCircle(icon);
+    public static void dismissNotifications(Context context, ArrayList<Conversation> conversations) {
+        for (Conversation c : conversations) {
+            dismissNotification(context, (User) c.getUsers().get(0));
+        }
+    }
 
-                NotificationCompat.Builder notificationBuilder =
-                        new NotificationCompat.Builder(context)
-                                .setLargeIcon(circularIcon)
-                                .setSmallIcon(R.drawable.logo_small)
-                                .setContentTitle(user.getName())
-                                .setContentText(EncodingUtils.decodeText(message.getText()));
+    public static void dismissNotification(Context context, User user) {
+        NotificationManager manager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(getNotificationId(user));
+    }
 
-                // intent for opening partner conversation window
-                Intent resultingIntent = new Intent(context, MainActivity.class);
-                resultingIntent.putExtra("invoker", "notification");
-                resultingIntent.putExtra("user", user.getId());
-
-                TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-                stackBuilder.addParentStack(MainActivity.class);
-                stackBuilder.addNextIntent(resultingIntent);
-
-                PendingIntent resultingPendingIntent =
-                        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                notificationBuilder.setContentIntent(resultingPendingIntent);
-
-                NotificationManager manager = (NotificationManager)
-                        context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-                // TODO all facebook ids seem to be too big to be integers?
-                // TODO crashes notification as it's greater than Integer.MAX_VALUE
-                manager.notify(1, notificationBuilder.build());
-                vibrate(context);
-            }
-
-            @Override
-            public void onFailure() {
-
-            }
-        }, user.getAvatar(), true).execute();
+    private static int getNotificationId(User user) {
+        long originalId = Long.parseLong(user.getId());
+        return (int) originalId;
     }
 }
