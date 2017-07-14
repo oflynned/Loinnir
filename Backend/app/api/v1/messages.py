@@ -21,7 +21,8 @@ def send_partner_message():
         "from_id": str(data["from_id"]),
         "to_id": str(data["to_id"]),
         "time": Helper.get_current_time_in_millis(),
-        "message": str(data["message"])
+        "message": str(data["message"]),
+        "was_seen": False
     }
 
     mongo.db.partner_conversations.insert(message)
@@ -64,10 +65,6 @@ def get_partner_messages():
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
 
-    # TODO pagination
-    from_range = 0
-    to_range = 50
-
     participants = [my_id, partner_id]
     query = {"from_id": {"$in": participants}, "to_id": {"$in": participants}}
     messages = list(mongo.db.partner_conversations.find(query).sort("time", -1))
@@ -84,13 +81,32 @@ def get_partner_messages():
 
 
 # POST { my_id: <string>, partner_id: <string> }
+# RETURN { success: <boolean> }
+@messages_endpoint.route("/mark-seen", methods=["POST"])
+def mark_message_seen():
+    data = request.json
+    my_id = data["my_id"]
+    partner_id = data["partner_id"]
+    curr_time = Helper.get_current_time_in_millis()
+
+    participants = [my_id, partner_id]
+    query = {"from_id": {"$in": participants}, "to_id": {"$in": participants}, "time": {"$lte": curr_time}}
+    messages = list(mongo.db.partner_conversations.find(query).sort("time", -1))
+
+    for message in messages:
+        message["was_seen"] = True
+        mongo.db.partner_conversations.save(message)
+
+    return Helper.get_json({"success": True})
+
+
+# POST { my_id: <string>, partner_id: <string> }
 # RETURN { count: <int> }
 @messages_endpoint.route("/get-partner-messages-count", methods=["POST"])
 def get_partner_messages_count():
     data = request.json
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
-
     messages = list(mongo.db.partner_conversations.find({"participants": [my_id, partner_id]}))
     return Helper.get_json({"count": len(messages)})
 
@@ -125,7 +141,7 @@ def get_locality_messages():
 def get_conversations():
     data = request.json
     fb_id = str(data["fb_id"])
-    partner_ids = list(mongo.db.conversations.find({"fb_id": fb_id}))[0]["partners"]
+    partner_ids = User.get_user(fb_id)["partners"]
     return Helper.get_json(partner_ids)
 
 

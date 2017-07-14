@@ -209,12 +209,10 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             setFragment(getFragmentManager(), new MapFrag());
-            //setFragment(getFragmentManager(), new ConversationsListFrag());
         }
     }
 
     private void setLocality() {
-        System.out.println("Setting locality");
         RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this), new BaseJsonHttpResponseHandler<JSONObject>() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
@@ -392,30 +390,6 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-
-        RestClient.post(getApplicationContext(), Endpoints.GET_USER, JSONUtils.getIdPayload(this),
-                new BaseJsonHttpResponseHandler<JSONObject>() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                        try {
-                            TextView localityName = (TextView) headerView.findViewById(R.id.nav_header_locality);
-                            String locality = response.getString("locality");
-                            localityName.setText(locality);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-                    }
-
-                    @Override
-                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                        return new JSONObject(rawJsonData);
-                    }
-                });
 
         return true;
     }

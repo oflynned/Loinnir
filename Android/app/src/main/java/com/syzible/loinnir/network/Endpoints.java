@@ -23,12 +23,9 @@ public class Endpoints {
     public static final String GET_NEARBY_COUNT = "/users/get-nearby-count";
 
     public static final String GET_USER = "/users/get";
-    public static final String GET_ALL_USERS = "/users/get-all";
     public static final String GET_OTHER_USERS = "/users/get-others";
     public static final String GET_NEARBY_USERS = "/users/get-nearby";
     public static final String GET_RANDOM_USER = "/users/get-random";
-
-    public static final String GET_NEAREST_TOWN = "/services/get-nearest-town";
 
     public static final String GET_MATCHED_COUNT = "/users/get-matched-count";
     public static final String GET_UNMATCHED_COUNT = "/users/get-unmatched-count";
@@ -42,11 +39,8 @@ public class Endpoints {
     public static final String SEND_PARTNER_MESSAGE = "/messages/send-partner-message";
     public static final String SEND_LOCALITY_MESSAGE = "/messages/send-locality-message";
     public static final String GET_PAST_CONVERSATION_PREVIEWS = "/messages/get-past-conversation-previews";
-    public static final String GET_PARTNER_CONVERSATION_PREVIEW = "/messages/get-partner-conversation-preview";
 
-    public static final String GET_PARTNER_IDS = "/messages/get-partner-ids";
     public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner";
-    public static final String UNSUBSCRIBE_PARTNER = "/messages/unsubscribe-partner";
 
     public static final String LICENCES = "/ceadunais";
     public static final String PRIVACY_POLICIES = "/priobhaideacht";

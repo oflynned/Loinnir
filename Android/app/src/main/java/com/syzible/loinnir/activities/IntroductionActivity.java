@@ -21,11 +21,6 @@ import agency.tango.materialintroscreen.SlideFragmentBuilder;
  */
 
 public class IntroductionActivity extends MaterialIntroActivity {
-    /*
-    * TODO
-    * request permissions
-    * facebook login
-    * */
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

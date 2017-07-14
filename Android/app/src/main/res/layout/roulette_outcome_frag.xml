@@ -16,7 +16,7 @@
         android:layout_marginTop="32dp"
         android:fontFamily=""
         android:gravity="center_horizontal"
-        android:text="Fuarthas meaitseáil le duine nua!"
+        android:text="Fuarthas Meaitseáil Nua!"
         android:textSize="24sp" />
 
     <ImageView
@@ -49,7 +49,7 @@
         android:layout_below="@+id/name_text_roulette"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="2dp"
         android:gravity="center_horizontal"
         android:text="Ceantar an úsáideora" />
 
@@ -61,14 +61,14 @@
         android:layout_below="@+id/locality_text_roulette"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="2dp"
         android:gravity="center_horizontal">
 
         <TextView
             android:id="@+id/county_text_roulette"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Contae Reatha" />
+            android:text="Contae an úsáideora" />
 
         <ImageView
             android:id="@+id/county_flag_roulette"
@@ -87,7 +87,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="16dp">
 
         <mehdi.sakout.fancybuttons.FancyButton
             android:id="@+id/back_to_roulette_btn"

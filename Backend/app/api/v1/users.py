@@ -100,7 +100,7 @@ def get_nearby_users():
     fb_id = str(data["fb_id"])
 
     # find local users and exclude self from lookup
-    my_locality = list(mongo.db.users.find({"fb_id": fb_id}))[0]["locality"]
+    my_locality = User.get_user(fb_id)["locality"]
     nearby_users = list(mongo.db.users.find({"fb_id": {"$ne": fb_id}, "locality": my_locality}))
     return Helper.get_json(nearby_users)
 
@@ -167,8 +167,9 @@ def get_random_user():
 def get_unmatched_user_count():
     data = request.json
     fb_id = str(data["fb_id"])
-    partners_met = User.get_user(fb_id)["partners"]
-    blocked_users = User.get_user(fb_id)["blocked"]
+    my_profile = User.get_user(fb_id)
+    partners_met = my_profile["partners"]
+    blocked_users = my_profile["blocked"]
 
     excluded_profiles = partners_met + blocked_users
     excluded_profiles.append(fb_id)
