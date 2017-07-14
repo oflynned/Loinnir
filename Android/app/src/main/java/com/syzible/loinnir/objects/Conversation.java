@@ -23,12 +23,13 @@ public class Conversation implements IDialog {
     private IMessage lastMessage;
     private int unreadCount;
 
-    public Conversation(User partner, Message lastMessage) {
+    public Conversation(User partner, Message lastMessage, int unreadCount) {
         users.add(partner);
         this.id = partner.getId();
         this.profilePic = partner.getAvatar();
         this.name = partner.getName();
         this.lastMessage = lastMessage;
+        this.unreadCount = unreadCount;
     }
 
     @Override
@@ -68,6 +69,6 @@ public class Conversation implements IDialog {
 
     @Override
     public int getUnreadCount() {
-        return 1;
+        return unreadCount;
     }
 }

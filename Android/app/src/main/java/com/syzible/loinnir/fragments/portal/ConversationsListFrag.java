@@ -81,8 +81,7 @@ public class ConversationsListFrag extends Fragment implements
 
     @Override
     public void onResume() {
-
-
+        // TODO register a listener for new partner messages to update conversations list
         super.onResume();
     }
 
@@ -96,9 +95,10 @@ public class ConversationsListFrag extends Fragment implements
         for (int i = 0; i < response.length(); i++) {
             try {
                 JSONObject o = response.getJSONObject(i);
+                int unreadCount = o.getInt("count");
                 User sender = new User(o.getJSONObject("user"));
                 Message message = new Message(sender, o.getJSONObject("message"));
-                Conversation conversation = new Conversation(sender, message);
+                Conversation conversation = new Conversation(sender, message, unreadCount);
 
                 conversations.add(conversation);
             } catch (JSONException e) {

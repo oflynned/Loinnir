@@ -164,7 +164,9 @@ public class PartnerConversationFrag extends Fragment {
                                     payload.put("my_id", me.getId());
                                     payload.put("partner_id", partner.getId());
 
-                                    RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES_COUNT, payload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                                    RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES_COUNT,
+                                            JSONUtils.getPartnerInteractionPayload(partner.getId(), getActivity()),
+                                            new BaseJsonHttpResponseHandler<JSONObject>() {
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                                             try {

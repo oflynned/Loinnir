@@ -56,6 +56,19 @@ def send_locality_message():
     return Helper.get_json({"success": True})
 
 
+# used to determine whether to match and subscribe the users or not
+# POST { my_id: <string>, partner_id: <string> }
+# RETURN { count: <int> }
+@messages_endpoint.route("/get-partner-messages-count", methods=["POST"])
+def get_partner_messages_count():
+    data = request.json
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
+
+    messages = list(mongo.db.partner_conversations.find({"participants": [my_id, partner_id]}))
+    return Helper.get_json({"count": len(messages)})
+
+
 # get messages between partners that have matched via roulette
 # POST { my_id: <string>, partner_id: <string> }
 # RETURN [ <message>, ... ]
@@ -201,8 +214,10 @@ def get_conversations_previews():
             last_message_in_chat = list(mongo.db.partner_conversations.find(query).sort("time", -1).limit(1))[0]
 
         # now get the count of unread messages
-        unread_messages = list(mongo.db.partner_conversations.find({"from_id": partner, "to_id": fb_id, "was_seen": False}))
-        messages_preview.append({"count": len(unread_messages), "message": last_message_in_chat, "user": User.get_user(partner)})
+        unread_messages = list(
+            mongo.db.partner_conversations.find({"from_id": partner, "to_id": fb_id, "was_seen": False}))
+        messages_preview.append(
+            {"count": len(unread_messages), "message": last_message_in_chat, "user": User.get_user(partner)})
 
     # sort list by last sent time of the message fragments
     sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=True)
