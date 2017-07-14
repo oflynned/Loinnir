@@ -17,6 +17,7 @@ import com.syzible.loinnir.activities.AuthenticationActivity;
 import com.syzible.loinnir.activities.SettingsActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.EmojiUtils;
 import com.syzible.loinnir.utils.FacebookUtils;
@@ -324,6 +325,7 @@ public class SettingsFragment extends PreferenceFragment {
                                             public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                                                 DisplayUtils.generateToast(context, "Scriosadh do chúntas!");
                                                 FacebookUtils.deleteToken(context);
+                                                CachingUtil.clearCache(context);
 
                                                 getActivity().sendBroadcast(new Intent("finish_main_activity"));
                                                 getActivity().finish();
@@ -332,7 +334,7 @@ public class SettingsFragment extends PreferenceFragment {
 
                                             @Override
                                             public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
+                                                DisplayUtils.generateSnackbar(context, "Theip ar scriosadh do chúntais.");
                                             }
 
                                             @Override

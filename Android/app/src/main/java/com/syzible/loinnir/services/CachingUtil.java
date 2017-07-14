@@ -31,7 +31,12 @@ public class CachingUtil {
 
     public static void cacheImage(Context context, String id, Bitmap image) {
         saveToFile(context, id, image);
-        getCachedImage(context, id);
+    }
+
+    public static void clearCache(Context context) {
+        File[] files = new File(getDirectoryPath(context)).listFiles();
+        for (File file : files)
+            file.delete();
     }
 
     public static Bitmap getCachedImage(Context context, String name) {

@@ -42,6 +42,7 @@ import com.syzible.loinnir.network.GetImage;
 import com.syzible.loinnir.network.NetworkCallback;
 import com.syzible.loinnir.network.RestClient;
 import com.syzible.loinnir.objects.User;
+import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.services.LocationService;
 import com.syzible.loinnir.services.MessagingService;
 import com.syzible.loinnir.utils.BitmapUtils;
@@ -253,20 +254,29 @@ public class MainActivity extends AppCompatActivity
         setLocality();
 
         final ImageView profilePic = (ImageView) headerView.findViewById(R.id.nav_header_pic);
-        String picUrl = LocalStorage.getStringPref(LocalStorage.Pref.profile_pic, this);
+        final String myId = LocalStorage.getID(getApplicationContext());
 
-        new GetImage(new NetworkCallback<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap pic) {
-                Bitmap croppedPic = BitmapUtils.getCroppedCircle(pic);
-                profilePic.setImageBitmap(croppedPic);
-            }
+        if (!CachingUtil.doesImageExist(getApplicationContext(), myId)) {
+            String picUrl = LocalStorage.getStringPref(LocalStorage.Pref.profile_pic, this);
 
-            @Override
-            public void onFailure() {
+            new GetImage(new NetworkCallback<Bitmap>() {
+                @Override
+                public void onResponse(Bitmap pic) {
+                    Bitmap croppedImage = BitmapUtils.getCroppedCircle(pic);
+                    Bitmap scaledAvatar = BitmapUtils.scaleBitmap(croppedImage, BitmapUtils.BITMAP_SIZE);
+                    profilePic.setImageBitmap(scaledAvatar);
+                    CachingUtil.cacheImage(getApplicationContext(), myId, scaledAvatar);
+                }
 
-            }
-        }, picUrl, true).execute();
+                @Override
+                public void onFailure() {
+
+                }
+            }, picUrl, true).execute();
+        } else {
+            Bitmap pic = CachingUtil.getCachedImage(getApplicationContext(), myId);
+            profilePic.setImageBitmap(pic);
+        }
     }
 
     @Override

@@ -14,4 +14,8 @@ public class Constants {
                 .replace("á", "a").replace("é", "e")
                 .replace("í", "i").replace("ó", "o").replace("ú", "u");
     }
+
+    public static final int ONE_SECOND = 1000;
+    public static final int ONE_MINUTE = ONE_SECOND * 60;
+    public static final int FIVE_MINUTES = ONE_MINUTE * 5;
 }

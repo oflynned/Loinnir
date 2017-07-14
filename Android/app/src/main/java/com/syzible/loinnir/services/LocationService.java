@@ -1,10 +1,8 @@
 package com.syzible.loinnir.services;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -12,10 +10,9 @@ import android.os.IBinder;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
-import com.syzible.loinnir.activities.MainActivity;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
-import com.syzible.loinnir.utils.BroadcastFilters;
+import com.syzible.loinnir.utils.Constants;
 import com.syzible.loinnir.utils.LocalStorage;
 
 import org.json.JSONException;
@@ -35,7 +32,7 @@ public class LocationService extends Service {
     public static final int USER_LOCATION_RADIUS = 500;
 
     // obtain fix interval every 5 minutes while the app is in the foreground
-    private static final int LOCATION_INTERVAL = 1000; // * 60 * 5;
+    private static final int LOCATION_INTERVAL = Constants.DEV_MODE ? Constants.ONE_SECOND : Constants.FIVE_MINUTES;
     // update every time 500m of a distance change is observed
     private static final float LOCATION_DISTANCE = 500f;
 
