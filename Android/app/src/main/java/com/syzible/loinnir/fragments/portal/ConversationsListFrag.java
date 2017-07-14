@@ -2,7 +2,11 @@ package com.syzible.loinnir.fragments.portal;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +34,7 @@ import com.syzible.loinnir.objects.Message;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.CachingUtil;
 import com.syzible.loinnir.utils.BitmapUtils;
+import com.syzible.loinnir.utils.BroadcastFilters;
 import com.syzible.loinnir.utils.DisplayUtils;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LanguageUtils;
@@ -57,8 +62,32 @@ public class ConversationsListFrag extends Fragment implements
     private DialogsList dialogsList;
     private JSONArray response;
 
-    private View view;
     private boolean shouldShowMessages = false;
+    private BroadcastReceiver newPartnerMessageConversationReceover = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(BroadcastFilters.new_partner_message.toString())) {
+                RestClient.post(getActivity(), Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
+                        JSONUtils.getIdPayload(getActivity()),
+                        new BaseJsonHttpResponseHandler<JSONArray>() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                                loadMessages(response);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+                                System.out.println(rawJsonData);
+                            }
+
+                            @Override
+                            protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                return new JSONArray(rawJsonData);
+                            }
+                        });
+            }
+        }
+    };
 
     @Nullable
     @Override
@@ -68,6 +97,7 @@ public class ConversationsListFrag extends Fragment implements
 
         shouldShowMessages = response.length() > 0;
 
+        View view;
         if (shouldShowMessages) {
             view = inflater.inflate(R.layout.conversations_list_frag, container, false);
 
@@ -84,6 +114,7 @@ public class ConversationsListFrag extends Fragment implements
 
     @Override
     public void onResume() {
+        // TODO issue of old view adapter being visible for a tiny period
         if (shouldShowMessages) {
             RestClient.post(getActivity(), Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
                     JSONUtils.getIdPayload(getActivity()),
@@ -105,10 +136,16 @@ public class ConversationsListFrag extends Fragment implements
                     });
         }
 
-        // TODO register a listener for new partner messages to update conversations list
-
+        getActivity().registerReceiver(newPartnerMessageConversationReceover,
+                new IntentFilter(BroadcastFilters.new_partner_message.toString()));
 
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        getActivity().unregisterReceiver(newPartnerMessageConversationReceover);
+        super.onPause();
     }
 
     public ConversationsListFrag setResponse(JSONArray response) {
