@@ -77,6 +77,20 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
+    // check lifecycle for notifications
+    private static boolean isAppVisible;
+    public static boolean isActivityVisible() {
+        return isAppVisible;
+    }
+
+    public static void setAppResumed() {
+        isAppVisible = true;
+    }
+
+    public static void setAppPausedOrDead() {
+        isAppVisible = false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +160,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
+        MainActivity.setAppResumed();
         registerBroadcastReceivers();
         startService(new Intent(getApplicationContext(), LocationService.class));
         super.onResume();
@@ -153,6 +168,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
+        MainActivity.setAppPausedOrDead();
         stopService(new Intent(this, LocationService.class));
         unregisterReceiver(finishMainActivityReceiver);
         super.onPause();

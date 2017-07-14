@@ -116,8 +116,8 @@ public class ConversationsListFrag extends Fragment implements
 
     @Override
     public void onResume() {
-        // TODO issue of old view adapter being visible for a tiny period
         if (shouldShowMessages) {
+            NotificationUtils.dismissNotifications(getActivity(), conversations);
             RestClient.post(getActivity(), Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
                     JSONUtils.getIdPayload(getActivity()),
                     new BaseJsonHttpResponseHandler<JSONArray>() {

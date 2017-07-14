@@ -1,5 +1,6 @@
 package com.syzible.loinnir.services;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -75,6 +76,11 @@ public class NotificationUtils {
                         .setContentTitle(user.getName())
                         .setContentText(EncodingUtils.decodeText(message.getText()));
 
+        if (!MainActivity.isActivityVisible()) {
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+            vibrate(context);
+        }
+
         // intent for opening partner conversation window
         Intent resultingIntent = new Intent(context, MainActivity.class);
         resultingIntent.putExtra("invoker", "notification");
@@ -87,13 +93,11 @@ public class NotificationUtils {
         PendingIntent resultingPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilder.setContentIntent(resultingPendingIntent);
+
         NotificationManager manager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         manager.notify(getNotificationId(user), notificationBuilder.build());
-
-        // TODO crash?
-        //vibrate(context);
     }
 
     public static void dismissNotifications(Context context, ArrayList<Conversation> conversations) {

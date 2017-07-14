@@ -46,36 +46,6 @@ public class MessagingService extends FirebaseMessagingService {
             }
         }
 
-        // background notifications if the app is dead or not in focus
-        /*if (remoteMessage.getNotification() != null) {
-            String partnerId = remoteMessage.getNotification().getBody();
-            RestClient.post(getApplicationContext(), Endpoints.GET_PARTNER_CONVERSATION_PREVIEW,
-                    JSONUtils.getPartnerInteractionPayload(partnerId, getApplicationContext()),
-                    new BaseJsonHttpResponseHandler<JSONObject>() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                            try {
-                                NotificationUtils.generateNotification(getApplicationContext(),
-                                        remoteMessage.getNotification().getTitle(),
-                                        response.getJSONObject("message").getString("message"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-                        }
-
-                        @Override
-                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                            return new JSONObject(rawJsonData);
-                        }
-                    }
-            );
-        }*/
-
         super.onMessageReceived(remoteMessage);
     }
 

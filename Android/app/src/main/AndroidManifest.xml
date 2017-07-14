@@ -10,10 +10,12 @@
     <!-- get user location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <uses-feature android:name="android.hardware.location.gps" />
 
     <!-- to poll with services - perhaps remove if unneeded -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -67,9 +69,8 @@
 
         <activity
             android:name=".activities.SettingsActivity"
-            android:theme="@style/DarkerAppTheme"
-            android:label="Socruithe">
-        </activity>
+            android:label="Socruithe"
+            android:theme="@style/DarkerAppTheme"></activity>
 
         <activity
             android:name="com.facebook.FacebookActivity"
