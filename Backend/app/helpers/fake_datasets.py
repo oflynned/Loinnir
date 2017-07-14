@@ -80,20 +80,14 @@ class FakeDatasets:
 
             was_county_added = False
 
-            print(counties_added)
-
             while not was_county_added:
                 locality = localities[place_index]
                 county = locality["county"]
-
-                print(county)
 
                 if county not in counties_added:
                     locality_lat = locality["lat"]
                     locality_lng = locality["lng"]
                     town = locality["town"]
-
-                    print(county)
 
                     profile_pic = "http://c1.thejournal.ie/media/2015/10/1916-easter-rising-commemoration-2-390x285.jpg"
                     gender = "male" if randint(0, 1) == 0 else "female"

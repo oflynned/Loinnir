@@ -1,14 +1,13 @@
+import json
+
+import requests
 from flask import Blueprint, request
 
-import json
-import requests
-import time
-
-from app.helpers.geo import Geo
+from app.app import mongo
 from app.helpers.datasets import Datasets
 from app.helpers.fake_datasets import FakeDatasets
+from app.helpers.geo import Geo
 from app.helpers.helper import Helper
-from app.app import mongo
 
 services_endpoint = Blueprint("services", __name__)
 
@@ -126,7 +125,7 @@ class Services:
         output = []
         for i in range(len(data) - 1):
             location = data[i]
-            location["county"] = counties[i]
+            location["county"] = counties[i - 1]
             output.append(location)
 
         with open("app/datasets/groomed_populated_areas_localised.json", "w") as f:

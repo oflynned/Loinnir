@@ -183,7 +183,7 @@
     "town": "Lusca",
     "lat": 53.525653999098495,
     "lng": -6.165365500000207,
-    "county": "Cill Dara"
+    "county": "\u00c1th Cliath"
   },
   {
     "town": "Cill Dara",
@@ -231,7 +231,7 @@
     "town": "Claonadh",
     "lat": 53.29290749909629,
     "lng": -6.686743500000206,
-    "county": "An Mh\u00ed"
+    "county": "Cill Dara"
   },
   {
     "town": "An Uaimh",
@@ -261,7 +261,7 @@
     "town": "Ceanannas",
     "lat": 53.726581499100476,
     "lng": -6.877548500000189,
-    "county": "Cill Mhant\u00e1in"
+    "county": "An Mh\u00ed"
   },
   {
     "town": "Na Clocha Liatha",
@@ -387,7 +387,7 @@
     "town": "Guaire",
     "lat": 52.67520499909065,
     "lng": -6.29577550000019,
-    "county": "Corcaigh"
+    "county": "Loch Garman"
   },
   {
     "town": "Corcaigh",
@@ -471,7 +471,7 @@
     "town": "Deilgne",
     "lat": 53.132838499094795,
     "lng": -6.091437500000183,
-    "county": "An Cabh\u00e1n"
+    "county": "Cill Mhant\u00e1in"
   },
   {
     "town": "Achadh an I\u00fair",
@@ -525,7 +525,7 @@
     "town": "Cill na Seanr\u00e1tha",
     "lat": 54.0160939991034,
     "lng": -7.5292020000002,
-    "county": "D\u00fan na nGall"
+    "county": "An Cabh\u00e1n"
   },
   {
     "town": "D\u00fan na nGall",
@@ -669,7 +669,7 @@
     "town": "Na Gleannta",
     "lat": 54.79795999911175,
     "lng": -8.28392150000019,
-    "county": "Liatroim"
+    "county": "D\u00fan na nGall"
   },
   {
     "town": "Cora Droma R\u00faisc",
@@ -771,7 +771,7 @@
     "town": "Inis Caoin",
     "lat": 54.00338199910327,
     "lng": -6.578760500000186,
-    "county": "Sligeach"
+    "county": "Muineach\u00e1n"
   },
   {
     "town": "Tobar an Choire",
@@ -807,7 +807,7 @@
     "town": "Cliafuine",
     "lat": 54.43037799910774,
     "lng": -8.454036000000201,
-    "county": "Laois"
+    "county": "Sligeach"
   },
   {
     "town": "M\u00f3inteach M\u00edlic",
@@ -843,7 +843,7 @@
     "town": "An Sr\u00e1idbhaile",
     "lat": 53.01758199909372,
     "lng": -7.152066500000188,
-    "county": "An Longfort"
+    "county": "Laois"
   },
   {
     "town": "Bale U\u00ed Mhath\u00e1in",
@@ -861,7 +861,7 @@
     "town": "An Garr\u00e1n Ard",
     "lat": 53.77926249910101,
     "lng": -7.492009500000193,
-    "county": "U\u00edbh Fhail\u00ed"
+    "county": "An Longfort"
   },
   {
     "town": "Biorra",
@@ -909,7 +909,7 @@
     "town": "G\u00e9isill",
     "lat": 53.23571399909573,
     "lng": -7.322426500000205,
-    "county": "An Iarmh\u00ed"
+    "county": "U\u00edbh Fhail\u00ed"
   },
   {
     "town": "An M\u00f3ta",
@@ -933,7 +933,7 @@
     "town": "Cill Li\u00facainne",
     "lat": 53.51452649909841,
     "lng": -7.1417725000002,
-    "county": "Gaillimh"
+    "county": "An Iarmh\u00ed"
   },
   {
     "town": "Baile \u00c1tha an R\u00ed",
@@ -1011,7 +1011,7 @@
     "town": "\u00c1rainn",
     "lat": 53.11799499909464,
     "lng": -9.674155500000182,
-    "county": "An Cl\u00e1r"
+    "county": "Gaillimh"
   },
   {
     "town": "Cl\u00e1r Chlainne Mhuiris",
@@ -1071,7 +1071,7 @@
     "town": "Balla",
     "lat": 53.80353549910125,
     "lng": -9.130563500000191,
-    "county": "Ros Com\u00e1in"
+    "county": "Maigh Eo"
   },
   {
     "town": "An Caisle\u00e1n Riabhach",
@@ -1095,7 +1095,7 @@
     "town": "B\u00e9al na mBuill\u00ed",
     "lat": 53.77698499910097,
     "lng": -8.103720500000179,
-    "county": "\u00c1th Cliath"
+    "county": "Ros Com\u00e1in"
   },
   {
     "town": "Cionn S\u00e1ile",
@@ -1131,7 +1131,7 @@
     "town": "An Caisle\u00e1n Nua",
     "lat": 53.29953399909636,
     "lng": -6.496504500000185,
-    "county": "Cill Dara"
+    "county": "\u00c1th Cliath"
   },
   {
     "town": "Cill Choca",
@@ -1173,7 +1173,7 @@
     "town": "Cill Chuilinn",
     "lat": 53.13030599909478,
     "lng": -6.745472500000205,
-    "county": "An Mh\u00ed"
+    "county": "Cill Dara"
   },
   {
     "town": "An B\u00f3thar Bu\u00ed",
@@ -1257,7 +1257,7 @@
     "town": "Baile \u00c1tha Bu\u00ed",
     "lat": 53.62154399909943,
     "lng": -6.921092500000185,
-    "county": "Cill Mhant\u00e1in"
+    "county": "An Mh\u00ed"
   },
   {
     "town": "\u00c1th na Sceire",
@@ -1305,7 +1305,7 @@
     "town": "R\u00e1th Droma",
     "lat": 52.928619499092896,
     "lng": -6.230876000000193,
-    "county": "An Cl\u00e1r"
+    "county": "Cill Mhant\u00e1in"
   },
   {
     "town": "Cill Rois",
@@ -1359,7 +1359,7 @@
     "town": "An Chreatalach",
     "lat": 52.69959649909087,
     "lng": -8.766587500000183,
-    "county": "Luimneach"
+    "county": "An Cl\u00e1r"
   },
   {
     "town": "An Caisle\u00e1n Nua Thiar",
@@ -1461,7 +1461,7 @@
     "town": "Cill Fh\u00edon\u00e1in",
     "lat": 52.35893999908795,
     "lng": -8.468281500000188,
-    "county": "Tiobr\u00e1id \u00c1rann"
+    "county": "Luimneach"
   },
   {
     "town": "Ros Cr\u00e9",
@@ -1515,7 +1515,7 @@
     "town": "Leithghlinn an Droichid",
     "lat": 52.736083999091186,
     "lng": -6.9758015000001885,
-    "county": "Cill Cheannaigh"
+    "county": "Ceatharlach"
   },
   {
     "town": "Callainn",
@@ -1557,7 +1557,7 @@
     "town": "Gr\u00e1ig na Manach",
     "lat": 52.542369999089495,
     "lng": -6.956364500000206,
-    "county": "Tiobr\u00e1id \u00c1rann"
+    "county": "Cill Cheannaigh"
   },
   {
     "town": "Caiseal",
@@ -1581,7 +1581,7 @@
     "town": "Ard Fh\u00edon\u00e1in",
     "lat": 52.30905899908753,
     "lng": -7.884606000000191,
-    "county": "Port L\u00e1irge"
+    "county": "Tiobr\u00e1id \u00c1rann"
   },
   {
     "town": "An Lios M\u00f3r",
@@ -1623,7 +1623,7 @@
     "town": "Ceapach Choinn",
     "lat": 52.14600349908618,
     "lng": -7.843968000000188,
-    "county": "Loch Garman"
+    "county": "Port L\u00e1irge"
   },
   {
     "town": "Ros L\u00e1ir",
@@ -1659,7 +1659,7 @@
     "town": "Fearna",
     "lat": 52.58977899908993,
     "lng": -6.496040000000193,
-    "county": "Corcaigh"
+    "county": "Loch Garman"
   },
   {
     "town": "Baile an Mhanaigh",
@@ -1809,7 +1809,7 @@
     "town": "An Druipseach",
     "lat": 51.914626999084334,
     "lng": -8.742557500000203,
-    "county": "Ciarra\u00ed"
+    "county": "Corcaigh"
   },
   {
     "town": "Lios Tuathail",
@@ -1869,6 +1869,6 @@
     "town": "Cathair Saidhbh\u00edn",
     "lat": 51.94586649908457,
     "lng": -10.226428500000194,
-    "county": "Cill Mhant\u00e1in"
+    "county": "Ciarra\u00ed"
   }
 ]
