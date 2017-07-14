@@ -264,6 +264,26 @@ public class PartnerConversationFrag extends Fragment {
                         return new JSONArray(rawJsonData);
                     }
                 });
+
+        // also demarcate any messages seen up to this point
+        RestClient.post(getActivity(), Endpoints.MARK_SEEN,
+                JSONUtils.getPartnerInteractionPayload(partner, getActivity()),
+                new BaseJsonHttpResponseHandler<JSONObject>() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                    }
+
+                    @Override
+                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        return new JSONObject(rawJsonData);
+                    }
+                });
     }
 
     public PartnerConversationFrag setPartner(User partner) {

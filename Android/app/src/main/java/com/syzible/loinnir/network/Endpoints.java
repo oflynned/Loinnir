@@ -39,6 +39,7 @@ public class Endpoints {
     public static final String SEND_PARTNER_MESSAGE = "/messages/send-partner-message";
     public static final String SEND_LOCALITY_MESSAGE = "/messages/send-locality-message";
     public static final String GET_PAST_CONVERSATION_PREVIEWS = "/messages/get-past-conversation-previews";
+    public static final String MARK_SEEN = "/messages/mark-seen";
 
     public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner";
 

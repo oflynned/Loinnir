@@ -89,8 +89,7 @@ def mark_message_seen():
     partner_id = data["partner_id"]
     curr_time = Helper.get_current_time_in_millis()
 
-    participants = [my_id, partner_id]
-    query = {"from_id": {"$in": participants}, "to_id": {"$in": participants}, "time": {"$lte": curr_time}}
+    query = {"from_id": partner_id, "to_id": my_id, "time": {"$lte": curr_time}}
     messages = list(mongo.db.partner_conversations.find(query).sort("time", -1))
 
     for message in messages:
