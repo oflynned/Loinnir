@@ -126,7 +126,6 @@ public class PartnerConversationFrag extends Fragment {
         super.onPause();
     }
 
-
     private void setupAdapter(View view) {
         MessageHolders holdersConfig = new MessageHolders();
         holdersConfig.setIncomingTextConfig(IncomingMessage.class, R.layout.chat_message_layout);
@@ -167,54 +166,54 @@ public class PartnerConversationFrag extends Fragment {
                                     RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES_COUNT,
                                             JSONUtils.getPartnerInteractionPayload(partner.getId(), getActivity()),
                                             new BaseJsonHttpResponseHandler<JSONObject>() {
-                                        @Override
-                                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                                            try {
-                                                if (response.getInt("count") == 0)
-                                                    matchPartner(partner);
+                                                @Override
+                                                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                                    try {
+                                                        if (response.getInt("count") == 0)
+                                                            matchPartner(partner);
 
-                                                String messageContent = input.toString();
+                                                        String messageContent = input.toString();
 
-                                                Message message = new Message(LocalStorage.getID(getActivity()), me, System.currentTimeMillis(), messageContent);
-                                                adapter.addToStart(message, true);
+                                                        Message message = new Message(LocalStorage.getID(getActivity()), me, System.currentTimeMillis(), messageContent);
+                                                        adapter.addToStart(message, true);
 
-                                                // send to server
-                                                JSONObject messagePayload = new JSONObject();
-                                                messagePayload.put("from_id", LocalStorage.getID(getActivity()));
-                                                messagePayload.put("to_id", partner.getId());
-                                                messagePayload.put("message", EncodingUtils.encodeText(message.getText()));
+                                                        // send to server
+                                                        JSONObject messagePayload = new JSONObject();
+                                                        messagePayload.put("from_id", LocalStorage.getID(getActivity()));
+                                                        messagePayload.put("to_id", partner.getId());
+                                                        messagePayload.put("message", EncodingUtils.encodeText(message.getText()));
 
-                                                RestClient.post(getActivity(), Endpoints.SEND_PARTNER_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
-                                                    @Override
-                                                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                                                        System.out.println(response);
+                                                        RestClient.post(getActivity(), Endpoints.SEND_PARTNER_MESSAGE, messagePayload, new BaseJsonHttpResponseHandler<JSONObject>() {
+                                                            @Override
+                                                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                                                System.out.println(response);
+                                                            }
+
+                                                            @Override
+                                                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                                                                System.out.println(rawJsonData);
+                                                            }
+
+                                                            @Override
+                                                            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                                                return new JSONObject(rawJsonData);
+                                                            }
+                                                        });
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
                                                     }
+                                                }
 
-                                                    @Override
-                                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                                                        System.out.println(rawJsonData);
-                                                    }
+                                                @Override
+                                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+                                                    System.out.println(rawJsonData);
+                                                }
 
-                                                    @Override
-                                                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                                        return new JSONObject(rawJsonData);
-                                                    }
-                                                });
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-                                            System.out.println(rawJsonData);
-                                        }
-
-                                        @Override
-                                        protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                                            return new JSONObject(rawJsonData);
-                                        }
-                                    });
+                                                @Override
+                                                protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                                    return new JSONObject(rawJsonData);
+                                                }
+                                            });
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -326,36 +325,6 @@ public class PartnerConversationFrag extends Fragment {
                 }
             }
         };
-    }
-
-    // TODO what is this for??? Unread messages??? Pagination???
-    private int getMessageCount(User me, User partner) throws JSONException {
-        RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES_COUNT,
-                JSONUtils.getPartnerInteractionPayload(partner, getActivity()),
-                new BaseJsonHttpResponseHandler<JSONObject>() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
-                        try {
-                            int count = response.getInt("count");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
-
-                    }
-
-                    @Override
-                    protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                        return null;
-                    }
-                });
-
-        // TODO make an interface for extracting these posts into one nice method to call with
-        // TODO a payload and an endpoint for returning at a later point in time
-        return -1;
     }
 
     private void matchPartner(User partner) {

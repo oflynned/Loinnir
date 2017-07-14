@@ -58,6 +58,7 @@ public class ConversationsListFrag extends Fragment implements
     private JSONArray response;
 
     private View view;
+    private boolean shouldShowMessages = false;
 
     @Nullable
     @Override
@@ -65,7 +66,9 @@ public class ConversationsListFrag extends Fragment implements
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.app_name);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(null);
 
-        if (response.length() > 0) {
+        shouldShowMessages = response.length() > 0;
+
+        if (shouldShowMessages) {
             view = inflater.inflate(R.layout.conversations_list_frag, container, false);
 
             dialogsList = (DialogsList) view.findViewById(R.id.conversations_list);
@@ -81,7 +84,30 @@ public class ConversationsListFrag extends Fragment implements
 
     @Override
     public void onResume() {
+        if (shouldShowMessages) {
+            RestClient.post(getActivity(), Endpoints.GET_PAST_CONVERSATION_PREVIEWS,
+                    JSONUtils.getIdPayload(getActivity()),
+                    new BaseJsonHttpResponseHandler<JSONArray>() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                            loadMessages(response);
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+
+                        }
+
+                        @Override
+                        protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                            return new JSONArray(rawJsonData);
+                        }
+                    });
+        }
+
         // TODO register a listener for new partner messages to update conversations list
+
+
         super.onResume();
     }
 
@@ -110,12 +136,16 @@ public class ConversationsListFrag extends Fragment implements
         dialogsListAdapter.setOnDialogClickListener(ConversationsListFrag.this);
         dialogsListAdapter.setOnDialogLongClickListener(ConversationsListFrag.this);
         dialogsList.setAdapter(dialogsListAdapter);
-
-
     }
 
     @Override
     public void onDialogClick(Conversation conversation) {
+        for (int i = 0; i < conversations.size(); i++) {
+            if (conversations.get(i).getId().equals(conversation.getId())) {
+                conversations.get(i).setUnreadCount(0);
+            }
+        }
+
         User partner = (User) conversation.getUsers().get(0);
         PartnerConversationFrag frag = new PartnerConversationFrag().setPartner(partner);
         MainActivity.setFragmentBackstack(getFragmentManager(), frag);
@@ -174,19 +204,6 @@ public class ConversationsListFrag extends Fragment implements
                 })
                 .setNegativeButton("Ná cur", null)
                 .show();
-    }
-
-    private void onNewMessage(String dialogId, Message message) {
-        if (!dialogsListAdapter.updateDialogWithMessage(dialogId, message)) {
-            // doesn't already exist, reload entire list or create a new dialog
-        }
-
-        // else update, check if read, AND reorder
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     private ImageLoader loadImage() {
