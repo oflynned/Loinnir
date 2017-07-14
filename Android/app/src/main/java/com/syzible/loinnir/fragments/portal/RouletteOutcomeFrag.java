@@ -28,6 +28,8 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 import mehdi.sakout.fancybuttons.FancyButton;
 
+import static com.syzible.loinnir.utils.Constants.getCountyFileName;
+
 /**
  * Created by ed on 07/05/2017.
  */
@@ -46,6 +48,7 @@ public class RouletteOutcomeFrag extends Fragment {
 
         ImageView profilePictureImageView = (ImageView) view.findViewById(R.id.roulette_partner_profile_pic);
         TextView usernameTextView = (TextView) view.findViewById(R.id.name_text_roulette);
+        TextView localityTextView = (TextView) view.findViewById(R.id.locality_text_roulette);
         TextView countyTextView = (TextView) view.findViewById(R.id.county_text_roulette);
         TextView matchWarningTextView = (TextView) view.findViewById(R.id.match_loss_warning_if_no_chat);
 
@@ -72,7 +75,13 @@ public class RouletteOutcomeFrag extends Fragment {
         profilePictureImageView.setImageBitmap(BitmapUtils.getCroppedCircle(profilePic));
 
         usernameTextView.setText(partner.getName());
-        countyTextView.setText(partner.getLocality() + ", " + partner.getCounty());
+        localityTextView.setText(partner.getLocality());
+        countyTextView.setText(partner.getCounty());
+
+        String countyFlagFile = getCountyFileName(partner.getCounty());
+        int flagDrawable = getResources().getIdentifier(countyFlagFile, "drawable", getActivity().getPackageName());
+        ImageView countyFlag = (ImageView) view.findViewById(R.id.county_flag_roulette);
+        countyFlag.setImageResource(flagDrawable);
 
         String outcome = "Is féidir an rúiléid a atriail, ach caillfidh tú an nasc leis an duine seo mura thosaíonn tú comhrá ";
         outcome += partner.isFemale() ? "léi" : "leis";

@@ -64,6 +64,34 @@ public class LocalityConversationFrag extends Fragment
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastFilters.new_locality_info_update.toString())) {
+                RestClient.post(getActivity(), Endpoints.GET_NEARBY_COUNT, JSONUtils.getIdPayload(getActivity()),
+                        new BaseJsonHttpResponseHandler<JSONObject>() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
+                                try {
+                                    String localityName = response.getString("locality");
+                                    int nearbyUsers = response.getInt("count");
+                                    String localUsers = nearbyUsers + " eile anseo";
+
+                                    // set title and subtitle
+                                    ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(localityName);
+                                    ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(localUsers);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONObject errorResponse) {
+
+                            }
+
+                            @Override
+                            protected JSONObject parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                                return new JSONObject(rawJsonData);
+                            }
+                        });
+
                 RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES, JSONUtils.getIdPayload(getActivity()),
                         new BaseJsonHttpResponseHandler<JSONArray>() {
                             @Override

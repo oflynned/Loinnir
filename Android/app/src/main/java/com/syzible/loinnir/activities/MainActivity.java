@@ -58,6 +58,8 @@ import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
+import static com.syzible.loinnir.utils.Constants.getCountyFileName;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -221,8 +223,7 @@ public class MainActivity extends AppCompatActivity
                     localityName.setText(response.getString("locality"));
 
                     String county = response.getString("county");
-                    String countyFlagFile = county.toLowerCase().replace(" ", "_").replace("á", "a")
-                            .replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u");
+                    String countyFlagFile = getCountyFileName(county);
                     countyName.setText(county);
 
                     int flagDrawable = getResources().getIdentifier(countyFlagFile, "drawable", getPackageName());
