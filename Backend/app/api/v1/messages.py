@@ -79,10 +79,9 @@ def get_partner_messages():
 
     participants = [my_id, partner_id]
     query = {"from_id": {"$in": participants}, "to_id": {"$in": participants}}
-    messages = list(mongo.db.partner_conversations.find(query).sort("time", -1))
+    messages = list(mongo.db.partner_conversations.find(query).sort("time", -1).limit(25))
 
     returned_messages = []
-
     for message in messages:
         returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
 
@@ -118,34 +117,9 @@ def get_paginated_partner_messages():
     return Helper.get_json(sorted_list)
 
 
-# POST { fb_id: <string>, last_message_id: <string> }
-# RETURN [ <message>, ... ]
-@messages_endpoint.route("/get-paginated-locality-messages", methods=["POST"])
-def get_paginated_locality_messages():
-    data = request.json
-    my_id = str(data["fb_id"])
-    oldest_message_id = str(data["oldest_message_id"])
-
-    me = User.get_user(my_id)
-
-    query = {
-        "locality": me["locality"],
-        "fb_id": {"$nin": me["blocked"]},
-        "_id": {"$lt": ObjectId(oldest_message_id)}
-    }
-    total_messages = list(mongo.db.partner_conversations.find(query).sort("_id", -1).limit(25))
-
-    returned_messages = []
-    for message in total_messages:
-        returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
-
-    sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
-
-    return Helper.get_json(sorted_list)
-
-
-# get all messages residing within the locality for the user's record provided
-# comes with initial pagination of 25 messages
+# get initial messages residing within the locality for the user's record provided
+# comes with initial pagination of 25 messages that can be paginated further on scrolling
+# see get_paginated_locality_messages() for further loading
 # POST { fb_id: <string> }
 # RETURN [ <message>, ... ]
 @messages_endpoint.route("/get-locality-messages", methods=["POST"])
@@ -169,6 +143,32 @@ def get_locality_messages():
         messages[i]["user"] = user
 
     sorted_list = sorted(list(messages), key=lambda k: k["time"], reverse=False)
+    return Helper.get_json(sorted_list)
+
+
+# POST { fb_id: <string>, last_message_id: <string> }
+# RETURN [ <message>, ... ]
+@messages_endpoint.route("/get-paginated-locality-messages", methods=["POST"])
+def get_paginated_locality_messages():
+    data = request.json
+    my_id = str(data["fb_id"])
+    oldest_message_id = str(data["oldest_message_id"])
+
+    me = User.get_user(my_id)
+
+    query = {
+        "locality": me["locality"],
+        "fb_id": {"$nin": me["blocked"]},
+        "_id": {"$lt": ObjectId(oldest_message_id)}
+    }
+    total_messages = list(mongo.db.partner_conversations.find(query).sort("_id", -1).limit(25))
+
+    returned_messages = []
+    for message in total_messages:
+        returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
+
+    sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
+
     return Helper.get_json(sorted_list)
 
 
