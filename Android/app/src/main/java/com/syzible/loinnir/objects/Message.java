@@ -24,7 +24,7 @@ public class Message implements IMessage {
 
     public Message(User sender, JSONObject messageObject) {
         try {
-            this.id = messageObject.getString("_id");
+            this.id = messageObject.getJSONObject("_id").getString("$oid");
             this.sender = sender;
             this.time = messageObject.getLong("time");
             this.contents = messageObject.getString("message");

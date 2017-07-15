@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from bson import ObjectId
+from bson.objectid import ObjectId
 
 from Loinnir import mode
 from app.api.v1.users import User
@@ -146,14 +146,14 @@ def get_locality_messages():
     return Helper.get_json(sorted_list)
 
 
-# POST { fb_id: <string>, last_message_id: <string> }
+# POST { fb_id: <string>, last_message_id: <string>, last_known_count: <int> }
 # RETURN [ <message>, ... ]
 @messages_endpoint.route("/get-paginated-locality-messages", methods=["POST"])
 def get_paginated_locality_messages():
     data = request.json
     my_id = str(data["fb_id"])
     oldest_message_id = str(data["oldest_message_id"])
-
+    last_known_count = int(data["last_known_count"])
     me = User.get_user(my_id)
 
     query = {
@@ -161,15 +161,25 @@ def get_paginated_locality_messages():
         "fb_id": {"$nin": me["blocked"]},
         "_id": {"$lt": ObjectId(oldest_message_id)}
     }
-    total_messages = list(mongo.db.partner_conversations.find(query).sort("_id", -1).limit(25))
 
-    returned_messages = []
-    for message in total_messages:
-        returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
+    # first check to see if all of the past messages have been loaded already
+    if len(list(mongo.db.locality_conversations.find(query))) > last_known_count:
+        query = {
+            "locality": me["locality"],
+            "fb_id": {"$nin": me["blocked"]},
+            "_id": {"$lt": ObjectId(oldest_message_id)}
+        }
+        total_messages = list(mongo.db.locality_conversations.find(query).sort("_id", -1).limit(25))
 
-    sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
+        returned_messages = []
+        for message in total_messages:
+            message["user"] = User.get_user(message["fb_id"])
+            returned_messages.append(message)
 
-    return Helper.get_json(sorted_list)
+        sorted_list = sorted(list(returned_messages), key=lambda k: k["time"], reverse=False)
+        return Helper.get_json(sorted_list)
+    else:
+        return Helper.get_json([])
 
 
 # POST { my_id: <string>, partner_id: <string> }

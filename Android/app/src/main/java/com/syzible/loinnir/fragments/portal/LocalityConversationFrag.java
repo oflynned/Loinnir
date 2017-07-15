@@ -49,15 +49,9 @@ import cz.msebera.android.httpclient.Header;
  * Created by ed on 07/05/2017.
  */
 
-public class LocalityConversationFrag extends Fragment
-        implements MessagesListAdapter.OnLoadMoreListener {
+public class LocalityConversationFrag extends Fragment {
 
     private View view;
-
-    private Date lastLoadedDate;
-    private int loadedCount;
-    private String lastLoadedMessageId;
-
     private ArrayList<Message> messages = new ArrayList<>();
     private MessagesListAdapter<Message> adapter;
     private BroadcastReceiver newLocalityInformationReceiver = new BroadcastReceiver() {
@@ -151,15 +145,65 @@ public class LocalityConversationFrag extends Fragment
             public void onMessageViewLongClick(View view, final Message message) {
                 // should not be able to block yourself
                 if (!message.getUser().getId().equals(LocalStorage.getID(getActivity())))
-                DisplayUtils.generateBlockDialog(getActivity(), (User) message.getUser(), new DisplayUtils.OnCallback() {
+                    DisplayUtils.generateBlockDialog(getActivity(), (User) message.getUser(), new DisplayUtils.OnCallback() {
+                        @Override
+                        public void onCallback() {
+                            DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc go rathúil ar " + LanguageUtils.lenite(((User) message.getUser()).getForename()));
+                            loadMessages();
+                        }
+                    });
+            }
+        });
+        adapter.setLoadMoreListener(new MessagesListAdapter.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                System.out.println("onLoadMore() " + page + " " + totalItemsCount);
+
+                JSONObject payload = new JSONObject();
+                try {
+                    payload.put("fb_id", LocalStorage.getID(getActivity()));
+                    payload.put("oldest_message_id", messages.get(messages.size() - 1).getId());
+                    payload.put("last_known_count", totalItemsCount - 1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(payload);
+
+                RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES_PAGINATION, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override
-                    public void onCallback() {
-                        DisplayUtils.generateSnackbar(getActivity(), "Cuireadh cosc go rathúil ar " + LanguageUtils.lenite(((User) message.getUser()).getForename()));
-                        loadMessages();
+                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                        if (response.length() > 0) {
+                            ArrayList<Message> paginatedMessages = new ArrayList<>();
+                            for (int i = response.length() - 1; i >= 0; i--) {
+                                try {
+                                    JSONObject o = response.getJSONObject(i);
+                                    User sender = new User(o.getJSONObject("user"));
+                                    Message message = new Message(sender, o);
+                                    paginatedMessages.add(message);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            adapter.addToEnd(paginatedMessages, false);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+
+                    }
+
+                    @Override
+                    protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                        System.out.println(rawJsonData);
+                        return new JSONArray(rawJsonData);
                     }
                 });
             }
         });
+
         MessagesList messagesList = (MessagesList) view.findViewById(R.id.messages_list);
         messagesList.setAdapter(adapter);
 
@@ -191,7 +235,7 @@ public class LocalityConversationFrag extends Fragment
                                                     try {
                                                         JSONObject latestMessage = response.getJSONObject(response.length() - 1);
                                                         User sender = new User(latestMessage.getJSONObject("user"));
-                                                        Message message = new Message(latestMessage.getString("_id"), sender,
+                                                        Message message = new Message(latestMessage.getJSONObject("_id").getString("$oid"), sender,
                                                                 System.currentTimeMillis(), latestMessage.getString("message"));
                                                         adapter.addToStart(message, true);
                                                     } catch (JSONException e) {
@@ -281,15 +325,13 @@ public class LocalityConversationFrag extends Fragment
                         for (int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject userMessage = response.getJSONObject(i);
-                                String id = userMessage.getString("_id");
+                                String id = userMessage.getJSONObject("_id").getString("$oid");
                                 String messageContent = userMessage.getString("message");
                                 long timeSent = userMessage.getLong("time");
 
                                 User user = new User(userMessage.getJSONObject("user"));
                                 Message message = new Message(id, user, timeSent, messageContent);
                                 messages.add(message);
-
-                                lastLoadedMessageId = id;
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -337,10 +379,5 @@ public class LocalityConversationFrag extends Fragment
                 }
             }
         };
-    }
-
-    @Override
-    public void onLoadMore(int page, int totalItemsCount) {
-
     }
 }

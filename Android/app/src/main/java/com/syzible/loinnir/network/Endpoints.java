@@ -12,7 +12,7 @@ public class Endpoints {
     private static final int API_VERSION = 1;
     private static final String LOCAL_ENDPOINT = "http://10.0.2.2:3000";
     private static final String REMOTE_ENDPOINT = "http://ec2-54-194-22-138.eu-west-1.compute.amazonaws.com";
-    private static final String STEM_URL = REMOTE_ENDPOINT;
+    private static final String STEM_URL = LOCAL_ENDPOINT;
     private static final String API_URL = STEM_URL + "/api/v" + API_VERSION;
 
     public static final String CREATE_USER = "/users/create";
@@ -32,14 +32,17 @@ public class Endpoints {
     public static final String BLOCK_USER = "/users/block-user";
     public static final String UNBLOCK_USER = "/users/unblock-user";
 
-    public static final String GET_PARTNER_MESSAGES = "/messages/get-partner-messages";
-    public static final String GET_PARTNER_MESSAGES_COUNT = "/messages/get-partner-messages-count";
-    public static final String GET_LOCALITY_MESSAGES = "/messages/get-locality-messages";
     public static final String SEND_PARTNER_MESSAGE = "/messages/send-partner-message";
     public static final String SEND_LOCALITY_MESSAGE = "/messages/send-locality-message";
     public static final String GET_PAST_CONVERSATION_PREVIEWS = "/messages/get-past-conversation-previews";
-    public static final String MARK_PARTNER_MESSAGES_SEEN = "/messages/mark-seen";
+    public static final String GET_PARTNER_MESSAGES_COUNT = "/messages/get-partner-messages-count";
 
+    public static final String GET_PARTNER_MESSAGES = "/messages/get-partner-messages";
+    public static final String GET_PARTNER_MESSAGES_PAGINATION = "/messages/get-paginated-partner-messages";
+    public static final String GET_LOCALITY_MESSAGES = "/messages/get-locality-messages";
+    public static final String GET_LOCALITY_MESSAGES_PAGINATION = "/messages/get-paginated-locality-messages";
+
+    public static final String MARK_PARTNER_MESSAGES_SEEN = "/messages/mark-seen";
     public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner";
 
     public static final String LICENCES = "/ceadunais";
