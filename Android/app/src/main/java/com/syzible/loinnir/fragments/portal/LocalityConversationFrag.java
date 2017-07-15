@@ -157,8 +157,6 @@ public class LocalityConversationFrag extends Fragment {
         adapter.setLoadMoreListener(new MessagesListAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                System.out.println("onLoadMore() " + page + " " + totalItemsCount);
-
                 JSONObject payload = new JSONObject();
                 try {
                     payload.put("fb_id", LocalStorage.getID(getActivity()));
@@ -167,8 +165,6 @@ public class LocalityConversationFrag extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                System.out.println(payload);
 
                 RestClient.post(getActivity(), Endpoints.GET_LOCALITY_MESSAGES_PAGINATION, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
                     @Override

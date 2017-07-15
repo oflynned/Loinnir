@@ -25,7 +25,8 @@ def send_partner_message():
     }
 
     mongo.db.partner_conversations.insert(message)
-    FCM.notify_partner_chat_update(data["from_id"], data["to_id"], mode)
+    if data["from_id"] != 0 and data["to_id"] != 0:
+        FCM.notify_partner_chat_update(data["from_id"], data["to_id"], mode)
 
     return Helper.get_json({"success": True})
 
@@ -50,7 +51,8 @@ def send_locality_message():
     }
 
     mongo.db.locality_conversations.insert(message)
-    FCM.notify_locality_chat_update(fb_id, mode)
+    if data["from_id"] != 0 and data["to_id"] != 0:
+        FCM.notify_locality_chat_update(fb_id, mode)
 
     return Helper.get_json({"success": True})
 
@@ -99,22 +101,31 @@ def get_paginated_partner_messages():
     my_id = str(data["my_id"])
     partner_id = str(data["partner_id"])
     oldest_message_id = str(data["oldest_message_id"])
-
+    last_known_count = int(data["last_known_count"])
     participants = [my_id, partner_id]
+
     query = {
         "from_id": {"$in": participants},
         "to_id": {"$in": participants},
-        "_id": {"$lt": ObjectId(oldest_message_id)}
     }
-    total_messages = list(mongo.db.partner_conversations.find(query).sort("_id", -1).limit(25))
 
-    returned_messages = []
-    for message in total_messages:
-        returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
+    if len(list(mongo.db.partner_conversations.find(query))) > last_known_count:
+        query = {
+            "from_id": {"$in": participants},
+            "to_id": {"$in": participants},
+            "_id": {"$lt": ObjectId(oldest_message_id)}
+        }
+        total_messages = list(mongo.db.partner_conversations.find(query).sort("_id", -1).limit(25))
 
-    sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
+        returned_messages = []
+        for message in total_messages:
+            returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
 
-    return Helper.get_json(sorted_list)
+        sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
+
+        return Helper.get_json(sorted_list)
+    else:
+        return Helper.get_json([])
 
 
 # get initial messages residing within the locality for the user's record provided
@@ -285,7 +296,7 @@ def get_conversations_previews():
             {"count": len(unread_messages), "message": last_message_in_chat, "user": User.get_user(partner)})
 
     # sort list by last sent time of the message fragments
-    sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=True)
+    sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=False)
 
     return Helper.get_json(sorted_list)
 
