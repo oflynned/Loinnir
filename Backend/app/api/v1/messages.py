@@ -1,12 +1,11 @@
 from flask import Blueprint, request
-import time
-
-from app.app import mongo
-from app.api.v1.users import User
-from app.helpers.helper import Helper
-from app.helpers.fcm import FCM
+from bson import ObjectId
 
 from Loinnir import mode
+from app.api.v1.users import User
+from app.app import mongo
+from app.helpers.fcm import FCM
+from app.helpers.helper import Helper
 
 messages_endpoint = Blueprint("messages", __name__)
 
@@ -93,6 +92,86 @@ def get_partner_messages():
     return Helper.get_json(sorted_list)
 
 
+# POST { my_id: <string>, partner_id: <string>, oldest_message_id: <string> }
+# RETURN [ <message>, ... ]
+@messages_endpoint.route("/get-paginated-partner-messages", methods=["POST"])
+def get_paginated_partner_messages():
+    data = request.json
+    my_id = str(data["my_id"])
+    partner_id = str(data["partner_id"])
+    oldest_message_id = str(data["oldest_message_id"])
+
+    participants = [my_id, partner_id]
+    query = {
+        "from_id": {"$in": participants},
+        "to_id": {"$in": participants},
+        "_id": {"$lt": ObjectId(oldest_message_id)}
+    }
+    total_messages = list(mongo.db.partner_conversations.find(query).sort("_id", -1).limit(25))
+
+    returned_messages = []
+    for message in total_messages:
+        returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
+
+    sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
+
+    return Helper.get_json(sorted_list)
+
+
+# POST { fb_id: <string>, last_message_id: <string> }
+# RETURN [ <message>, ... ]
+@messages_endpoint.route("/get-paginated-locality-messages", methods=["POST"])
+def get_paginated_locality_messages():
+    data = request.json
+    my_id = str(data["fb_id"])
+    oldest_message_id = str(data["oldest_message_id"])
+
+    me = User.get_user(my_id)
+
+    query = {
+        "locality": me["locality"],
+        "fb_id": {"$nin": me["blocked"]},
+        "_id": {"$lt": ObjectId(oldest_message_id)}
+    }
+    total_messages = list(mongo.db.partner_conversations.find(query).sort("_id", -1).limit(25))
+
+    returned_messages = []
+    for message in total_messages:
+        returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
+
+    sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
+
+    return Helper.get_json(sorted_list)
+
+
+# get all messages residing within the locality for the user's record provided
+# comes with initial pagination of 25 messages
+# POST { fb_id: <string> }
+# RETURN [ <message>, ... ]
+@messages_endpoint.route("/get-locality-messages", methods=["POST"])
+def get_locality_messages():
+    data = request.json
+    fb_id = str(data["fb_id"])
+
+    user = User.get_user(fb_id)
+    locality = str(user["locality"])
+    blocked_users = user["blocked"]
+
+    # aggregate over the messages to get the fb user details
+    messages = list(mongo.db.locality_conversations.find({
+        "locality": locality,
+        "fb_id": {"$nin": blocked_users}
+    }).sort("time", -1).limit(25))
+
+    for i, message in enumerate(messages):
+        fb_id = message["fb_id"]
+        user = User.get_user(fb_id)
+        messages[i]["user"] = user
+
+    sorted_list = sorted(list(messages), key=lambda k: k["time"], reverse=False)
+    return Helper.get_json(sorted_list)
+
+
 # POST { my_id: <string>, partner_id: <string> }
 # RETURN { success: <boolean> }
 @messages_endpoint.route("/mark-seen", methods=["POST"])
@@ -110,30 +189,6 @@ def mark_message_seen():
         mongo.db.partner_conversations.save(message)
 
     return Helper.get_json({"success": True})
-
-
-# get all messages residing within the locality for the user's record provided
-# POST { fb_id: <string> }
-# RETURN [ <message>, ... ]
-@messages_endpoint.route("/get-locality-messages", methods=["POST"])
-def get_locality_messages():
-    data = request.json
-    fb_id = str(data["fb_id"])
-
-    user = User.get_user(fb_id)
-    locality = str(user["locality"])
-    blocked_users = user["blocked"]
-
-    # aggregate over the messages to get the fb user details
-    messages = list(mongo.db.locality_conversations.find({"locality": locality, "fb_id": {"$nin": blocked_users}}))
-
-    for i, message in enumerate(messages):
-        fb_id = message["fb_id"]
-        user = mongo.db.users.find({"fb_id": fb_id})
-        user_details = list(user)[0]
-        messages[i]["user"] = user_details
-
-    return Helper.get_json(list(messages))
 
 
 # POST { fb_id: <string> }
