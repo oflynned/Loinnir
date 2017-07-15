@@ -25,8 +25,7 @@ def send_partner_message():
     }
 
     mongo.db.partner_conversations.insert(message)
-    if data["from_id"] != 0 and data["to_id"] != 0:
-        FCM.notify_partner_chat_update(data["from_id"], data["to_id"], mode)
+    FCM.notify_partner_chat_update(data["from_id"], data["to_id"], mode)
 
     return Helper.get_json({"success": True})
 
@@ -51,8 +50,7 @@ def send_locality_message():
     }
 
     mongo.db.locality_conversations.insert(message)
-    if data["from_id"] != 0 and data["to_id"] != 0:
-        FCM.notify_locality_chat_update(fb_id, mode)
+    FCM.notify_locality_chat_update(fb_id, mode)
 
     return Helper.get_json({"success": True})
 

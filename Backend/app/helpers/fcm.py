@@ -45,7 +45,9 @@ class FCM:
             key = Datasets.get_fcm_api_key(mode)
             push_service = FCMNotification(api_key=key)
             # notify a screen refresh and polling for new messages
-            push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
+            # remember that FCM id of 0 is for bots
+            if partner_id != 0:
+                push_service.notify_single_device(registration_id=registration_id, data_message=data_content)
 
             return Helper.get_json({"success": True})
 
@@ -53,16 +55,18 @@ class FCM:
 
     @staticmethod
     def notify_locality_chat_update(my_id, mode):
-        me = dict(list(mongo.db.users.find({"fb_id": my_id}))[0])
+        me = User.get_user(my_id)
         me.pop("_id")
 
         locality = me["locality"]
+        # remember that FCM token of 0 is for auto-generated bot profiles
+        exclusion_ids = [my_id, 0]
         ids = []
 
         # do we care about blocked users?
         locality_users = list(mongo.db.users.find({
             "$and": [
-                {"fb_id": {"$ne": my_id}},
+                {"fb_id": {"$nin": exclusion_ids}},
                 {"locality": {"$eq": locality}}
             ]}))
 

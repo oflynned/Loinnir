@@ -63,7 +63,16 @@ public class MessagingService extends FirebaseMessagingService {
         User sender = new User(new JSONObject(remoteMessage.getData().get("from_details")));
 
         // on message received in the foreground
-        Message message = new Message(sender, new JSONObject(notificationBody));
+        System.out.println(notificationBody);
+        JSONObject notificationData = new JSONObject(notificationBody);
+        String _id = notificationData.getString("_id");
+        notificationData.remove("_id");
+
+        JSONObject idObj = new JSONObject();
+        idObj.put("$oid", _id);
+        notificationData.put("_id", idObj);
+
+        Message message = new Message(sender, notificationData);
 
         // for updating UI or creating notifications on receiving a message
         String newMessageIntent = BroadcastFilters.new_partner_message.toString();
