@@ -20,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterManager;
@@ -54,9 +55,12 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
     private ClusterManager<MapCircle> clusterManager;
     private ArrayList<MapCircle> userCircles = new ArrayList<>();
 
+    private int GREEN_500;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
     }
 
     @Override
@@ -130,10 +134,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                             }
                         }
 
-                        for (MapCircle circle : userCircles)
-                            if (!circle.isMe())
-                                clusterManager.addItem(circle);
-
+                        for(MapCircle circle : userCircles)
+                            googleMap.addCircle(getUserCircle(circle.getPosition()));
                     }
 
                     @Override
@@ -155,11 +157,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                         try {
                             final User me = new User(response);
                             userCircles.add(new MapCircle(me, true));
-
-                            for (MapCircle circle : userCircles)
-                                if (circle.isMe())
-                                    clusterManager.addItem(circle);
-
+                            googleMap.addCircle(getUserCircle(me.getLocation()));
                             zoomToLocation(me.getLocation());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -187,6 +185,23 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                         LocationService.MY_LOCATION_ZOOM));
             }
         }, 1000);
+    }
+
+    private CircleOptions getUserCircle(LatLng position) {
+        return new CircleOptions()
+                .center(position)
+                .radius(LocationService.USER_LOCATION_RADIUS)
+                .strokeColor(GREEN_500)
+                .fillColor(getFillColour());
+    }
+
+    private int getFillColour() {
+        int r = (GREEN_500) & 0xFF;
+        int g = (GREEN_500 >> 8) & 0xFF;
+        int b = (GREEN_500 >> 16) & 0xFF;
+        int a = 128;
+
+        return Color.argb(a, r, g, b);
     }
 
     private void registerBroadcastReceiver() {

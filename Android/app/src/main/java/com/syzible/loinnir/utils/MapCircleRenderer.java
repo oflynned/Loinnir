@@ -43,10 +43,6 @@ public class MapCircleRenderer extends DefaultClusterRenderer<MapCircle> {
                 .radius(LocationService.USER_LOCATION_RADIUS)
                 .strokeColor(GREEN_500)
                 .fillColor(getFillColour());
-
-
-
-
     }
 
     private int getFillColour() {
