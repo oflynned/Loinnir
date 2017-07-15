@@ -31,6 +31,8 @@ def get_fake_users():
 @services_endpoint.route("/create-fake-users", methods=["GET"])
 def create_fake_users():
     for user in FakeDatasets.generate_fake_users(1):
+        user["partners"] = []
+        user["blocked"] = []
         mongo.db.users.insert(user)
 
     return Helper.get_json({"success": True})
@@ -39,6 +41,8 @@ def create_fake_users():
 @services_endpoint.route("/create-all-counties-fake-users", methods=["GET"])
 def create_all_counties_fake_users():
     for user in FakeDatasets.generate_all_counties_fake_users():
+        user["partners"] = []
+        user["blocked"] = []
         mongo.db.users.insert(user)
 
     return Helper.get_json({"success": True})

@@ -194,7 +194,23 @@ def get_matched_user_count():
 @user_endpoint.route('/delete', methods=["DELETE"])
 def delete_user():
     fb_id = str(request.json["fb_id"])
+
+    # delete the user
     mongo.db.users.remove({"fb_id": fb_id})
+
+    # delete all chats the user was a partner of
+    mongo.db.partner_conversations.remove({"$or": [{"to_id": fb_id}, {"from_id": fb_id}]})
+
+    # delete all messages from the user in locality chats
+    mongo.db.locality_conversations.remove({"fb_id": fb_id})
+
+    # unsubscribe the user from anyone they were matched with and remove from the blocked list
+    query = {"$or": [{"partners": {"$in": [fb_id]}}, {"blocked": {"$in": [fb_id]}}]}
+    users_with_relationship = list(mongo.db.users.find(query))
+    for user in users_with_relationship:
+        mongo.db.users.update({"fb_id": user["fb_id"]}, {"$pull": {"partners": fb_id}})
+        mongo.db.users.update({"fb_id": user["fb_id"]}, {"$pull": {"blocked": fb_id}})
+
     return Helper.get_json({"success": True})
 
 
