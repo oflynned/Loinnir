@@ -39,6 +39,7 @@ dependencies {
     compile 'com.github.stfalcon:chatkit:0.2.1'
     compile 'com.github.medyo:fancybuttons:1.8.3'
     compile 'com.google.android.gms:play-services-maps:10.2.6'
+    compile 'com.google.maps.android:android-maps-utils:0.5+'
     compile 'com.google.android.gms:play-services-location:10.2.6'
     compile 'com.kishan.askpermission:askpermission:1.0.3'
     compile 'com.android.support:support-v4:25.3.1'

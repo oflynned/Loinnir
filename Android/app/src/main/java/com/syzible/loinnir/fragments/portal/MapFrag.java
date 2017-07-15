@@ -1,61 +1,45 @@
 package com.syzible.loinnir.fragments.portal;
 
-import android.Manifest;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.content.pm.PackageManager;
-import android.graphics.Camera;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.network.Endpoints;
 import com.syzible.loinnir.network.RestClient;
+import com.syzible.loinnir.objects.MapCircle;
 import com.syzible.loinnir.objects.User;
 import com.syzible.loinnir.services.LocationService;
 import com.syzible.loinnir.utils.Constants;
 import com.syzible.loinnir.utils.JSONUtils;
 import com.syzible.loinnir.utils.LocalStorage;
+import com.syzible.loinnir.utils.MapCircleRenderer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -65,13 +49,14 @@ import cz.msebera.android.httpclient.Header;
 
 public class MapFrag extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
-    private int GREEN_500;
-    private BroadcastReceiver receiver;
+    private BroadcastReceiver locationUpdateReceiver;
+
+    private ClusterManager<MapCircle> clusterManager;
+    private ArrayList<MapCircle> userCircles = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GREEN_500 = ContextCompat.getColor(getActivity(), R.color.green500);
     }
 
     @Override
@@ -86,7 +71,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onPause() {
-        getActivity().unregisterReceiver(receiver);
+        getActivity().unregisterReceiver(locationUpdateReceiver);
         super.onPause();
     }
 
@@ -116,6 +101,10 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
+        clusterManager = new ClusterManager<>(getActivity(), this.googleMap);
+        clusterManager.setRenderer(new MapCircleRenderer(getActivity(), this.googleMap, clusterManager));
+        this.googleMap.setOnCameraIdleListener(clusterManager);
+
         if (Constants.DEV_MODE)
             this.googleMap.getUiSettings().setZoomControlsEnabled(true);
 
@@ -126,6 +115,7 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
 
     private void getWebServerLocation() {
         googleMap.clear();
+        userCircles.clear();
 
         RestClient.post(getActivity(), Endpoints.GET_OTHER_USERS, JSONUtils.getIdPayload(getActivity().getBaseContext()),
                 new BaseJsonHttpResponseHandler<JSONArray>() {
@@ -134,11 +124,15 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                         for (int i = 0; i < response.length(); i++) {
                             try {
                                 User user = new User(response.getJSONObject(i));
-                                addUserCircle(new LatLng(user.getLatitude(), user.getLongitude()), false);
+                                userCircles.add(new MapCircle(user, false));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
+
+                        for (MapCircle circle : userCircles)
+                            if (!circle.isMe())
+                                clusterManager.addItem(circle);
 
                     }
 
@@ -159,11 +153,14 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONObject response) {
                         try {
-                            User me = new User(response);
-                            LatLng location = new LatLng(me.getLatitude(), me.getLongitude());
-                            addUserCircle(location, true);
-                            googleMap.animateCamera(CameraUpdateFactory
-                                    .newLatLngZoom(location, LocationService.MY_LOCATION_ZOOM));
+                            final User me = new User(response);
+                            userCircles.add(new MapCircle(me, true));
+
+                            for (MapCircle circle : userCircles)
+                                if (circle.isMe())
+                                    clusterManager.addItem(circle);
+
+                            zoomToLocation(me.getLocation());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -182,36 +179,25 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
                 });
     }
 
-    private int getFillColour() {
-        int r = (GREEN_500) & 0xFF;
-        int g = (GREEN_500 >> 8) & 0xFF;
-        int b = (GREEN_500 >> 16) & 0xFF;
-        int a = 128;
-
-        return Color.argb(a, r, g, b);
-    }
-
-    private void addUserCircle(final LatLng latLng, boolean isMe) {
-        googleMap.addCircle(new CircleOptions()
-                .center(latLng)
-                .radius(LocationService.USER_LOCATION_RADIUS)
-                .strokeColor(GREEN_500)
-                .fillColor(getFillColour()));
-
-        if (isMe) {
-            // delay zooming in from overall map to the user's position so it looks better
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                            latLng, LocationService.MY_LOCATION_ZOOM));
-                }
-            }, 1000);
-        }
+    private void zoomToLocation(final LatLng location) {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        location, LocationService.INITIAL_LOCATION_ZOOM));
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                location, LocationService.MY_LOCATION_ZOOM));
+                    }
+                }, 1000);
+            }
+        }, 1000);
     }
 
     private void registerBroadcastReceiver() {
-        receiver = new BroadcastReceiver() {
+        locationUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.syzible.loinnir.updated_location")) {
@@ -220,6 +206,6 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
             }
         };
 
-        getActivity().registerReceiver(receiver, new IntentFilter("com.syzible.loinnir.updated_location"));
+        getActivity().registerReceiver(locationUpdateReceiver, new IntentFilter("com.syzible.loinnir.updated_location"));
     }
 }

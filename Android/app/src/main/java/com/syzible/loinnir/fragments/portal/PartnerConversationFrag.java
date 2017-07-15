@@ -129,10 +129,8 @@ public class PartnerConversationFrag extends Fragment {
     }
 
     private void setupAdapter(View view) {
-        MessageHolders holdersConfig = new MessageHolders();
-        holdersConfig.setIncomingTextConfig(IncomingMessage.class, R.layout.chat_message_layout);
 
-        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), holdersConfig, loadImage());
+        adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
         adapter.setOnMessageViewLongClickListener(new MessagesListAdapter.OnMessageViewLongClickListener<Message>() {
             @Override
             public void onMessageViewLongClick(View view, final Message message) {

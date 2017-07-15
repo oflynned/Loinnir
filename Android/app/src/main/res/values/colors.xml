@@ -19,5 +19,6 @@
 
     <color name="green300">#81C784</color>
     <color name="green500">#4CAF50</color>
+    <color name="green500_50alpha">#804CAF50</color>
     <color name="green700">#388E3C</color>
 </resources>

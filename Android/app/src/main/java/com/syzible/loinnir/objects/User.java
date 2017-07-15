@@ -1,6 +1,7 @@
 package com.syzible.loinnir.objects;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 import com.stfalcon.chatkit.commons.models.IUser;
 import com.syzible.loinnir.utils.Constants;
 import com.syzible.loinnir.utils.EncodingUtils;

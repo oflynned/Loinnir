@@ -24,7 +24,6 @@ public class Endpoints {
 
     public static final String GET_USER = "/users/get";
     public static final String GET_OTHER_USERS = "/users/get-others";
-    public static final String GET_NEARBY_USERS = "/users/get-nearby";
     public static final String GET_RANDOM_USER = "/users/get-random";
 
     public static final String GET_MATCHED_COUNT = "/users/get-matched-count";
@@ -40,7 +39,6 @@ public class Endpoints {
     public static final String SEND_LOCALITY_MESSAGE = "/messages/send-locality-message";
     public static final String GET_PAST_CONVERSATION_PREVIEWS = "/messages/get-past-conversation-previews";
     public static final String MARK_PARTNER_MESSAGES_SEEN = "/messages/mark-seen";
-    public static final String GET_PARTNER_UNSEEN_MESSAGE_COUNT = "/messages/get-partner-unseen-count";
 
     public static final String SUBSCRIBE_TO_PARTNER = "/messages/subscribe-partner";
 
