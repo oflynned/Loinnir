@@ -183,15 +183,8 @@ public class MapFrag extends Fragment implements OnMapReadyCallback {
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                        location, LocationService.INITIAL_LOCATION_ZOOM));
-                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                location, LocationService.MY_LOCATION_ZOOM));
-                    }
-                }, 1000);
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location,
+                        LocationService.MY_LOCATION_ZOOM));
             }
         }, 1000);
     }
