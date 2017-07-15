@@ -1,6 +1,6 @@
 import sys
 import json
-from random import uniform, randint
+from random import uniform, randint, shuffle
 
 from app.helpers.geo import Geo
 
@@ -77,6 +77,7 @@ class FakeDatasets:
         for i in range(26):
             forename = forenames[randint(0, len(forenames) - 1)]
             surname = surnames[randint(0, len(surnames) - 1)]
+            shuffle(localities)
 
             was_county_added = False
 
