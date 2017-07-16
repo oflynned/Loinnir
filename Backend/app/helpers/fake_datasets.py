@@ -54,7 +54,9 @@ class FakeDatasets:
                 "lng": new_lng_location,
                 "locality": new_locality["town"],
                 "county": new_locality["county"],
-                "profile_pic": profile_pic
+                "profile_pic": profile_pic,
+                "blocked": [],
+                "partners": []
             })
 
         return users
@@ -74,7 +76,7 @@ class FakeDatasets:
         with open("app/datasets/groomed_populated_areas_localised.json", "r") as f:
             localities = list(json.loads(f.read()))
 
-        for i in range(26):
+        for i in range(32):
             forename = forenames[randint(0, len(forenames) - 1)]
             surname = surnames[randint(0, len(surnames) - 1)]
             shuffle(localities)
@@ -106,7 +108,9 @@ class FakeDatasets:
                         "lng": locality_lng,
                         "locality": town,
                         "county": county,
-                        "profile_pic": profile_pic
+                        "profile_pic": profile_pic,
+                        "blocked": [],
+                        "partners": []
                     })
 
                     counties_added.append(county)
