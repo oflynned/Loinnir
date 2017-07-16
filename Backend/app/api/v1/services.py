@@ -55,6 +55,68 @@ def get_all_counties_fake_users():
 
 class Services:
     @staticmethod
+    def groom_ni_towns():
+        with open("app/datasets/ni_towns.txt", "r") as f:
+            data = str(f.read()).split("\n")
+
+        counties_hash = {
+            "Antrim": "Aontroim",
+            "Armagh": "Ard Mhacha",
+            "Carlow": "Ceatharlach",
+            "Cavan": "An Cabhán",
+            "Clare": "An Clár",
+            "Cork": "Corcaigh",
+            "Derry": "Doire",
+            "Donegal": "Dún na nGall",
+            "Down": "An Dún",
+            "Dublin": "Áth Cliath",
+            "Fermanagh": "Fear Manach",
+            "Galway": "Gaillimh",
+            "Kerry": "Ciarraí",
+            "Kildare": "Cill Dara",
+            "Kilkenny": "Cill Cheannaigh",
+            "Laois": "Laois",
+            "Leitrim": "Liatroim",
+            "Limerick": "Luimneach",
+            "Longford": "An Longfort",
+            "Louth": "Lú",
+            "Mayo": "Maigh Eo",
+            "Meath": "An Mhí",
+            "Monaghan": "Muineachán",
+            "Offaly": "Uíbh Fhailí",
+            "Roscommon": "Ros Comáin",
+            "Sligo": "Sligeach",
+            "Tipperary": "Tiobráid Árann",
+            "Tyrone": "Tír Eoghain",
+            "Waterford": "Port Láirge",
+            "Westmeath": "An Iarmhí",
+            "Wexford": "Loch Garman",
+            "Wicklow": "Cill Mhantáin"
+        }
+
+        output = []
+
+        for item in data:
+            dataset = item.split("/")
+            output.append({
+                "town": dataset[2],
+                "lat": float(dataset[3]),
+                "lng": float(dataset[4]),
+                "county": counties_hash[dataset[0]]
+            })
+
+        with open('output.json', 'w') as f:
+            f.write(json.dumps(output))
+
+    @staticmethod
+    def bisort_alphabetically():
+        data = Datasets.open_json_file("groomed_populated_areas_localised")
+        sorted_data = sorted(data, key=lambda k: (str(k["county"]), str(k["town"])))
+
+        with open("app/datasets/groomed_populated_areas_localised.json", "w") as f:
+            f.write(json.dumps(sorted_data))
+
+    @staticmethod
     def groom_counties():
         data = Datasets.open_json_file("groomed_populated_areas_localised")
         counties = []
