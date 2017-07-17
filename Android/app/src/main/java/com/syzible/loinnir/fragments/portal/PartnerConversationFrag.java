@@ -129,7 +129,6 @@ public class PartnerConversationFrag extends Fragment {
     }
 
     private void setupAdapter(View view) {
-
         adapter = new MessagesListAdapter<>(LocalStorage.getID(getActivity()), loadImage());
         adapter.setOnMessageViewLongClickListener(new MessagesListAdapter.OnMessageViewLongClickListener<Message>() {
             @Override
@@ -148,49 +147,51 @@ public class PartnerConversationFrag extends Fragment {
         adapter.setLoadMoreListener(new MessagesListAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                JSONObject payload = new JSONObject();
-                try {
-                    payload.put("my_id", LocalStorage.getID(getActivity()));
-                    payload.put("partner_id", partner.getId());
-                    payload.put("oldest_message_id", messages.get(messages.size() - 1).getId());
-                    payload.put("last_known_count", totalItemsCount - 1);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                if (messages.size() > 0) {
+                    JSONObject payload = new JSONObject();
+                    try {
+                        payload.put("my_id", LocalStorage.getID(getActivity()));
+                        payload.put("partner_id", partner.getId());
+                        payload.put("oldest_message_id", messages.get(messages.size() - 1).getId());
+                        payload.put("last_known_count", totalItemsCount - 1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-                System.out.println(payload);
+                    System.out.println(payload);
 
-                RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES_PAGINATION, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
-                        if (response.length() > 0) {
-                            ArrayList<Message> paginatedMessages = new ArrayList<>();
-                            for (int i = response.length() - 1; i >= 0; i--) {
-                                try {
-                                    JSONObject o = response.getJSONObject(i);
-                                    User sender = new User(o.getJSONObject("user"));
-                                    Message message = new Message(sender, o.getJSONObject("message"));
-                                    paginatedMessages.add(message);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                    RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES_PAGINATION, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, JSONArray response) {
+                            if (response.length() > 0) {
+                                ArrayList<Message> paginatedMessages = new ArrayList<>();
+                                for (int i = response.length() - 1; i >= 0; i--) {
+                                    try {
+                                        JSONObject o = response.getJSONObject(i);
+                                        User sender = new User(o.getJSONObject("user"));
+                                        Message message = new Message(sender, o.getJSONObject("message"));
+                                        paginatedMessages.add(message);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
+
+                                adapter.addToEnd(paginatedMessages, false);
                             }
-
-                            adapter.addToEnd(paginatedMessages, false);
                         }
-                    }
 
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, JSONArray errorResponse) {
 
-                    }
+                        }
 
-                    @Override
-                    protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
-                        System.out.println(rawJsonData);
-                        return new JSONArray(rawJsonData);
-                    }
-                });
+                        @Override
+                        protected JSONArray parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                            System.out.println(rawJsonData);
+                            return new JSONArray(rawJsonData);
+                        }
+                    });
+                }
             }
         });
 

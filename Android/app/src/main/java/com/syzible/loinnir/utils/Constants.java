@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
  */
 
 public class Constants {
-    public static final boolean DEV_MODE = true;
+    public static final boolean DEV_MODE = false;
 
     public static String getCountyFileName(String county) {
         return county.toLowerCase().replace(" ", "_")
