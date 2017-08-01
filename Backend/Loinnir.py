@@ -16,11 +16,3 @@ if __name__ == '__main__':
 
     else:
         app.run(host='0.0.0.0', port=3000)
-
-# TODO
-"""
-    fcm
-    unread/read messages
-    pagination
-    auto generate password to protect public api by tokens
-"""

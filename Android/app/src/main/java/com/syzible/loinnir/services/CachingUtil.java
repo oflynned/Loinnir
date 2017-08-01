@@ -19,6 +19,9 @@ public class CachingUtil {
         checkDirectoryExists(context);
         File[] files = new File(getDirectoryPath(context)).listFiles();
 
+        if(files == null)
+            return false;
+
         if (files.length == 0)
             return false;
 
