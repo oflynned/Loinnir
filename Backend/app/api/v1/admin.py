@@ -2,6 +2,8 @@ import json
 
 from flask import Blueprint, request
 
+from app.helpers.helper import Helper
+
 admin_endpoint = Blueprint("admin", __name__)
 
 
@@ -22,3 +24,5 @@ def set_maintenance_mode():
     data["maintenance_mode"] = received["maintenance_mode"]
     with open("../../datasets/admin.json", "w") as f:
         json.dump(data, f)
+
+    return Helper.get_json({"success": True})

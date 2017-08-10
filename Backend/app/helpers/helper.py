@@ -8,6 +8,10 @@ from flask import Response
 
 class Helper:
     @staticmethod
+    def is_prod_environ():
+        return "MONGO_USERNAME" in os.environ and "MONGO_PASSWORD" in os.environ
+
+    @staticmethod
     def get_current_time_in_millis():
         return int(round(time.time() * 1000))
 
@@ -19,12 +23,9 @@ class Helper:
         )
 
     @staticmethod
-    def get_path(mode):
-        if mode == "prod":
-            return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'loinnir_auth.json'))
-        else:
-            return os.path.abspath(
-                os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'loinnir_auth.json'))
+    def get_path():
+        return os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'loinnir_auth.json'))
 
     @staticmethod
     def get_decoded_name(encoded_name):

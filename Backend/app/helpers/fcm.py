@@ -42,7 +42,7 @@ class FCM:
         # if user gets a block enforced in a chat the messages shouldn't get delivered or notified
         blocked_users = User.get_user(partner_id)["blocked"]
         if my_id not in blocked_users:
-            key = Datasets.get_fcm_api_key(mode)
+            key = Datasets.get_fcm_api_key()
             push_service = FCMNotification(api_key=key)
             # notify a screen refresh and polling for new messages
             # remember that FCM id of 0 is for bots

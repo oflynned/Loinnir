@@ -106,6 +106,7 @@ public class PartnerConversationFrag extends Fragment {
         actionBar.setTitle(partner.getName());
         actionBar.setSubtitle(formatSubtitle());
 
+        /*
         final int actionBarId = getResources().getIdentifier("action_bar_title", "id", "android");
         view.findViewById(actionBarId).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,7 +117,7 @@ public class PartnerConversationFrag extends Fragment {
                         .setBitmap(cachedImage);
                 MainActivity.setFragmentBackstack(getFragmentManager(), profileFrag);
             }
-        });
+        });*/
 
         return view;
     }

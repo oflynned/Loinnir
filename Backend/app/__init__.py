@@ -9,8 +9,8 @@ from app.api.v1.messages import messages_endpoint
 from app.api.v1.users import user_endpoint
 from app.api.v1.debug import debug_endpoint
 
-frontend_dir = os.path.abspath("../Frontend/")
-static_dir = os.path.abspath("../Frontend/static/")
+frontend_dir = os.path.abspath("templates/")
+static_dir = os.path.abspath("static/")
 
 app = Flask(__name__, template_folder=frontend_dir, static_folder=static_dir)
 app.debug = True
