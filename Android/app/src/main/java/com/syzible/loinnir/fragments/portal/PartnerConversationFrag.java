@@ -8,11 +8,13 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.loopj.android.http.BaseJsonHttpResponseHandler;
 import com.stfalcon.chatkit.commons.ImageLoader;
@@ -52,10 +54,6 @@ import cz.msebera.android.httpclient.Header;
  */
 
 public class PartnerConversationFrag extends Fragment {
-
-    private Date lastLoadedDate;
-    private int loadedCount;
-
     private User partner;
     private View view;
 
@@ -104,8 +102,21 @@ public class PartnerConversationFrag extends Fragment {
         view = inflater.inflate(R.layout.conversation_frag, container, false);
         setupAdapter(view);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(partner.getName());
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(formatSubtitle());
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        actionBar.setTitle(partner.getName());
+        actionBar.setSubtitle(formatSubtitle());
+
+        final int actionBarId = getResources().getIdentifier("action_bar_title", "id", "android");
+        view.findViewById(actionBarId).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap cachedImage = CachingUtil.getCachedImage(getActivity(), partner.getId());
+                ProfileFrag profileFrag = new ProfileFrag()
+                        .setPartner(partner)
+                        .setBitmap(cachedImage);
+                MainActivity.setFragmentBackstack(getFragmentManager(), profileFrag);
+            }
+        });
 
         return view;
     }
@@ -157,8 +168,6 @@ public class PartnerConversationFrag extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-                    System.out.println(payload);
 
                     RestClient.post(getActivity(), Endpoints.GET_PARTNER_MESSAGES_PAGINATION, payload, new BaseJsonHttpResponseHandler<JSONArray>() {
                         @Override

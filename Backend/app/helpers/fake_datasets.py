@@ -1,6 +1,8 @@
 import sys
 import json
+import requests
 from random import uniform, randint, shuffle
+
 
 from app.helpers.geo import Geo
 
@@ -11,14 +13,10 @@ class FakeDatasets:
         users = []
 
         for i in range(quantity):
-            # generate a name set
-            with open("app/datasets/forenames.json", "r") as f:
-                forenames = list(json.loads(f.read()))
-                forename = forenames[randint(0, len(forenames) - 1)]
-
-            with open("app/datasets/surnames.json", "r") as f:
-                surnames = list(json.loads(f.read()))
-                surname = surnames[randint(0, len(surnames) - 1)]
+            r = requests.get("https://randomuser.me/api/").json()["results"][0]
+            gender = "male" if r["name"]["title"] == "mr" else "female"
+            forename = FakeDatasets.capitalise(r["name"]["first"])
+            surname = FakeDatasets.capitalise(r["name"]["last"])
 
             with open("app/datasets/groomed_populated_areas_localised.json", "r") as f:
                 localities = list(json.loads(f.read()))
@@ -38,8 +36,7 @@ class FakeDatasets:
                 new_lng_location = Geo.add_dist_to_lat(displacement_lng, locality_lng)
                 new_locality = Geo.get_locality(new_lat_location, new_lng_location)
 
-            profile_pic = "http://c1.thejournal.ie/media/2015/10/1916-easter-rising-commemoration-2-390x285.jpg"
-            gender = "male" if randint(0, 1) == 0 else "female"
+            profile_pic = r["picture"]["large"]
             fb_id = str(randint(0, sys.maxsize - 1))
             show_location = True
 
@@ -60,6 +57,10 @@ class FakeDatasets:
             })
 
         return users
+
+    @staticmethod
+    def capitalise(item):
+        return item[:1].upper() + item[1:]
 
     @staticmethod
     def generate_all_counties_fake_users():

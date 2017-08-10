@@ -32,10 +32,10 @@ class Geo:
                     nearest_town = town["town"]
                     county = town["county"]
 
-            return {"town": nearest_town, "flag": county}
+            return {"town": nearest_town, "county": county}
 
         else:
-            return {"town": "abroad", "flag": "abroad"}
+            return {"town": "abroad", "county": "abroad"}
 
     @staticmethod
     def _get_country_name():

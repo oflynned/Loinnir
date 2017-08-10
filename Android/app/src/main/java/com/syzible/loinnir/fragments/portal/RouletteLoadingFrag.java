@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.syzible.loinnir.R;
 import com.syzible.loinnir.activities.MainActivity;
@@ -45,6 +46,8 @@ public class RouletteLoadingFrag extends Fragment {
                         .setPartner(partner)
                         .setBitmap(response);
 
+                System.out.println("Success");
+
                 // show loading screen for at least one second
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
@@ -57,7 +60,7 @@ public class RouletteLoadingFrag extends Fragment {
 
             @Override
             public void onFailure() {
-
+                System.out.println("Failure");
             }
         }, partner.getAvatar(), true).execute();
 

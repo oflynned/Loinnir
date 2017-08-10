@@ -48,9 +48,9 @@ def create_user():
 
     if User.does_user_exist(data["fb_id"]):
         return Helper.get_json({"success": False, "reason": "User already exists"})
-    else:
-        users_col.insert(data)
-        return Helper.get_json({"success": True})
+
+    users_col.insert(data)
+    return Helper.get_json({"success": True})
 
 
 # POST { fb_id: <string>, *params: <value> }
@@ -78,8 +78,8 @@ def get_user():
 
     if user is not None:
         return Helper.get_json(user)
-    else:
-        return Helper.get_json({"success": False, "reason": "User doesn't exist"})
+
+    return Helper.get_json({"success": False, "reason": "User doesn't exist"})
 
 
 # POST { fb_id: <string> }
