@@ -1,7 +1,6 @@
 import sys
 
 from app import app
-from app.api.v1.services import Services
 
 mode = "dev"
 
