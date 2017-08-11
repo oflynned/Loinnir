@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import requests
@@ -68,18 +69,16 @@ class FakeDatasets:
         counties_added = []
         place_index = 0
 
-        with open("app/datasets/forenames.json", "r") as f:
-            forenames = list(json.loads(f.read()))
-
-        with open("app/datasets/surnames.json", "r") as f:
-            surnames = list(json.loads(f.read()))
+        r = requests.get("https://randomuser.me/api/").json()["results"][0]
+        gender = "male" if r["name"]["title"] == "mr" else "female"
+        forename = FakeDatasets.capitalise(r["name"]["first"])
+        surname = FakeDatasets.capitalise(r["name"]["last"])
+        profile_pic = r["picture"]["large"]
 
         with open("app/datasets/groomed_populated_areas_localised.json", "r") as f:
             localities = list(json.loads(f.read()))
 
         for i in range(32):
-            forename = forenames[randint(0, len(forenames) - 1)]
-            surname = surnames[randint(0, len(surnames) - 1)]
             shuffle(localities)
 
             was_county_added = False
@@ -93,8 +92,6 @@ class FakeDatasets:
                     locality_lng = locality["lng"]
                     town = locality["town"]
 
-                    profile_pic = "http://c1.thejournal.ie/media/2015/10/1916-easter-rising-commemoration-2-390x285.jpg"
-                    gender = "male" if randint(0, 1) == 0 else "female"
                     fb_id = str(randint(0, sys.maxsize - 1))
                     show_location = True
 
