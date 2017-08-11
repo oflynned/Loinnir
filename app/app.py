@@ -14,7 +14,6 @@ if "MONGO_USERNAME" in os.environ and "MONGO_PASSWORD" in os.environ:
     app.config["MONGO_URI"] = "mongodb://{username}:{password}:27017/loinnir".format(username=username, password=password)
 else:
     app.config["MONGO_URI"] = "mongodb://localhost:27017/loinnir"
-
-app.debug = True
+    app.debug = True
 
 mongo = PyMongo(app)
