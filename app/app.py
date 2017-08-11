@@ -13,6 +13,9 @@ if "MONGO_USERNAME" in os.environ:
     app.config["MONGO_PASSWORD"] = os.environ["MONGO_PASSWORD"]
     app.config["MONGO_HOST"] = os.environ["MONGO_URL"]
     app.config["MONGO_PORT"] = os.environ["MONGO_PORT"]
+    app.config["MONGO_DBNAME"] = "loinnir"
+
+    print(app.config)
 
 else:
     app.config["MONGO_URI"] = "mongodb://localhost:27017/loinnir"
