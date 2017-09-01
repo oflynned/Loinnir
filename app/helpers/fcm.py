@@ -9,7 +9,7 @@ from app.helpers.datasets import Datasets
 
 class FCM:
     @staticmethod
-    def notify_partner_chat_update(my_id, partner_id, mode):
+    def notify_partner_chat_update(my_id, partner_id):
         me = dict(User.get_user(my_id))
         partner = dict(User.get_user(partner_id))
 
@@ -44,6 +44,7 @@ class FCM:
         if my_id not in blocked_users:
             key = Datasets.get_fcm_api_key()
             push_service = FCMNotification(api_key=key)
+
             # notify a screen refresh and polling for new messages
             # remember that FCM id of 0 is for bots
             if partner_id != 0:
@@ -51,10 +52,10 @@ class FCM:
 
             return Helper.get_json({"success": True})
 
-        return Helper.get_json({"success": False, "reason": "partner has enforced a block on you"})
+        return Helper.get_json({"success": False, "reason": "partner_enforced_block"})
 
     @staticmethod
-    def notify_locality_chat_update(my_id, mode):
+    def notify_locality_chat_update(my_id):
         me = User.get_user(my_id)
         me.pop("_id")
 
@@ -82,10 +83,10 @@ class FCM:
             }
 
             # perhaps should not notify users on a new locality message @ spam
-            key = Datasets.get_fcm_api_key(mode)
+            key = Datasets.get_fcm_api_key()
             push_service = FCMNotification(api_key=key)
             push_service.notify_multiple_devices(registration_ids=ids, data_message=data_content)
 
             return Helper.get_json({"success": True})
-        else:
-            return Helper.get_json({"success": False, "reason": "no users in locality right now"})
+
+        return Helper.get_json({"success": False, "reason": "no_users_in_locality"})

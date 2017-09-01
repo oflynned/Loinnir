@@ -7,21 +7,11 @@ from app.helpers.helper import Helper
 class Datasets:
     @staticmethod
     def get_fcm_api_key():
-        if Helper.is_prod_environ():
-            return os.environ["FCM_API_KEY"]
-
-        with open(Helper.get_path(), "r") as f:
-            data = json.loads(f.read())
-            return data["fcm_api_key"]
+        return os.environ["FCM_API_KEY"]
 
     @staticmethod
     def get_places_api_key():
-        if Helper.is_prod_environ():
-            return os.environ["PLACES_API_KEY"]
-
-        with open(Helper.get_path(), "r") as f:
-            data = json.loads(f.read())
-            return data["places_api_key"]
+        return os.environ["PLACES_API_KEY"]
 
     @staticmethod
     def open_json_file(file_name):

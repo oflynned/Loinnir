@@ -5,7 +5,6 @@ from app.api.v1.users import User
 from app.app import mongo
 from app.helpers.fcm import FCM
 from app.helpers.helper import Helper
-from utils.Loinnir import mode
 
 messages_endpoint = Blueprint("messages", __name__)
 
@@ -25,7 +24,7 @@ def send_partner_message():
     }
 
     mongo.db.partner_conversations.insert(message)
-    FCM.notify_partner_chat_update(data["from_id"], data["to_id"], mode)
+    FCM.notify_partner_chat_update(data["from_id"], data["to_id"])
 
     return Helper.get_json({"success": True})
 
@@ -50,7 +49,7 @@ def send_locality_message():
     }
 
     mongo.db.locality_conversations.insert(message)
-    FCM.notify_locality_chat_update(fb_id, mode)
+    FCM.notify_locality_chat_update(fb_id)
 
     return Helper.get_json({"success": True})
 
