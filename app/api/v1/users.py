@@ -83,6 +83,18 @@ def get_user():
 
 
 # POST { fb_id: <string> }
+# RETURN [ { ... }, { ... }, ... ]
+@user_endpoint.route('get-all', methods=["POST"])
+def get_all_users():
+    data = request.json
+    fb_id = str(data["fb_id"])
+    if User.does_user_exist(fb_id):
+        return Helper.get_json(mongo.db.users.find())
+
+    return Helper.get_json({"success": False})
+
+
+# POST { fb_id: <string> }
 # RETURN [ <user>, ... ]
 @user_endpoint.route('/get-others', methods=["POST"])
 def get_other_users():
