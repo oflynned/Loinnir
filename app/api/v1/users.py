@@ -84,7 +84,7 @@ def get_user():
 
 # POST { fb_id: <string> }
 # RETURN [ { ... }, { ... }, ... ]
-@user_endpoint.route('get-all', methods=["POST"])
+@user_endpoint.route('/get-all', methods=["POST"])
 def get_all_users():
     data = request.json
     fb_id = str(data["fb_id"])
