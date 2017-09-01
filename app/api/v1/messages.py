@@ -293,7 +293,7 @@ def get_conversations_previews():
             {"count": len(unread_messages), "message": last_message_in_chat, "user": User.get_user(partner)})
 
     # sort list by last sent time of the message fragments
-    sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=True)
+    sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=False)
 
     return Helper.get_json(sorted_list)
 
