@@ -21,7 +21,7 @@ app.register_blueprint(user_endpoint, url_prefix="/api/v1/users")
 app.register_blueprint(messages_endpoint, url_prefix="/api/v1/messages")
 app.register_blueprint(services_endpoint, url_prefix="/api/v1/services")
 
-if "MONGO_USERNAME" in os.environ:
+if "MONGO_URL" in os.environ:
     MONGO_HOST = str(os.environ["MONGO_URL"])
     MONGO_PORT = int(os.environ["MONGO_PORT"])
     MONGO_USERNAME = str(os.environ["MONGO_USERNAME"])

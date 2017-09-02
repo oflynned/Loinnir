@@ -35,11 +35,8 @@ class Geo:
             return {"town": nearest_town, "county": county}
 
         else:
+            #  TODO get country from lat lng via google apis
             return {"town": "abroad", "county": "abroad"}
-
-    @staticmethod
-    def _get_country_name():
-        pass
 
     @staticmethod
     def _is_abroad(lat, lng):
@@ -48,9 +45,12 @@ class Geo:
         # BL 51.256233, -11.052482
         # BR 51.256233, -5.386214
 
-        is_outside_lat = (lat < 51.256233) or (lat > 55.562678)
+        is_outside_lat = (lat < 51.256233) or (lat > 55.449334)
         is_outside_lng = (lng < -11.052482) or (lng > -5.386214)
-        return is_outside_lat and is_outside_lng
+
+        print(is_outside_lat, is_outside_lng)
+
+        return is_outside_lat or is_outside_lng
 
     @staticmethod
     def add_dist_to_lat(dist_in_km, lat):
@@ -61,7 +61,7 @@ class Geo:
         return lng + (111.320 * math.cos(dist_in_km))
 
     @staticmethod
-    def _get_country(country):
+    def _get_localised_country(country):
         countries_hash = {
 
         }

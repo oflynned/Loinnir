@@ -8,7 +8,7 @@ static_dir = os.path.abspath("../../Frontend/static/")
 
 app = Flask(__name__, template_folder=frontend_dir, static_folder=static_dir)
 
-if "MONGO_USERNAME" in os.environ:
+if "MONGO_URL" in os.environ:
     MONGO_HOST = str(os.environ["MONGO_URL"])
     MONGO_PORT = int(os.environ["MONGO_PORT"])
     MONGO_USERNAME = str(os.environ["MONGO_USERNAME"])
