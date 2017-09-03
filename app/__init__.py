@@ -5,6 +5,7 @@ from threading import Thread
 import requests
 from flask import Flask
 from flask_pymongo import PyMongo
+from dotenv import load_dotenv, find_dotenv
 
 from app.api.v1.debug import debug_endpoint
 from app.api.v1.messages import messages_endpoint
@@ -22,6 +23,8 @@ app.register_blueprint(debug_endpoint, url_prefix="/api/v1/debug")
 app.register_blueprint(user_endpoint, url_prefix="/api/v1/users")
 app.register_blueprint(messages_endpoint, url_prefix="/api/v1/messages")
 app.register_blueprint(services_endpoint, url_prefix="/api/v1/services")
+
+load_dotenv(find_dotenv())
 
 if "MONGO_URL" in os.environ:
     app.config["MONGO_HOST"] = str(os.environ["MONGO_URL"])

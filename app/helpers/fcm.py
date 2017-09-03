@@ -60,6 +60,7 @@ class FCM:
         me.pop("_id")
 
         locality = me["locality"]
+
         # remember that FCM token of 0 is for auto-generated bot profiles
         exclusion_ids = [my_id, 0]
         ids = []
