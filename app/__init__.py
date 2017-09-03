@@ -1,18 +1,16 @@
+import os
+import time
+from threading import Thread
+
+import requests
 from flask import Flask
 from flask_pymongo import PyMongo
 
-from threading import Thread
-import time
-import requests
-import os
-import schedule
-
-from app.frontend.frontend import frontend
-
-from app.api.v1.services import services_endpoint
-from app.api.v1.messages import messages_endpoint
-from app.api.v1.users import user_endpoint
 from app.api.v1.debug import debug_endpoint
+from app.api.v1.messages import messages_endpoint
+from app.api.v1.services import services_endpoint
+from app.api.v1.users import user_endpoint
+from app.frontend.frontend import frontend
 
 frontend_dir = os.path.abspath("templates/")
 static_dir = os.path.abspath("static/")
