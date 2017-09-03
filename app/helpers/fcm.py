@@ -1,17 +1,15 @@
-import json
 from flask_pyfcm import FCMNotification
 
 from app.app import mongo
-from app.api.v1.users import User
-from app.helpers.helper import Helper
 from app.helpers.datasets import Datasets
+from app.helpers.helper import Helper
 
 
 class FCM:
     @staticmethod
-    def notify_partner_chat_update(my_id, partner_id):
-        me = dict(User.get_user(my_id))
-        partner = dict(User.get_user(partner_id))
+    def notify_partner_chat_update(me, partner):
+        my_id = me["fb_id"]
+        partner_id = partner["fb_id"]
 
         me.pop("_id")
         partner.pop("_id")
@@ -29,7 +27,7 @@ class FCM:
         message_id = str(message["_id"])
         message.pop("_id")
         message["_id"] = message_id
-        
+
         data_content = {
             "notification_type": "new_partner_message",
             "message_title": message_title,
@@ -40,7 +38,7 @@ class FCM:
         }
 
         # if user gets a block enforced in a chat the messages shouldn't get delivered or notified
-        blocked_users = User.get_user(partner_id)["blocked"]
+        blocked_users = partner["blocked"]
         if my_id not in blocked_users:
             key = Datasets.get_fcm_api_key()
             push_service = FCMNotification(api_key=key)
@@ -55,14 +53,13 @@ class FCM:
         return Helper.get_json({"success": False, "reason": "partner_enforced_block"})
 
     @staticmethod
-    def notify_locality_chat_update(my_id):
-        me = User.get_user(my_id)
+    def notify_locality_chat_update(me):
         me.pop("_id")
 
         locality = me["locality"]
 
         # remember that FCM token of 0 is for auto-generated bot profiles
-        exclusion_ids = [my_id, 0]
+        exclusion_ids = [me["fb_id"], 0]
         ids = []
 
         # do we care about blocked users?
@@ -91,3 +88,19 @@ class FCM:
             return Helper.get_json({"success": True})
 
         return Helper.get_json({"success": False, "reason": "no_users_in_locality"})
+
+    @staticmethod
+    def notify_block_enacted_event(blocker, blockee):
+        blockee_fcm_token = blockee["fcm_token"]
+
+        event_content = {
+            "notification_type": "block_enacted",
+            "message_title": "block_enacted",
+            "message": {},
+            "block_enacter_id": blocker["fb_id"]
+        }
+
+        key = Datasets.get_fcm_api_key()
+        push_service = FCMNotification(api_key=key)
+        push_service.notify_single_device(registration_id=blockee_fcm_token, data_message=event_content)
+        return Helper.get_json({"success": True})

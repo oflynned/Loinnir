@@ -1,11 +1,11 @@
-import json
 from random import randint
 
 from flask import Blueprint, request
 
 from app.app import mongo
-from app.helpers.helper import Helper
 from app.helpers.geo import Geo
+from app.helpers.helper import Helper
+from app.helpers.fcm import FCM
 
 user_endpoint = Blueprint("users", __name__)
 
@@ -140,37 +140,17 @@ def get_random_user():
     data = request.json
     fb_id = str(data["fb_id"])
 
-    # first check to see that you're not the only user on the platform
-    partner_choice = list(mongo.db.users.find({"fb_id": {"$ne": fb_id}}))
-    if len(partner_choice) > 0:
-        # now check that you actually have new people to interact with
-        # exclude self and others chatted to already in partners list
-        my_profile = list(mongo.db.users.find({"fb_id": fb_id}))[0]
-        users_matched = my_profile["partners"]
-        users_blocked = my_profile["partners"]
+    # your own profile and blocked/matched users should be removed from the searches
+    me = User.get_user(fb_id)
+    partner_choice = list(mongo.db.users.find({"fb_id": {"$ne": me["fb_id"], "$nin": me["blocked"] + me["partners"]}}))
 
-        # have you interacted with someone before?
-        # if not, then you have a full range of choice, minus yourself
-        if len(users_matched) == 0:
-            random_index = randint(0, len(partner_choice) - 1)
-            return Helper.get_json(partner_choice[random_index])
-
-        # if so, then exclude them and yourself from lookup
-        else:
-            users_matched.append(fb_id)
-            users = list(mongo.db.users.find({
-                "$and": [
-                    {"fb_id": {"$nin": users_matched}},
-                    {"fb_id": {"$nin": users_blocked}}
-                ]}))
-
-            if len(users) > 1:
-                random_index = randint(0, len(users))
-                return Helper.get_json(users[random_index])
-            elif len(users) == 1:
-                return Helper.get_json(users[0])
-            else:
-                return Helper.get_json([])
+    if len(partner_choice) == 0:
+        return Helper.get_json([])
+    if len(partner_choice) == 1:
+        return Helper.get_json(partner_choice[0])
+    else:
+        random_index = randint(0, len(partner_choice))
+        return Helper.get_json(partner_choice[random_index])
 
 
 # POST { fb_id: <string> }
@@ -259,6 +239,10 @@ def block_user():
 
     # now add the partner's id to this user's blocked list
     mongo.db.users.update({"fb_id": my_id}, {"$push": {"blocked": partner_id}})
+
+    # now broadcast the block event to make everyone's phone update to the current status
+    FCM.notify_block_enacted_event(User.get_user(my_id), User.get_user(partner_id))
+
     return Helper.get_json(User.get_user(my_id))
 
 
