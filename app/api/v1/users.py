@@ -149,7 +149,7 @@ def get_random_user():
     if len(partner_choice) == 1:
         return Helper.get_json(partner_choice[0])
     else:
-        random_index = randint(0, len(partner_choice))
+        random_index = randint(0, len(partner_choice) - 1)
         return Helper.get_json(partner_choice[random_index])
 
 
