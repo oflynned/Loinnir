@@ -18,12 +18,10 @@ if "MONGO_URL" in os.environ:
     app.config["MONGO_URI"] = "mongodb://{username}:{password}@{host}:{port}/loinnir" \
         .format(username=MONGO_USERNAME, password=MONGO_PASSWORD, host=MONGO_HOST, port=MONGO_PORT)
 
-    print("using production")
+    print("using production environment")
 
 else:
     app.config["MONGO_URI"] = "mongodb://localhost:27017/loinnir"
-    app.debug = True
-
-    print("using development")
+    print("using development environment")
 
 mongo = PyMongo(app)
