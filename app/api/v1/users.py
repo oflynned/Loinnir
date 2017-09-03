@@ -265,4 +265,9 @@ def unblock_user():
 
     # now remove the partner's id from this user's blocked list
     mongo.db.users.update({"fb_id": my_id}, {"$pull": {"blocked": partner_id}})
+
+    # now rematch the users
+    mongo.db.users.update({"fb_id": my_id}, {"$push": {"partners": partner_id}})
+    mongo.db.users.update({"fb_id": partner_id}, {"$push": {"partners": my_id}})
+
     return Helper.get_json(User.get_user(my_id))
