@@ -83,6 +83,20 @@ def get_user():
 
 
 # POST { fb_id: <string> }
+@user_endpoint.route("/update-user-meta-data", methods=["POST"])
+def update_user_meta_data():
+    data = request.json
+    fb_id = data["fb_id"]
+
+    # update some meta data so we can keep track of some basic user statistics
+    mongo.db.users.update({"fb_id": fb_id}, {
+        "last_active": Helper.get_current_time_in_millis()
+    })
+
+    return Helper.get_json({"success": True})
+
+
+# POST { fb_id: <string> }
 # RETURN [ { ... }, { ... }, ... ]
 @user_endpoint.route('/get-all', methods=["POST"])
 def get_all_users():

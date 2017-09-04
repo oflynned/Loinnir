@@ -7,22 +7,17 @@ from app.helpers.helper import Helper
 admin_endpoint = Blueprint("admin", __name__)
 
 
-@admin_endpoint.route("/get-maintenance-mode", methods=["GET"])
-def maintenance_mode():
-    with open("../../datasets/admin.json", "r") as f:
-        data = json.loads(f.read())
-        return data["maintenance_mode"]
+def get_active_users_last_24_hours():
+    pass
 
 
-@admin_endpoint.route("/set-maintenance-mode", methods=["POST"])
-def set_maintenance_mode():
-    received = request.json
+def get_total_users():
+    pass
 
-    with open("../../datasets/admin.json", "r") as f:
-        data = json.loads(f.read())
 
-    data["maintenance_mode"] = received["maintenance_mode"]
-    with open("../../datasets/admin.json", "w") as f:
-        json.dump(data, f)
+def get_total_message_count():
+    pass
 
-    return Helper.get_json({"success": True})
+
+def get_all_locality_conversations():
+    pass
