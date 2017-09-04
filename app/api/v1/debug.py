@@ -16,11 +16,6 @@ def get_all_locality_conversations():
     return Helper.get_json(list(mongo.db.locality_conversations.find({})))
 
 
-@debug_endpoint.route("/get-all-conversations", methods=["GET"])
-def get_all_conversations():
-    return Helper.get_json(list(mongo.db.conversations.find({})))
-
-
 @debug_endpoint.route("/get-all-users", methods=["GET"])
 def get_all_users():
     return Helper.get_json(list(mongo.db.users.find({})))

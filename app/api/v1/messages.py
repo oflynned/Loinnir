@@ -18,7 +18,7 @@ def send_partner_message():
     message = {
         "from_id": str(data["from_id"]),
         "to_id": str(data["to_id"]),
-        "time": Helper.get_current_time_in_millis(),
+        "time": Helper.get_current_time_in_millis() if "time" not in data else data["time"],
         "message": str(data["message"]),
         "was_seen": False
     }
@@ -39,7 +39,11 @@ def send_locality_message():
     users_col = mongo.db.users
     user = users_col.find({"fb_id": fb_id})
     user = list(user)[0]
-    locality = user["locality"]
+
+    if "locality" not in data:
+        locality = user["locality"]
+    else:
+        locality = data["locality"]
 
     message = {
         "fb_id": str(data["fb_id"]),
