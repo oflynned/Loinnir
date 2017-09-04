@@ -11,6 +11,7 @@ from app.api.v1.debug import debug_endpoint
 from app.api.v1.messages import messages_endpoint
 from app.api.v1.services import services_endpoint
 from app.api.v1.users import user_endpoint
+from app.api.v1.admin import admin_endpoint
 from app.frontend.frontend import frontend
 
 frontend_dir = os.path.abspath("templates/")
@@ -23,6 +24,7 @@ app.register_blueprint(debug_endpoint, url_prefix="/api/v1/debug")
 app.register_blueprint(user_endpoint, url_prefix="/api/v1/users")
 app.register_blueprint(messages_endpoint, url_prefix="/api/v1/messages")
 app.register_blueprint(services_endpoint, url_prefix="/api/v1/services")
+app.register_blueprint(admin_endpoint, url_prefix="/api/v1/admin")
 
 load_dotenv(find_dotenv())
 

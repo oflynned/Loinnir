@@ -1,9 +1,8 @@
-import os
-import sys
 import json
-import requests
+import sys
 from random import uniform, randint, shuffle
 
+import requests
 
 from app.helpers.geo import Geo
 
