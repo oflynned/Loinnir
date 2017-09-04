@@ -1,6 +1,8 @@
 from bson.objectid import ObjectId
 from flask import Blueprint, request
 
+from urllib import parse
+
 from app.api.v1.users import User
 from app.app import mongo
 from app.helpers.fcm import FCM
@@ -36,18 +38,12 @@ def send_locality_message():
     data = request.json
 
     fb_id = str(data["fb_id"])
-    users_col = mongo.db.users
-    user = users_col.find({"fb_id": fb_id})
-    user = list(user)[0]
-
-    if "locality" not in data:
-        locality = user["locality"]
-    else:
-        locality = data["locality"]
+    user = User.get_user(fb_id)
+    locality = user["locality"] if "locality" not in data else data["locality"]
 
     message = {
         "fb_id": str(data["fb_id"]),
-        "locality": str(locality),
+        "locality": parse.unquote_plus(locality),
         "time": Helper.get_current_time_in_millis(),
         "message": str(data["message"])
     }
