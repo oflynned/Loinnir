@@ -12,14 +12,43 @@ admin_endpoint = Blueprint("admin", __name__)
 @admin_endpoint.route("/user-stats", methods=["POST"])
 def get_active_users_last_24_hours():
     if authenticate_user(request.json):
-        count_users_total = mongo.db.users.find().count()
+        total_users = list(mongo.db.users.find())
+        count_users_total = len(total_users)
         count_users_24_hours = mongo.db.users.find({"last_active": {"$gt": get_time_24_hours_ago()}}).count()
+
+        county_count = {}
+        locality_count = {}
+
+        localities = []
+        counties = []
+
+        for user in total_users:
+            locality = parse.unquote_plus(user["locality"])
+            county = parse.unquote_plus(user["county"])
+            if locality not in localities:
+                localities.append(locality)
+            if county not in counties:
+                counties.append(county)
+
+        for locality in localities:
+            locality_count[locality] = 0
+
+        for county in counties:
+            county_count[county] = 0
+
+        for user in total_users:
+            for locality in localities:
+                if parse.unquote_plus(user["locality"]) == locality:
+                    locality_count[locality] += 1
+            for county in counties:
+                if parse.unquote_plus(user["county"]) == county:
+                    county_count[county] += 1
 
         return Helper.get_json({
             "count_users_last_24_hours": count_users_24_hours,
             "count_users_total": count_users_total,
-            "count_per_county": [],
-            "count_per_locality": []
+            "count_per_county": county_count,
+            "count_per_locality": locality_count
         })
 
     return Helper.get_json({"success": False})
@@ -94,6 +123,7 @@ def get_locality_messages_last_24_hours():
         for message in messages:
             for locality in localities:
                 if parse.unquote_plus(message["locality"]) == locality:
+                    message["locality"] = locality
                     output[locality].append(message)
 
         return Helper.get_json(output)
