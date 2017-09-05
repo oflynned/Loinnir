@@ -40,3 +40,11 @@ p.block-text {
     color: white;
     text-align: justify;
 }
+
+img.badge {
+    height: 90px;
+}
+
+img.logo {
+    height: 180px;
+}
