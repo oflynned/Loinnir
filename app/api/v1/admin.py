@@ -10,7 +10,7 @@ admin_endpoint = Blueprint("admin", __name__)
 
 
 @admin_endpoint.route("/user-stats", methods=["POST"])
-def get_active_users_last_24_hours():
+def get_user_stats():
     if authenticate_user(request.json):
         total_users = list(mongo.db.users.find())
         count_users_total = len(total_users)
@@ -98,7 +98,7 @@ def get_message_stats():
                 "user_count": user_count,
                 "users_active_last_24_hours": users_active_last_24_hours,
                 "user_block_count": user_block_count,
-                "time_24_hours_ago": Helper.get_current_time_in_millis() - get_time_24_hours_ago()
+                "time_24_hours_ago": get_time_24_hours_ago()
             }
         )
 
