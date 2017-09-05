@@ -4,16 +4,23 @@ from app.app import mongo
 from app.helpers.helper import Helper
 
 import os
+from urllib import parse
 
 admin_endpoint = Blueprint("admin", __name__)
 
 
-@admin_endpoint.route("/active-users-last-24-hours", methods=["POST"])
+@admin_endpoint.route("/user-stats", methods=["POST"])
 def get_active_users_last_24_hours():
     if authenticate_user(request.json):
-        query = {"last_active": {"$gt": get_time_24_hours_ago()}}
-        count = mongo.db.users.find(query).count()
-        return Helper.get_json({"count": int(count)})
+        count_users_total = mongo.db.users.find().count()
+        count_users_24_hours = mongo.db.users.find({"last_active": {"$gt": get_time_24_hours_ago()}}).count()
+
+        return Helper.get_json({
+            "count_users_last_24_hours": count_users_24_hours,
+            "count_users_total": count_users_total,
+            "count_per_county": [],
+            "count_per_locality": []
+        })
 
     return Helper.get_json({"success": False})
 
@@ -32,30 +39,13 @@ def clear_dud_accounts():
     return Helper.get_json({"success": False})
 
 
-@admin_endpoint.route("/total-user-count", methods=["POST"])
-def get_total_user_count():
-    if authenticate_user(request.json):
-        count = mongo.db.users.find().count()
-        return Helper.get_json({"count": int(count)})
-
-    return Helper.get_json({"success": False})
-
-
-def get_users_per_locality():
-    pass
-
-
-def get_users_per_county():
-    pass
-
-
 @admin_endpoint.route("/message-stats", methods=["POST"])
 def get_message_stats():
     if authenticate_user(request.json):
         partner_message_count_24_hours = mongo.db.partner_conversations.find(
-            {"time": {"gt": get_time_24_hours_ago()}}).count()
+            {"time": {"$gt": get_time_24_hours_ago()}}).count()
         locality_message_count_24_hours = mongo.db.locality_conversations.find(
-            {"time": {"gt": get_time_24_hours_ago()}}).count()
+            {"time": {"$gt": get_time_24_hours_ago()}}).count()
         partner_message_count = mongo.db.partner_conversations.find().count()
         locality_message_count = mongo.db.locality_conversations.find().count()
 
@@ -77,29 +67,24 @@ def get_message_stats():
 @admin_endpoint.route("/locality-messages-last-24-hours", methods=["POST"])
 def get_locality_messages_last_24_hours():
     if authenticate_user(request.json):
-        messages = list(mongo.db.locality_conversations.find({"time": {"gt": get_time_24_hours_ago()}}))
+        messages = list(mongo.db.locality_conversations.find({"time": {"$gt": get_time_24_hours_ago()}}))
+        localities = []
         output = {}
 
         for message in messages:
-            pass
+            locality = parse.unquote_plus(message["locality"])
+            if locality not in localities and len(locality) > 0:
+                localities.append(locality)
+
+        for locality in localities:
+            output[locality] = []
+
+        for message in messages:
+            for locality in localities:
+                if parse.unquote_plus(message["locality"]) == locality:
+                    output[locality].append(message)
 
         return Helper.get_json(output)
-
-    return Helper.get_json({"success": False})
-
-
-@admin_endpoint.route("/total-message-count", methods=["POST"])
-def get_total_message_count():
-    if authenticate_user(request.json):
-        locality_messages_count = mongo.db.locality_conversations.find().count()
-        partner_messages_count = mongo.db.partner_conversations.find().count()
-        total_count = locality_messages_count + partner_messages_count
-
-        return Helper.get_json({
-            "locality_messages_count": locality_messages_count,
-            "partner_messages_count": partner_messages_count,
-            "total_count": total_count
-        })
 
     return Helper.get_json({"success": False})
 
