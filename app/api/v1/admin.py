@@ -1,7 +1,9 @@
 from flask import Blueprint, request
+import flask_login
 
 from app.app import mongo
 from app.helpers.helper import Helper
+from app.helpers.fcm import FCM
 
 import os
 from urllib import parse
@@ -11,10 +13,10 @@ admin_endpoint = Blueprint("admin", __name__)
 
 @admin_endpoint.route("/user-stats", methods=["POST"])
 def get_user_stats():
-    if authenticate_user(request.json):
+    if Admin.authenticate_user(request.json):
         total_users = list(mongo.db.users.find())
         count_users_total = len(total_users)
-        count_users_24_hours = mongo.db.users.find({"last_active": {"$gt": get_time_24_hours_ago()}}).count()
+        count_users_24_hours = mongo.db.users.find({"last_active": {"$gt": Admin.get_time_24_hours_ago()}}).count()
 
         county_count = {}
         locality_count = {}
@@ -57,7 +59,7 @@ def get_user_stats():
 # TODO remove -- debug function
 @admin_endpoint.route("/clear-dud-accounts", methods=["POST"])
 def clear_dud_accounts():
-    if authenticate_user(request.json):
+    if Admin.authenticate_user(request.json):
         users = list(mongo.db.users.find())
         for user in users:
             if "fb_id" not in user:
@@ -70,17 +72,18 @@ def clear_dud_accounts():
 
 @admin_endpoint.route("/message-stats", methods=["POST"])
 def get_message_stats():
-    if authenticate_user(request.json):
+    if Admin.authenticate_user(request.json):
         partner_message_count_24_hours = mongo.db.partner_conversations.find(
-            {"time": {"$gt": get_time_24_hours_ago()}}).count()
+            {"time": {"$gt": Admin.get_time_24_hours_ago()}}).count()
         locality_message_count_24_hours = mongo.db.locality_conversations.find(
-            {"time": {"$gt": get_time_24_hours_ago()}}).count()
+            {"time": {"$gt": Admin.get_time_24_hours_ago()}}).count()
 
         partner_message_count = mongo.db.partner_conversations.find().count()
         locality_message_count = mongo.db.locality_conversations.find().count()
 
         user_count = mongo.db.users.find().count()
-        users_active_last_24_hours = mongo.db.users.find({"last_active": {"$gt": get_time_24_hours_ago()}}).count()
+        users_active_last_24_hours = mongo.db.users.find(
+            {"last_active": {"$gt": Admin.get_time_24_hours_ago()}}).count()
 
         users_who_enacted_blocks = list(mongo.db.users.find({"blocked": {"$ne": []}}))
         user_block_count = 0
@@ -98,7 +101,7 @@ def get_message_stats():
                 "user_count": user_count,
                 "users_active_last_24_hours": users_active_last_24_hours,
                 "user_block_count": user_block_count,
-                "time_24_hours_ago": get_time_24_hours_ago()
+                "time_24_hours_ago": Admin.get_time_24_hours_ago()
             }
         )
 
@@ -107,8 +110,8 @@ def get_message_stats():
 
 @admin_endpoint.route("/locality-messages-last-24-hours", methods=["POST"])
 def get_locality_messages_last_24_hours():
-    if authenticate_user(request.json):
-        messages = list(mongo.db.locality_conversations.find({"time": {"$gt": get_time_24_hours_ago()}}))
+    if Admin.authenticate_user(request.json):
+        messages = list(mongo.db.locality_conversations.find({"time": {"$gt": Admin.get_time_24_hours_ago()}}))
         localities = []
         output = {}
 
@@ -133,7 +136,7 @@ def get_locality_messages_last_24_hours():
 
 @admin_endpoint.route("/get-all-locality-conversations", methods=["POST"])
 def get_all_locality_conversations():
-    if authenticate_user(request.json):
+    if Admin.authenticate_user(request.json):
         messages = list(mongo.db.locality_conversations.find())
         localities = []
         output = {}
@@ -161,7 +164,7 @@ def get_all_locality_conversations():
 # TODO may also be a breach of privacy
 @admin_endpoint.route("/get-all-partner-conversations", methods=["POST"])
 def get_all_partner_conversations():
-    if authenticate_user(request.json):
+    if Admin.authenticate_user(request.json):
         messages = list(mongo.db.partner_conversations.find())
         match_ids = []
         output = {}
@@ -176,12 +179,38 @@ def get_all_partner_conversations():
     return Helper.get_json({"success": False})
 
 
-def get_time_24_hours_ago():
-    twenty_four_hours = 1000 * 60 * 60 * 24
-    return Helper.get_current_time_in_millis() - twenty_four_hours
+@admin_endpoint.route("/broadcast-push-notification", methods=["POST"])
+def broadcast_push_notification():
+    if Admin.authenticate_user(request.json):
+        data = request.json
+        title = data["push_notification_title"]
+        content = data["push_notification_content"]
+        link = data["push_notification_link"]
+
+        return FCM.notify_push_notification(title, content, link)
+
+    return Helper.get_json({"success": False})
 
 
-def authenticate_user(payload):
-    given_username = payload["username"]
-    given_secret = payload["secret"]
-    return given_username == os.environ["ADMIN_USERNAME"] and given_secret == os.environ["ADMIN_SECRET"]
+class Admin(flask_login.UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+    @staticmethod
+    def get_time_24_hours_ago():
+        twenty_four_hours = 1000 * 60 * 60 * 24
+        return Helper.get_current_time_in_millis() - twenty_four_hours
+
+    @staticmethod
+    def authenticate_fields(username, secret):
+        return username == os.environ["ADMIN_USERNAME"] and secret == os.environ["ADMIN_SECRET"]
+
+    @staticmethod
+    def authenticate_user(payload):
+        given_username = payload["username"]
+        given_secret = payload["secret"]
+        return given_username == os.environ["ADMIN_USERNAME"] and given_secret == os.environ["ADMIN_SECRET"]
+
+    @staticmethod
+    def generate_cookie():
+        pass

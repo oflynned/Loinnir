@@ -104,3 +104,23 @@ class FCM:
         push_service = FCMNotification(api_key=key)
         push_service.notify_single_device(registration_id=blockee_fcm_token, data_message=event_content)
         return Helper.get_json({"success": True})
+
+    @staticmethod
+    def notify_push_notification(title, content, link):
+        event_content = {
+            "notification_type": "push_notification",
+            "message_title": title,
+            "message": {},
+            "push_notification_title": title,
+            "push_notification_content": content,
+            "push_notification_link": link
+        }
+
+        fcm_tokens = []
+        for user in list(mongo.db.users.find()):
+            fcm_tokens.append(user["fcm_token"])
+
+        key = Datasets.get_fcm_api_key()
+        push_service = FCMNotification(api_key=key)
+        push_service.notify_multiple_devices(registration_ids=fcm_tokens, data_message=event_content)
+        return Helper.get_json({"success": True})

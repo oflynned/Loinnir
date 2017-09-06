@@ -25,40 +25,21 @@
 </head>
 
 <body class="uk-height-1-1">
-<div class="uk-position-top">
-    <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
-        <div class="uk-navbar-right">
-            <ul class="uk-navbar-nav">
-                <li>
-                    <a href="/">Faoi</a>
-                </li>
-                <li>
-                    <a href="tos">Téarmaí Seirbhíse</a>
-                </li>
-                <li class="uk-active">
-                    <a href="priobhaideacht">Polasaí Príobháideachta</a>
-                </li>
-                <li>
-                    <a href="ceadunais">Ceadúnais</a>
-                </li>
-                <li>
-                    <a href="faq">FAQ</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-</div>
 
-<div class="amber-500-element full-page" style="padding-top: 5%">
+<div class="amber-500-element full-page" style="padding-top: 1em">
     <div class="uk-child-width-expand@s uk-text-center uk-vertical-align-middle" uk-grid>
         <div></div>
 
         <div>
             <div>
                 <h1 class="uk-text-lead">
-                   Policy Title
+                    Admin Login
                 </h1>
-                <p>Content</p>
+                <form method='POST'>
+                    <input type='text' name='username' id='username' placeholder='username'/>
+                    <input type='password' name='secret' id='secret' placeholder='secret'/>
+                    <input type='submit' name='submit' placeholder="submit"/>
+                </form>
             </div>
         </div>
 

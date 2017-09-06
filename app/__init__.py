@@ -5,6 +5,7 @@ from threading import Thread
 import requests
 from flask import Flask
 from flask_pymongo import PyMongo
+
 from dotenv import load_dotenv, find_dotenv
 
 from app.api.v1.debug import debug_endpoint
@@ -50,5 +51,8 @@ class HerokuTools(Thread):
             time.sleep(60 * 5)
 
 
+app.secret_key = os.environ["ADMIN_SECRET"]
+
 mongo = PyMongo(app)
+
 HerokuTools()

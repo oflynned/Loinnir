@@ -29,20 +29,8 @@
     <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
         <div class="uk-navbar-right">
             <ul class="uk-navbar-nav">
-                <li>
-                    <a href="/">Faoi</a>
-                </li>
-                <li>
-                    <a href="tos">Téarmaí Seirbhíse</a>
-                </li>
                 <li class="uk-active">
-                    <a href="priobhaideacht">Polasaí Príobháideachta</a>
-                </li>
-                <li>
-                    <a href="ceadunais">Ceadúnais</a>
-                </li>
-                <li>
-                    <a href="faq">FAQ</a>
+                    <a href="/log-out">Logáil Amach</a>
                 </li>
             </ul>
         </div>
@@ -56,9 +44,11 @@
         <div>
             <div>
                 <h1 class="uk-text-lead">
-                   Policy Title
+                    Admin Console
                 </h1>
-                <p>Content</p>
+                {% if user.is_authenticated %}
+                <p>Logged in as {{user.username}}</p>
+                {% endif %}
             </div>
         </div>
 
