@@ -167,7 +167,6 @@ class Admin():
                     county_count[county] += 1
 
         return {
-            "count_users_last_24_hours": count_users_24_hours,
             "count_users_total": count_users_total,
             "count_per_county": county_count,
             "count_per_locality": locality_count,

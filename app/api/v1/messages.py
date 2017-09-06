@@ -121,8 +121,8 @@ def get_paginated_partner_messages():
         sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
 
         return Helper.get_json(sorted_list)
-    else:
-        return Helper.get_json([])
+
+    return Helper.get_json([])
 
 
 # get initial messages residing within the locality for the user's record provided
