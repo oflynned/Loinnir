@@ -130,6 +130,14 @@ class Admin():
         count_users_total = len(total_users)
         count_users_24_hours = mongo.db.users.find({"last_active": {"$gt": Admin.get_time_24_hours_ago()}}).count()
 
+        users_active_last_24_hours = mongo.db.users.find(
+            {"last_active": {"$gt": Admin.get_time_24_hours_ago()}}).count()
+
+        users_who_enacted_blocks = list(mongo.db.users.find({"blocked": {"$ne": []}}))
+        user_block_count = 0
+        for user in users_who_enacted_blocks:
+            user_block_count += len(user["blocked"])
+
         county_count = {}
         locality_count = {}
 
@@ -162,7 +170,9 @@ class Admin():
             "count_users_last_24_hours": count_users_24_hours,
             "count_users_total": count_users_total,
             "count_per_county": county_count,
-            "count_per_locality": locality_count
+            "count_per_locality": locality_count,
+            "users_active_last_24_hours": users_active_last_24_hours,
+            "user_block_count": user_block_count
         }
 
     @staticmethod
@@ -175,23 +185,11 @@ class Admin():
         partner_message_count = mongo.db.partner_conversations.find().count()
         locality_message_count = mongo.db.locality_conversations.find().count()
 
-        user_count = mongo.db.users.find().count()
-        users_active_last_24_hours = mongo.db.users.find(
-            {"last_active": {"$gt": Admin.get_time_24_hours_ago()}}).count()
-
-        users_who_enacted_blocks = list(mongo.db.users.find({"blocked": {"$ne": []}}))
-        user_block_count = 0
-        for user in users_who_enacted_blocks:
-            user_block_count += len(user["blocked"])
-
         return {
             "partner_message_count": partner_message_count,
             "locality_message_count": locality_message_count,
             "total_message_count": partner_message_count + locality_message_count,
             "partner_message_count_24_hours": partner_message_count_24_hours,
             "locality_message_count_24_hours": locality_message_count_24_hours,
-            "total_message_count_24_hours": partner_message_count_24_hours + locality_message_count_24_hours,
-            "user_count": user_count,
-            "users_active_last_24_hours": users_active_last_24_hours,
-            "user_block_count": user_block_count
+            "total_message_count_24_hours": partner_message_count_24_hours + locality_message_count_24_hours
         }
