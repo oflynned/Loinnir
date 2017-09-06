@@ -15,11 +15,6 @@ def tacaiocht():
     return render_template("tos.html")
 
 
-@frontend.route("/ceadunais", methods=["GET"])
-def ceadunais():
-    return render_template("ceadunais.html")
-
-
 @frontend.route("/priobhaideacht", methods=["GET"])
 def priobhaideacht():
     return render_template("priobhaideacht.html")
