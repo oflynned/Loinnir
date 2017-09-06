@@ -87,10 +87,12 @@ def get_user():
 def update_user_meta_data():
     data = request.json
     fb_id = data["fb_id"]
+
     user = User.get_user(fb_id)
     user["last_active"] = Helper.get_current_time_in_millis()
-    mongo.db.users.save(user)
+    # user["is_online"] = data["is_online"]
 
+    mongo.db.users.save(user)
     return Helper.get_json({"success": True})
 
 
