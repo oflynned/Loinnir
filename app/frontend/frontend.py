@@ -1,13 +1,8 @@
-import os
-import operator
-
-from flask import Blueprint, render_template, redirect, request
-import flask_login
+from flask import Blueprint, render_template
 
 from app.api.v1.admin import Admin
 
 frontend = Blueprint("frontend", __name__)
-login_manager = flask_login.LoginManager()
 
 
 @frontend.route("/", methods=["GET"])
