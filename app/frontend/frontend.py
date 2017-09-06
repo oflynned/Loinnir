@@ -1,4 +1,5 @@
 import os
+import operator
 
 from flask import Blueprint, render_template, redirect, request
 import flask_login
@@ -49,7 +50,7 @@ def load_admin_user(username):
 def request_loader(given_request):
     print(given_request)
     admin = Admin(os.environ["ADMIN_USERNAME"])
-    admin.is_authenticated = Admin.authenticate_fields(given_request["id"], given_request["secret"])
+    # admin.is_authenticated = Admin.authenticate_fields(given_request["id"], given_request["secret"])
     return admin
 
 
@@ -66,10 +67,23 @@ def unauthorized_user():
 @frontend.route("/admin", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        print(request.form)
         admin_user = Admin(os.environ["ADMIN_USERNAME"])
         flask_login.login_user(admin_user)
-        return render_template("admin-console.html", user=admin_user)
+
+        user_stats = Admin.get_user_stats()
+        locality_stats = user_stats["count_per_locality"]
+        county_stats = user_stats["count_per_county"]
+        user_stats.pop("count_per_locality")
+        user_stats.pop("count_per_county")
+
+        message_stats = Admin.get_message_stats()
+
+        return render_template("admin-console.html",
+                               user=admin_user,
+                               user_stats=user_stats,
+                               locality_stats=locality_stats,
+                               county_stats=county_stats,
+                               message_stats=message_stats)
 
     return render_template("admin-login.html")
 

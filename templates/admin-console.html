@@ -46,9 +46,56 @@
                 <h1 class="uk-text-lead">
                     Admin Console
                 </h1>
-                {% if user.is_authenticated %}
-                <p>Logged in as {{user.username}}</p>
-                {% endif %}
+                <p>Logged in as {{user.id}}</p>
+
+
+                <h1 class="uk-text-lead">
+                    User Statistics
+                </h1>
+                <table class="uk-table">
+                    {% for key, value in user_stats.items() %}
+                    <tr>
+                        <th> {{ key }}</th>
+                        <td> {{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <h1 class="uk-text-lead">
+                    Locality Counts
+                </h1>
+                <table class="uk-table">
+                    {% for key, value in locality_stats.items() %}
+                    <tr>
+                        <th> {{ key }}</th>
+                        <td> {{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <h1 class="uk-text-lead">
+                    County Counts
+                </h1>
+                <table class="uk-table">
+                    {% for key, value in county_stats.items() %}
+                    <tr>
+                        <th> {{ key }}</th>
+                        <td> {{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <h1 class="uk-text-lead">
+                    Message Statistics
+                </h1>
+                <table class="uk-table">
+                    {% for key, value in message_stats.items() %}
+                    <tr>
+                        <th> {{ key }}</th>
+                        <td> {{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
             </div>
         </div>
 
