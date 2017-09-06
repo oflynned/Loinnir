@@ -1,5 +1,4 @@
 from flask import Blueprint, request
-import flask_login
 
 from app.app import mongo
 from app.helpers.helper import Helper
@@ -109,11 +108,7 @@ def broadcast_push_notification():
     return Helper.get_json({"success": False})
 
 
-class Admin(flask_login.UserMixin):
-    def __init__(self, id, secret):
-        self.id = id
-        self.secret = secret
-
+class Admin():
     @staticmethod
     def get_time_24_hours_ago():
         twenty_four_hours = 1000 * 60 * 60 * 24
