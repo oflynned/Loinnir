@@ -110,8 +110,9 @@ def broadcast_push_notification():
 
 
 class Admin(flask_login.UserMixin):
-    def __init__(self, id):
+    def __init__(self, id, secret):
         self.id = id
+        self.secret = secret
 
     @staticmethod
     def get_time_24_hours_ago():

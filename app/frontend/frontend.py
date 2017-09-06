@@ -35,66 +35,18 @@ def faq():
     return render_template("faq.html")
 
 
-@frontend.route("/error", methods=["GET"])
-def error():
-    return render_template("error.html")
+@frontend.route("/staitistici", methods=["GET", "POST"])
+def staitistici():
+    user_stats = Admin.get_user_stats()
+    locality_stats = user_stats["count_per_locality"]
+    county_stats = user_stats["count_per_county"]
+    user_stats.pop("count_per_locality")
+    user_stats.pop("count_per_county")
 
+    message_stats = Admin.get_message_stats()
 
-@login_manager.user_loader
-def load_admin_user(username):
-    admin = Admin(username)
-    return admin
-
-
-@login_manager.request_loader
-def request_loader(given_request):
-    print(given_request)
-    admin = Admin(os.environ["ADMIN_USERNAME"])
-    # admin.is_authenticated = Admin.authenticate_fields(given_request["id"], given_request["secret"])
-    return admin
-
-
-@frontend.route("/log-out")
-def logout():
-    flask_login.logout_user()
-    return redirect("/")
-
-
-def unauthorized_user():
-    return redirect("error")
-
-
-@frontend.route("/admin", methods=["GET", "POST"])
-def admin_login():
-    if request.method == "POST":
-        admin_user = Admin(os.environ["ADMIN_USERNAME"])
-        flask_login.login_user(admin_user)
-
-        user_stats = Admin.get_user_stats()
-        locality_stats = user_stats["count_per_locality"]
-        county_stats = user_stats["count_per_county"]
-        user_stats.pop("count_per_locality")
-        user_stats.pop("count_per_county")
-
-        message_stats = Admin.get_message_stats()
-
-        return render_template("admin-console.html",
-                               user=admin_user,
-                               user_stats=user_stats,
-                               locality_stats=locality_stats,
-                               county_stats=county_stats,
-                               message_stats=message_stats)
-
-    return render_template("admin-login.html")
-
-
-@flask_login.login_required
-@frontend.route("/admin-console", methods=["GET", "POST"])
-def admin_console():
-    return render_template("admin-console.html")
-
-
-@frontend.record_once
-def on_load(state):
-    login_manager.init_app(state.app)
-    login_manager.login_view = "admin"
+    return render_template("staitistici.html",
+                           user_stats=user_stats,
+                           locality_stats=locality_stats,
+                           county_stats=county_stats,
+                           message_stats=message_stats)
