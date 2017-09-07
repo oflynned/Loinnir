@@ -10,7 +10,6 @@ from urllib import parse
 admin_endpoint = Blueprint("admin", __name__)
 
 
-# TODO remove -- debug function
 @admin_endpoint.route("/clear-dud-accounts", methods=["POST"])
 def clear_dud_accounts():
     if Admin.authenticate_user(request.json):
@@ -20,6 +19,18 @@ def clear_dud_accounts():
                 mongo.db.users.remove(user)
 
         return Helper.get_json(list(mongo.db.users.find()))
+
+    return Helper.get_json({"success": False})
+
+
+@admin_endpoint.route("/clear-locality-chats", methods=["POST"])
+def clear_locality_chats():
+    if Admin.authenticate_user(request.json):
+        messages = list(mongo.db.locality_conversations.find())
+        for message in messages:
+            mongo.db.users.remove(message)
+
+        return Helper.get_json({"success": True})
 
     return Helper.get_json({"success": False})
 
@@ -75,26 +86,6 @@ def get_all_locality_conversations():
     return Helper.get_json({"success": False})
 
 
-# TODO may not be necessary now but could be useful for ML grooming of learning about user interaction
-# TODO or also with user blocks/admin intervention -- currently unimplemented
-# TODO may also be a breach of privacy
-@admin_endpoint.route("/get-all-partner-conversations", methods=["POST"])
-def get_all_partner_conversations():
-    if Admin.authenticate_user(request.json):
-        messages = list(mongo.db.partner_conversations.find())
-        match_ids = []
-        output = {}
-
-        for message in messages:
-            conversation_couple = [message["from_id"], message["to_id"]]
-            if conversation_couple not in match_ids:
-                match_ids.append(conversation_couple)
-
-        return Helper.get_json(match_ids)
-
-    return Helper.get_json({"success": False})
-
-
 @admin_endpoint.route("/broadcast-push-notification", methods=["POST"])
 def broadcast_push_notification():
     if Admin.authenticate_user(request.json):
@@ -106,6 +97,11 @@ def broadcast_push_notification():
         return FCM.notify_push_notification(title, content, link)
 
     return Helper.get_json({"success": False})
+
+
+@admin_endpoint.route("/authenticate", methods=["POST"])
+def authenticate_admin_user():
+    return Helper.get_json({"success": Admin.authenticate_user(request.json)})
 
 
 class Admin():
@@ -128,8 +124,6 @@ class Admin():
     def get_user_stats():
         total_users = list(mongo.db.users.find())
         count_users_total = len(total_users)
-        count_users_24_hours = mongo.db.users.find({"last_active": {"$gt": Admin.get_time_24_hours_ago()}}).count()
-
         users_active_last_24_hours = mongo.db.users.find(
             {"last_active": {"$gt": Admin.get_time_24_hours_ago()}}).count()
 
