@@ -26,3 +26,10 @@ def get_all_users():
     if Admin.authenticate_user(request.json):
         return Helper.get_json(list(mongo.db.users.find()))
     return Helper.get_json({"success": False})
+
+
+@debug_endpoint.route("/get-all-push-notifications", methods=["POST"])
+def get_all_push_notifications():
+    if Admin.authenticate_user(request.json):
+        return Helper.get_json(list(mongo.db.push_notifications.find()))
+    return Helper.get_json({"success": False})

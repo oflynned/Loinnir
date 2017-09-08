@@ -145,13 +145,13 @@ def broadcast_push_notification():
             "link": link,
             "user_count_at_this_time": users_at_this_time,
             "user_count_delivered_to": 0,
-            "user_count_interacted_with": 0
+            "user_count_interacted_with": 0,
+            "broadcast_time": Helper.get_current_time_in_millis()
         }
 
         mongo.db.push_notifications.save(notification)
-        notification = mongo.db.push_notifications.find(notification)
-
-        return FCM.notify_push_notification(title, content, link, notification["_id"])
+        notification = list(mongo.db.push_notifications.find({"broadcast_time": notification["broadcast_time"]}))[0]
+        return FCM.notify_push_notification(title, content, link, str(notification["_id"]))
 
     return Helper.get_json({"success": False})
 

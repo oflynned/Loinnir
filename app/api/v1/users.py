@@ -1,4 +1,5 @@
 from random import randint
+from bson.objectid import ObjectId
 
 from flask import Blueprint, request
 
@@ -292,7 +293,7 @@ def unblock_user():
 # POST { push_notification_id: <string>, event: [delivery, interaction] }
 @user_endpoint.route("/push-notification-interaction", methods=["POST"])
 def interact_push_notification():
-    notification = mongo.db.push_notifications.find({"_id": request.json["push_notification_id"]})
+    notification = list(mongo.db.push_notifications.find({"_id": ObjectId(request.json["push_notification_id"])}))[0]
     if request.json["event"] == "delivery":
         notification["user_count_delivered_to"] += 1
     elif request.json["event"] == "interaction":
