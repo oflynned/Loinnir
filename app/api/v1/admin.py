@@ -79,7 +79,7 @@ def get_locality_messages_last_24_hours():
 @admin_endpoint.route("/get-locality-names", methods=["POST"])
 def get_locality_names():
     if Admin.authenticate_user(request.json):
-        return Helper.get_json(Datasets.get_locality_names())
+        return Helper.get_json(Datasets.get_area_names())
 
     return Helper.get_json({"success": False})
 

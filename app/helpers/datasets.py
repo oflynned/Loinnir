@@ -26,7 +26,7 @@ class Datasets:
         data = Datasets.get_groomed_populated_areas()
         output = []
         for area in data:
-            output.append(area["locality"])
+            output.append(area["town"])
 
         return output
 
