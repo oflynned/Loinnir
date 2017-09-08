@@ -2,6 +2,7 @@ from flask import Blueprint, request
 
 from app.api.v1.users import User
 from app.app import mongo
+from app.helpers.datasets import Datasets
 from app.helpers.helper import Helper
 from app.helpers.fcm import FCM
 
@@ -29,8 +30,8 @@ def clear_locality_chats():
     if Admin.authenticate_user(request.json):
         messages = list(mongo.db.locality_conversations.find())
         for message in messages:
-            mongo.db.users.remove(message)
-
+            mongo.db.locality_conversations.remove(message)
+            
         return Helper.get_json({"success": True})
 
     return Helper.get_json({"success": False})
@@ -58,6 +59,26 @@ def get_locality_messages_last_24_hours():
                     output[locality].append(message)
 
         return Helper.get_json(output)
+
+    return Helper.get_json({"success": False})
+
+
+@admin_endpoint.route("/get-locality-names", methods=["POST"])
+def get_locality_names():
+    if Admin.authenticate_user(request.json):
+        return Helper.get_json(Datasets.get_locality_names())
+
+    return Helper.get_json({"success": False})
+
+
+# POST { username: <string>, secret: <string>, locality: <string> }
+# RETURN [ <message>, <message>, ... ]
+@admin_endpoint.route("/get-locality-chat-by-name", methods=["POST"])
+def get_locality_chat_by_name():
+    if Admin.authenticate_user(request.json):
+        locality = request.json["locality"]
+        messages = list(mongo.db.locality_conversations.find({"locality": locality}))
+        return Helper.get_json(messages)
 
     return Helper.get_json({"success": False})
 
