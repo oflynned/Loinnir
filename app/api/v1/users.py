@@ -285,3 +285,16 @@ def unblock_user():
     mongo.db.users.update({"fb_id": partner_id}, {"$push": {"partners": my_id}})
 
     return Helper.get_json(User.get_user(my_id))
+
+
+# POST { notification_id: <string>, event: [delivery, interaction] }
+@user_endpoint.route("/push-notification-interaction", methods=["POST"])
+def interact_push_notification():
+    notification = mongo.db.push_notifications.find({"_id": request.json["notification_id"]})
+    if request.json["event"] == "delivery":
+        notification["user_count_delivered_to"] += 1
+    elif request.json["event"] == "interaction":
+        notification["user_count_interacted_with"] += 1
+
+    mongo.db.push_notifications.save(notification)
+    return Helper.get_json({"success": True})

@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 
+from app.api.v1.users import User
 from app.app import mongo
 from app.helpers.helper import Helper
 from app.helpers.fcm import FCM
@@ -86,6 +87,15 @@ def get_all_locality_conversations():
     return Helper.get_json({"success": False})
 
 
+@admin_endpoint.route("/get-past-push-notifications", methods=["POST"])
+def get_past_push_notifications():
+    if Admin.authenticate_user(request.json):
+        notifications = list(mongo.db.push_notifications.find())
+        return Helper.get_json(notifications)
+
+    return Helper.get_json({"success": False})
+
+
 @admin_endpoint.route("/broadcast-push-notification", methods=["POST"])
 def broadcast_push_notification():
     if Admin.authenticate_user(request.json):
@@ -93,8 +103,21 @@ def broadcast_push_notification():
         title = data["push_notification_title"]
         content = data["push_notification_content"]
         link = data["push_notification_link"]
+        users_at_this_time = mongo.db.users.find().count()
 
-        return FCM.notify_push_notification(title, content, link)
+        notification = {
+            "title": title,
+            "content": content,
+            "link": link,
+            "user_count_at_this_time": users_at_this_time,
+            "user_count_delivered_to": 0,
+            "user_count_interacted_with": 0
+        }
+
+        mongo.db.push_notifications.save(notification)
+        notification = mongo.db.push_notifications.find(notification)
+
+        return FCM.notify_push_notification(title, content, link, notification["_id"])
 
     return Helper.get_json({"success": False})
 

@@ -106,14 +106,15 @@ class FCM:
         return Helper.get_json({"success": True})
 
     @staticmethod
-    def notify_push_notification(title, content, link):
+    def notify_push_notification(title, content, link, id):
         event_content = {
             "notification_type": "push_notification",
             "message_title": title,
             "message": {},
             "push_notification_title": title,
             "push_notification_content": content,
-            "push_notification_link": link
+            "push_notification_link": link,
+            "push_notification_id": id
         }
 
         fcm_tokens = []
