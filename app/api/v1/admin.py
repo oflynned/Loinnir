@@ -165,7 +165,7 @@ class Admin():
             locality = parse.unquote_plus(user["locality"])
             county = parse.unquote_plus(user["county"])
             if locality not in localities:
-                localities.append(locality + " (" + user["county"] + ")")
+                localities.append(locality)
             if county not in counties:
                 counties.append(county)
 
@@ -177,7 +177,7 @@ class Admin():
 
         for user in total_users:
             for locality in localities:
-                if parse.unquote_plus(user["locality"]) + " (" + user["county"] + ")" == locality:
+                if parse.unquote_plus(user["locality"]) == locality:
                     locality_count[locality] += 1
             for county in counties:
                 if parse.unquote_plus(user["county"]) == county:
