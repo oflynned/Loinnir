@@ -35,6 +35,7 @@ class User:
 def create_user():
     users_col = mongo.db.users
     data = request.json
+    data["time_created"] = Helper.get_current_time_in_millis()
     data["fb_id"] = str(data["fb_id"])
     data["gender"] = "female" if (data["gender"] == "female") else "male"
 
