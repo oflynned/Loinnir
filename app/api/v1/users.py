@@ -26,8 +26,9 @@ class User:
 
 # POST
 # {
-# fb_id: <int>, forename: <encoded string>, surname: <encoded string>, gender: [female, male], profile_pic: <url string>
-# locality: <string>, lng: <float>, lat: <float>, locality: <encoded string>, show_location: <boolean>
+# fb_id: <string>, forename: <encoded string>, surname: <encoded string>,
+# gender: [female, male], profile_pic: <url string>
+# lng: <float>, lat: <float>, show_location: <boolean>
 # }
 #
 # RETURN { success: <boolean>, *reason: <string> }

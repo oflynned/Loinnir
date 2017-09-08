@@ -31,7 +31,20 @@ def clear_locality_chats():
         messages = list(mongo.db.locality_conversations.find())
         for message in messages:
             mongo.db.locality_conversations.remove(message)
-            
+
+        return Helper.get_json({"success": True})
+
+    return Helper.get_json({"success": False})
+
+
+@admin_endpoint.route("/update-old-user-accounts", methods=["POST"])
+def update_old_user_accounts():
+    if Admin.authenticate_user(request.json):
+        users = list(mongo.db.users.find())
+        for user in users:
+            if "time_created" not in user:
+                user["time_created"] = Helper.get_current_time_in_millis()
+                mongo.db.users.save(user)
         return Helper.get_json({"success": True})
 
     return Helper.get_json({"success": False})
