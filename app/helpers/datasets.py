@@ -1,6 +1,8 @@
 import os
 import json
 
+from app.app import mongo
+
 
 class Datasets:
     @staticmethod
@@ -44,7 +46,22 @@ class Datasets:
         data = Datasets.get_groomed_populated_areas()
         output = []
         for area in data:
-            output.append({"locality": area["town"], "county": area["county"]})
+            locality_count = mongo.db.users.find({"locality": area["town"]}).count()
+            county_count = mongo.db.users.find({"county": area["county"]}).count()
 
-        output.append({"locality": "abroad", "county": "abroad"})
+            output.append({
+                "locality": area["town"],
+                "county": area["county"],
+                "locality_count": locality_count,
+                "county_count": county_count
+            })
+
+        count = mongo.db.users.find({"locality": "abroad"}).count()
+        output.append({
+            "locality": "Abroad",
+            "county": "abroad",
+            "locality_count": count,
+            "county_county": count
+        })
+
         return output

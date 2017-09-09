@@ -1,28 +1,14 @@
-from flask import Blueprint, request
-
-from app.api.v1.users import User
-from app.app import mongo
-from app.helpers.datasets import Datasets
-from app.helpers.helper import Helper
-from app.helpers.fcm import FCM
-
 import os
 from urllib import parse
 
+from flask import Blueprint, request
+
+from app.app import mongo
+from app.helpers.datasets import Datasets
+from app.helpers.fcm import FCM
+from app.helpers.helper import Helper
+
 admin_endpoint = Blueprint("admin", __name__)
-
-
-@admin_endpoint.route("/clear-dud-accounts", methods=["POST"])
-def clear_dud_accounts():
-    if Admin.authenticate_user(request.json):
-        users = list(mongo.db.users.find())
-        for user in users:
-            if "fb_id" not in user:
-                mongo.db.users.remove(user)
-
-        return Helper.get_json(list(mongo.db.users.find()))
-
-    return Helper.get_json({"success": False})
 
 
 @admin_endpoint.route("/clear-locality-chats", methods=["POST"])
@@ -37,14 +23,11 @@ def clear_locality_chats():
     return Helper.get_json({"success": False})
 
 
-@admin_endpoint.route("/update-old-user-accounts", methods=["POST"])
-def update_old_user_accounts():
+# POST { username: <string>, secret: <string>, locality: <string> }
+@admin_endpoint.route("/clear-locality-chat", methods=["POST"])
+def clear_locality_chat():
     if Admin.authenticate_user(request.json):
-        users = list(mongo.db.users.find())
-        for user in users:
-            if "time_created" not in user:
-                user["time_created"] = Helper.get_current_time_in_millis()
-                mongo.db.users.save(user)
+        mongo.db.locality_conversations.remove({"locality": request.json["locality"]})
         return Helper.get_json({"success": True})
 
     return Helper.get_json({"success": False})
@@ -76,7 +59,7 @@ def get_locality_messages_last_24_hours():
     return Helper.get_json({"success": False})
 
 
-@admin_endpoint.route("/get-locality-names", methods=["POST"])
+@admin_endpoint.route("/get-area-data", methods=["POST"])
 def get_locality_names():
     if Admin.authenticate_user(request.json):
         return Helper.get_json(Datasets.get_area_names())
