@@ -46,8 +46,8 @@ class Datasets:
         data = Datasets.get_groomed_populated_areas()
         output = []
         for area in data:
-            locality_count = mongo.db.users.find({"locality": area["town"]}).count()
-            county_count = mongo.db.users.find({"county": area["county"]}).count()
+            locality_count = len(list(mongo.db.users.find({"locality": area["town"]})))
+            county_count = len(list(mongo.db.users.find({"county": area["county"]})))
 
             output.append({
                 "locality": area["town"],
@@ -56,7 +56,7 @@ class Datasets:
                 "county_count": county_count
             })
 
-        count = mongo.db.users.find({"locality": "abroad"}).count()
+        count = len(list(mongo.db.users.find({"locality": "abroad"})))
         output.append({
             "locality": "Abroad",
             "county": "abroad",
