@@ -67,6 +67,22 @@ def get_locality_names():
     return Helper.get_json({"success": False})
 
 
+@admin_endpoint.route("/get-user-stats", methods=["POST"])
+def get_user_stats():
+    if Admin.authenticate_user(request.json):
+        return Helper.get_json(Admin.get_user_stats())
+
+    return Helper.get_json({"success": False})
+
+
+@admin_endpoint.route("/get-message-stats", methods=["POST"])
+def get_message_stats():
+    if Admin.authenticate_user(request.json):
+        return Helper.get_json(Admin.get_message_stats())
+
+    return Helper.get_json({"success": False})
+
+
 # POST { username: <string>, secret: <string>, locality: <string> }
 # RETURN [ <message>, <message>, ... ]
 @admin_endpoint.route("/get-locality-chat-by-name", methods=["POST"])
