@@ -23,20 +23,3 @@ def priobhaideacht():
 @frontend.route("/faq", methods=["GET"])
 def faq():
     return render_template("faq.html")
-
-
-@frontend.route("/staitistici", methods=["GET", "POST"])
-def staitistici():
-    user_stats = Admin.get_user_stats()
-    locality_stats = user_stats["count_per_locality"]
-    county_stats = user_stats["count_per_county"]
-    user_stats.pop("count_per_locality")
-    user_stats.pop("count_per_county")
-
-    message_stats = Admin.get_message_stats()
-
-    return render_template("staitistici.html",
-                           user_stats=user_stats,
-                           locality_stats=locality_stats,
-                           county_stats=county_stats,
-                           message_stats=message_stats)

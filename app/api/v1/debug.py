@@ -24,7 +24,18 @@ def get_all_locality_conversations():
 @debug_endpoint.route("/get-all-users", methods=["POST"])
 def get_all_users():
     if Admin.authenticate_user(request.json):
-        return Helper.get_json(list(mongo.db.users.find()))
+        output = []
+        users = list(mongo.db.users.find())
+        for user in users:
+            locality_message_count = mongo.db.locality_conversations.find({"fb_id": user["fb_id"]}).count()
+            partner_message_count = mongo.db.partner_conversations.find({"fb_id": user["fb_id"]}).count()
+            user_data = user
+            user_data["total_partner_message_count"] = partner_message_count
+            user_data["total_locality_message_count"] = locality_message_count
+            user_data["total_message_count"] = locality_message_count + partner_message_count
+            output.append(user_data)
+
+        return Helper.get_json(output)
     return Helper.get_json({"success": False})
 
 
