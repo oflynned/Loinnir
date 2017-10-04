@@ -48,6 +48,7 @@ def create_user():
     # blank lists -- will be populated as the user interacts with profiles
     data["blocked"] = []
     data["partners"] = []
+    data["users_met"] = []
 
     if User.does_user_exist(data["fb_id"]):
         return Helper.get_json({"success": False, "reason": "user_already_exists"})
@@ -159,15 +160,21 @@ def get_random_user():
 
     # your own profile and blocked/matched users should be removed from the searches
     me = User.get_user(fb_id)
-    partner_choice = list(mongo.db.users.find({"fb_id": {"$ne": me["fb_id"], "$nin": me["blocked"] + me["partners"]}}))
+    partner_choice = list(mongo.db.users.find({
+        "fb_id": {
+            "$ne": me["fb_id"], "$nin": me["blocked"] + me["partners"]
+        }
+    }))
 
     if len(partner_choice) == 0:
-        return Helper.get_json([])
+        returned_partner = []
     if len(partner_choice) == 1:
-        return Helper.get_json(partner_choice[0])
+        returned_partner = partner_choice[0]
     else:
         random_index = randint(0, len(partner_choice) - 1)
-        return Helper.get_json(partner_choice[random_index])
+        returned_partner = partner_choice[random_index]
+
+    return Helper.get_json(returned_partner)
 
 
 # POST { fb_id: <string> }

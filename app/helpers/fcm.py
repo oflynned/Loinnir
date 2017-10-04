@@ -90,6 +90,21 @@ class FCM:
         return Helper.get_json({"success": False, "reason": "no_users_in_locality"})
 
     @staticmethod
+    def notify_seen_message(me, partner):
+        partner_fcm_token = partner["fcm_token"]
+        event_content = {
+            "notification_type": "message_seen",
+            "message_title": "message_seen",
+            "message": {},
+            "partner_id": me["fb_id"]
+        }
+
+        key = Datasets.get_fcm_api_key()
+        push_service = FCMNotification(api_key=key)
+        push_service.notify_single_device(registration_id=partner_fcm_token, data_message=event_content)
+        return Helper.get_json({"success": True})
+
+    @staticmethod
     def notify_block_enacted_event(blocker, blockee):
         blockee_fcm_token = blockee["fcm_token"]
 

@@ -206,6 +206,8 @@ def mark_message_seen():
         message["was_seen"] = True
         mongo.db.partner_conversations.save(message)
 
+    FCM.notify_seen_message(User.get_user(my_id), User.get_user(partner_id))
+
     return Helper.get_json({"success": True})
 
 
