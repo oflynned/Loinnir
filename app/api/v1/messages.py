@@ -186,8 +186,8 @@ def get_paginated_locality_messages():
 
         sorted_list = sorted(list(returned_messages), key=lambda k: k["time"], reverse=False)
         return Helper.get_json(sorted_list)
-    else:
-        return Helper.get_json([])
+
+    return Helper.get_json([])
 
 
 # POST { my_id: <string>, partner_id: <string> }

@@ -3,6 +3,7 @@ from urllib import parse
 
 from flask import Blueprint, request
 
+from app.api.v1.users import User
 from app.app import mongo
 from app.helpers.datasets import Datasets
 from app.helpers.fcm import FCM
@@ -88,9 +89,15 @@ def get_message_stats():
 @admin_endpoint.route("/get-locality-chat-by-name", methods=["POST"])
 def get_locality_chat_by_name():
     if Admin.authenticate_user(request.json):
-        locality = request.json["locality"]
+        locality = parse.unquote_plus(request.json["locality"])
         messages = list(mongo.db.locality_conversations.find({"locality": locality}))
-        return Helper.get_json(messages)
+        output = []
+
+        for message in messages:
+            message["user"] = User.get_user(message["fb_id"])
+            output.append(message)
+
+        return Helper.get_json(output)
 
     return Helper.get_json({"success": False})
 
