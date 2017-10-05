@@ -102,6 +102,44 @@ def get_locality_chat_by_name():
     return Helper.get_json({"success": False})
 
 
+@admin_endpoint.route("/get-partner-id-pairs", methods=["POST"])
+def get_partner_id_pairs():
+    if Admin.authenticate_user(request.json):
+        users = list(mongo.db.users.find())
+        user_pairs = []
+        for user in users:
+            for partner_id in user["partners"]:
+                user_pairs.append({user["fb_id"], partner_id})
+
+        # map-reduce list of tuples
+        reduced_set = set(map(tuple, user_pairs))
+        output = map(list, reduced_set)
+
+        return Helper.get_json(output)
+
+    return Helper.get_json({"success": False})
+
+
+# POST { username: <string>, secret: <string>, participants: [ <id>, <id> ] }
+@admin_endpoint.route("/get-partner-id-pair-conversation", methods=["POST"])
+def get_partner_id_pair_conversation():
+    if Admin.authenticate_user(request.json):
+        participants = list(request.json["participants"])
+        query = {"from_id": {"$in": participants}, "to_id": {"$in": participants}}
+        messages = list(mongo.db.partner_conversations.find(query).sort("time", -1))
+        output = []
+
+        print(messages)
+
+        for message in messages:
+            message["user"] = User.get_user(message["from_id"])
+            output.append(message)
+
+        return Helper.get_json(output)
+
+    return Helper.get_json({"success": False})
+
+
 @admin_endpoint.route("/get-all-locality-conversations", methods=["POST"])
 def get_all_locality_conversations():
     if Admin.authenticate_user(request.json):
@@ -138,6 +176,8 @@ def get_past_push_notifications():
 
 @admin_endpoint.route("/broadcast-push-notification", methods=["POST"])
 def broadcast_push_notification():
+    print(request.json)
+
     if Admin.authenticate_user(request.json):
         data = request.json
         title = data["push_notification_title"]
@@ -167,7 +207,7 @@ def authenticate_admin_user():
     return Helper.get_json({"success": Admin.authenticate_user(request.json)})
 
 
-class Admin():
+class Admin:
     @staticmethod
     def get_time_24_hours_ago():
         twenty_four_hours = 1000 * 60 * 60 * 24
