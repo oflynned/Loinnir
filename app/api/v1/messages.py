@@ -264,6 +264,8 @@ def get_conversations_previews():
     messages_preview = []
 
     for partner in partners:
+        is_dud = False
+
         # check if only one message exists in the conversation
         my_messages_query = {"$and": [{"from_id": {"$in": [fb_id]}}, {"to_id": {"$in": [partner]}}]}
         partner_messages_query = {"$and": [{"from_id": {"$in": [partner]}}, {"to_id": {"$in": [fb_id]}}]}
@@ -287,14 +289,18 @@ def get_conversations_previews():
             # both parties have communicated with each other
             query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}
             last_message_in_chat = list(mongo.db.partner_conversations.find(query).sort("time", -1).limit(1))
-            if len(last_message_in_chat) > 0:
+            if len(last_message_in_chat) == 0:
+                is_dud = True
+            else:
                 last_message_in_chat = last_message_in_chat[0]
 
         # now get the count of unread messages
         unread_messages = list(
             mongo.db.partner_conversations.find({"from_id": partner, "to_id": fb_id, "was_seen": False}))
-        messages_preview.append(
-            {"count": len(unread_messages), "message": last_message_in_chat, "user": User.get_user(partner)})
+
+        if not is_dud:
+            messages_preview.append(
+                {"count": len(unread_messages), "message": last_message_in_chat, "user": User.get_user(partner)})
 
     # sort list by last sent time of the message fragments
     sorted_list = sorted(messages_preview, key=lambda k: k["message"]["time"], reverse=False)
