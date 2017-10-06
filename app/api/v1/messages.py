@@ -287,9 +287,8 @@ def get_conversations_previews():
             # both parties have communicated with each other
             query = {"$and": [{"to_id": {"$in": [fb_id, partner]}}, {"from_id": {"$in": [fb_id, partner]}}]}
             last_message_in_chat = list(mongo.db.partner_conversations.find(query).sort("time", -1).limit(1))
-            print(last_message_in_chat)
-            last_message_in_chat = last_message_in_chat[0]
-            print(last_message_in_chat)
+            if last_message_in_chat:
+                last_message_in_chat = last_message_in_chat[0]
 
         # now get the count of unread messages
         unread_messages = list(
