@@ -129,8 +129,6 @@ def get_partner_id_pair_conversation():
         messages = list(mongo.db.partner_conversations.find(query).sort("time", -1))
         output = []
 
-        print(messages)
-
         for message in messages:
             message["user"] = User.get_user(message["from_id"])
             output.append(message)
@@ -176,8 +174,6 @@ def get_past_push_notifications():
 
 @admin_endpoint.route("/broadcast-push-notification", methods=["POST"])
 def broadcast_push_notification():
-    print(request.json)
-
     if Admin.authenticate_user(request.json):
         data = request.json
         title = data["push_notification_title"]

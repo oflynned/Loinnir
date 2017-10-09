@@ -48,8 +48,6 @@ class Geo:
         is_outside_lat = (lat < 51.256233) or (lat > 55.449334)
         is_outside_lng = (lng < -11.052482) or (lng > -5.386214)
 
-        print(is_outside_lat, is_outside_lng)
-
         return is_outside_lat or is_outside_lng
 
     @staticmethod

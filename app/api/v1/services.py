@@ -177,16 +177,11 @@ class Services:
                     component_name = str(component["long_name"]).strip()
                     if component_name[:6] == "County":
                         component_name = component_name[7:].strip()
-                        print("Contains county!", component_name, component_name in counties_hash)
 
-                    print(component_name)
                     if component_name in counties_hash.keys():
                         county = counties_hash[str(component_name)]
                         counties.append(county)
-                        print(str(i) + "/" + str(len(data) - 1), locale["town"], county, "\n")
                         is_found = True
-
-        print(counties)
 
         output = []
         for i in range(len(data) - 1):
