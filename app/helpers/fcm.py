@@ -66,7 +66,7 @@ class FCM:
         locality_users = list(mongo.db.users.find({
             "$and": [
                 {"fb_id": {"$nin": exclusion_ids}},
-                {"locality": {"$eq": locality}}
+                # {"locality": {"$eq": locality}}
             ]}))
 
         if len(locality_users) > 0:
