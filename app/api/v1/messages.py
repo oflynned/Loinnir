@@ -141,7 +141,7 @@ def get_locality_messages():
 
     # aggregate over the messages to get the fb user details
     messages = list(mongo.db.locality_conversations.find({
-        "locality": locality,
+        # "locality": locality,
         "fb_id": {"$nin": blocked_users}
     }).sort("time", -1).limit(25))
 
