@@ -165,7 +165,7 @@ def get_paginated_locality_messages():
     me = User.get_user(my_id)
 
     query = {
-        "locality": me["locality"],
+        # "locality": me["locality"],
         "fb_id": {"$nin": me["blocked"]},
         "_id": {"$lt": ObjectId(oldest_message_id)}
     }
@@ -173,7 +173,7 @@ def get_paginated_locality_messages():
     # first check to see if all of the past messages have been loaded already
     if len(list(mongo.db.locality_conversations.find(query))) > last_known_count:
         query = {
-            "locality": me["locality"],
+            # "locality": me["locality"],
             "fb_id": {"$nin": me["blocked"]},
             "_id": {"$lt": ObjectId(oldest_message_id)}
         }
