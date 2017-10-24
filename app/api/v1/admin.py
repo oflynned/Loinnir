@@ -241,8 +241,10 @@ def broadcast_push_notification_to_target_group():
         title = data["push_notification_title"]
         content = data["push_notification_content"]
         link = data["push_notification_link"]
-        target_user_filter = data["push_notification_target_user_filter"]
+        target_user_filter = parse.unquote_plus(data["push_notification_target_user_filter"])
         users_at_this_time = mongo.db.users.find().count()
+
+        print(request.json)
 
         notification = {
             "title": title,
@@ -258,7 +260,7 @@ def broadcast_push_notification_to_target_group():
         notification = list(mongo.db.push_notifications.find({"broadcast_time": notification["broadcast_time"]}))[0]
 
         return FCM.notify_push_notification(title, content, link, str(notification["_id"]),
-                                            {"county": target_user_filter})
+                                            {"$and": [{"county": target_user_filter}, {"fcm_id": {"$ne": 0}}]})
 
     return Helper.get_json({"success": False})
 

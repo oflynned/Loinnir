@@ -158,8 +158,7 @@ class FCM:
 
         fcm_tokens = []
         for user in list(mongo.db.users.find(search_filter)):
-            if user["fcm_token"] != 0:
-                fcm_tokens.append(user["fcm_token"])
+            fcm_tokens.append(user["fcm_token"])
 
         key = Datasets.get_fcm_api_key()
         push_service = FCMNotification(api_key=key)
