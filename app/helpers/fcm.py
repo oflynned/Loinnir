@@ -1,6 +1,5 @@
 from flask_pyfcm import FCMNotification
 
-from app.api.v1.users import User
 from app.app import mongo
 from app.helpers.datasets import Datasets
 from app.helpers.helper import Helper
@@ -60,18 +59,23 @@ class FCM:
         locality = me["locality"]
 
         # remember that FCM token of 0 is for auto-generated bot profiles
-        exclusion_ids = [me["fb_id"], 0]
+        # mistakenly called bot fcm 'fcm_id' and user fcm 'fcm_token'
+        exclusion_ids = [me["fb_id"]] + me["blocked"]
         ids = []
 
-        # do we care about blocked users?
-        locality_users = list(mongo.db.users.find({
-            "$and": [
-                {"fb_id": {"$nin": exclusion_ids}},
-                # {"locality": {"$eq": locality}}
-            ]}))
+        locality_users = list(
+            mongo.db.users.find({"$and": [{"fb_id": {"$nin": exclusion_ids}}, {"fcm_id": {"$ne": 0}}]}))
+        """
+        $and: [{"locality": {"$eq": locality}}, "fb_id": {"$nin": exclusion_ids}}]})
+        """
+
+        print(exclusion_ids)
+        print(len(locality_users))
 
         if len(locality_users) > 0:
             for user in locality_users:
+                print("\n")
+                print(user)
                 ids.append(user["fcm_token"])
 
             data_content = {
@@ -122,7 +126,7 @@ class FCM:
         return Helper.get_json({"success": True})
 
     @staticmethod
-    def notify_singular_push_notification(title, content, link, notification_id, fb_id):
+    def notify_singular_push_notification(title, content, link, notification_id, user):
         event_content = {
             "notification_type": "push_notification",
             "message_title": title,
@@ -133,7 +137,7 @@ class FCM:
             "push_notification_id": notification_id
         }
 
-        fcm_tokens = [User.get_user(fb_id)["fcm_token"]]
+        fcm_tokens = [user["fcm_token"]]
 
         key = Datasets.get_fcm_api_key()
         push_service = FCMNotification(api_key=key)
@@ -141,7 +145,7 @@ class FCM:
         return Helper.get_json({"success": True})
 
     @staticmethod
-    def notify_push_notification(title, content, link, notification_id, search_filter):
+    def notify_push_notification(title, content, link, notification_id, search_filter={}):
         event_content = {
             "notification_type": "push_notification",
             "message_title": title,
@@ -154,7 +158,8 @@ class FCM:
 
         fcm_tokens = []
         for user in list(mongo.db.users.find(search_filter)):
-            fcm_tokens.append(user["fcm_token"])
+            if user["fcm_token"] != 0:
+                fcm_tokens.append(user["fcm_token"])
 
         key = Datasets.get_fcm_api_key()
         push_service = FCMNotification(api_key=key)

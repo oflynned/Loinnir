@@ -172,6 +172,8 @@ def get_past_push_notifications():
     return Helper.get_json({"success": False})
 
 
+# POST
+# push_notification_title: <string>, push_notification_content: <string>, push_notification_link: <string>
 @admin_endpoint.route("/broadcast-push-notification", methods=["POST"])
 def broadcast_push_notification():
     if Admin.authenticate_user(request.json):
@@ -180,9 +182,6 @@ def broadcast_push_notification():
         content = data["push_notification_content"]
         link = data["push_notification_link"]
         users_at_this_time = mongo.db.users.find().count()
-
-        target_filter = data["push_notification_target"]
-        search_filter = {"county": target_filter}
 
         notification = {
             "title": title,
@@ -197,12 +196,69 @@ def broadcast_push_notification():
         mongo.db.push_notifications.save(notification)
         notification = list(mongo.db.push_notifications.find({"broadcast_time": notification["broadcast_time"]}))[0]
 
-        if data["notification_target_fb_id"] is not None:
-            return FCM.notify_singular_push_notification(title, content, link, str(notification["_id"]),
-                                                         data["notification_target_fb_id"])
+        return FCM.notify_push_notification(title, content, link, str(notification["_id"]))
+
+    return Helper.get_json({"success": False})
+
+
+# POST
+# push_notification_title: <string>, push_notification_content: <string>,
+# push_notification_link: <string>, push_notification_target_fb_id: <string>
+@admin_endpoint.route("/broadcast-push-notification-to-id", methods=["POST"])
+def broadcast_push_notification_to_id():
+    if Admin.authenticate_user(request.json):
+        data = request.json
+        title = data["push_notification_title"]
+        content = data["push_notification_content"]
+        link = data["push_notification_link"]
+        users_at_this_time = mongo.db.users.find().count()
+
+        notification = {
+            "title": title,
+            "content": content,
+            "link": link,
+            "user_count_at_this_time": users_at_this_time,
+            "user_count_delivered_to": 0,
+            "user_count_interacted_with": 0,
+            "broadcast_time": Helper.get_current_time_in_millis()
+        }
+
+        mongo.db.push_notifications.save(notification)
+        notification = list(mongo.db.push_notifications.find({"broadcast_time": notification["broadcast_time"]}))[0]
+        return FCM.notify_singular_push_notification(title, content, link, str(notification["_id"]),
+                                                     User.get_user(data["push_notification_target_fb_id"]))
+
+    return Helper.get_json({"success": False})
+
+
+# POST
+# push_notification_title: <string>, push_notification_content: <string>,
+# push_notification_link: <string>, push_notification_target_user_filter: <string>
+@admin_endpoint.route("/broadcast-push-notification-to-target-group", methods=["POST"])
+def broadcast_push_notification_to_target_group():
+    if Admin.authenticate_user(request.json):
+        data = request.json
+        title = data["push_notification_title"]
+        content = data["push_notification_content"]
+        link = data["push_notification_link"]
+        target_user_filter = data["push_notification_target_user_filter"]
+        users_at_this_time = mongo.db.users.find().count()
+
+        notification = {
+            "title": title,
+            "content": content,
+            "link": link,
+            "user_count_at_this_time": users_at_this_time,
+            "user_count_delivered_to": 0,
+            "user_count_interacted_with": 0,
+            "broadcast_time": Helper.get_current_time_in_millis()
+        }
+
+        mongo.db.push_notifications.save(notification)
+        notification = list(mongo.db.push_notifications.find({"broadcast_time": notification["broadcast_time"]}))[0]
 
         return FCM.notify_push_notification(title, content, link, str(notification["_id"]),
-                                            search_filter if target_filter is not None else {})
+                                            {"county": target_user_filter})
 
     return Helper.get_json({"success": False})
 
