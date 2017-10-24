@@ -106,13 +106,25 @@ def get_paginated_partner_messages():
         "to_id": {"$in": participants},
     }
 
-    if len(list(mongo.db.partner_conversations.find(query))) > last_known_count:
+    remaining_count = len(list(mongo.db.partner_conversations.find(query)))
+
+    if remaining_count > 25:
         query = {
             "from_id": {"$in": participants},
             "to_id": {"$in": participants},
             "_id": {"$lt": ObjectId(oldest_message_id)}
         }
         total_messages = list(mongo.db.partner_conversations.find(query).sort("_id", -1).limit(25))
+
+        returned_messages = []
+        for message in total_messages:
+            returned_messages.append({"message": message, "user": User.get_user(message["from_id"])})
+
+        sorted_list = sorted(returned_messages, key=lambda k: k["message"]["time"], reverse=False)
+
+        return Helper.get_json(sorted_list)
+    elif 25 > remaining_count > 0:
+        total_messages = list(mongo.db.partner_conversations.find(query))
 
         returned_messages = []
         for message in total_messages:
