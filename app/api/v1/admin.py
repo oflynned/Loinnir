@@ -181,6 +181,9 @@ def broadcast_push_notification():
         link = data["push_notification_link"]
         users_at_this_time = mongo.db.users.find().count()
 
+        target_filter = data["push_notification_target"]
+        search_filter = {"county": target_filter}
+
         notification = {
             "title": title,
             "content": content,
@@ -193,7 +196,13 @@ def broadcast_push_notification():
 
         mongo.db.push_notifications.save(notification)
         notification = list(mongo.db.push_notifications.find({"broadcast_time": notification["broadcast_time"]}))[0]
-        return FCM.notify_push_notification(title, content, link, str(notification["_id"]))
+
+        if data["notification_target_fb_id"] is not None:
+            return FCM.notify_singular_push_notification(title, content, link, str(notification["_id"]),
+                                                         data["notification_target_fb_id"])
+
+        return FCM.notify_push_notification(title, content, link, str(notification["_id"]),
+                                            search_filter if target_filter is not None else {})
 
     return Helper.get_json({"success": False})
 

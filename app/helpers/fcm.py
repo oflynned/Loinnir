@@ -1,5 +1,6 @@
 from flask_pyfcm import FCMNotification
 
+from app.api.v1.users import User
 from app.app import mongo
 from app.helpers.datasets import Datasets
 from app.helpers.helper import Helper
@@ -121,7 +122,7 @@ class FCM:
         return Helper.get_json({"success": True})
 
     @staticmethod
-    def notify_push_notification(title, content, link, id):
+    def notify_singular_push_notification(title, content, link, notification_id, fb_id):
         event_content = {
             "notification_type": "push_notification",
             "message_title": title,
@@ -129,11 +130,30 @@ class FCM:
             "push_notification_title": title,
             "push_notification_content": content,
             "push_notification_link": link,
-            "push_notification_id": id
+            "push_notification_id": notification_id
+        }
+
+        fcm_tokens = [User.get_user(fb_id)["fcm_token"]]
+
+        key = Datasets.get_fcm_api_key()
+        push_service = FCMNotification(api_key=key)
+        push_service.notify_multiple_devices(registration_ids=fcm_tokens, data_message=event_content)
+        return Helper.get_json({"success": True})
+
+    @staticmethod
+    def notify_push_notification(title, content, link, notification_id, search_filter):
+        event_content = {
+            "notification_type": "push_notification",
+            "message_title": title,
+            "message": {},
+            "push_notification_title": title,
+            "push_notification_content": content,
+            "push_notification_link": link,
+            "push_notification_id": notification_id
         }
 
         fcm_tokens = []
-        for user in list(mongo.db.users.find()):
+        for user in list(mongo.db.users.find(search_filter)):
             fcm_tokens.append(user["fcm_token"])
 
         key = Datasets.get_fcm_api_key()
