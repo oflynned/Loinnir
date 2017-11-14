@@ -51,12 +51,6 @@ def create_user():
     data["users_met"] = []
 
     if User.does_user_exist(data["fb_id"]):
-        user = User.get_user(data["fb_id"])
-        if "birthday" in data and "birthday" not in user:
-            user = User.get_user(data["fb_id"])
-            user["birthday"] = data["birthday"]
-            mongo.db.users.save(user)
-
         return Helper.get_json({"success": False, "reason": "user_already_exists"})
 
     users_col.insert(data)
