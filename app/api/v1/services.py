@@ -4,12 +4,30 @@ import requests
 from flask import Blueprint, request
 
 from app.app import mongo
+from app.api.v1.admin import Admin
 from app.helpers.datasets import Datasets
 from app.helpers.fake_datasets import FakeDatasets
 from app.helpers.geo import Geo
 from app.helpers.helper import Helper
 
 services_endpoint = Blueprint("services", __name__)
+
+
+# POST { suggestion: <string>, version: <string>, time: <long> }
+@services_endpoint.route("/send-suggestion", methods=["POST"])
+def send_suggestion():
+    mongo.db.suggestions.save(request.json)
+    return Helper.get_json({"success": True})
+
+
+# POST { username: <string>, secret: <string> }
+@services_endpoint.route("/get-suggestions", methods=["POST"])
+def get_suggestions():
+    if Admin.authenticate_user(request.json):
+        suggestions = list(mongo.db.suggestions.find())
+        return Helper.get_json(suggestions)
+
+    return Helper.get_json({"success": False})
 
 
 # POST { lat: <float>, lng: <float> }
