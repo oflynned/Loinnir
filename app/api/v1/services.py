@@ -17,8 +17,14 @@ services_endpoint = Blueprint("services", __name__)
 # POST { suggestion: <string>, version: <string>, time: <long> }
 @services_endpoint.route("/send-suggestion", methods=["POST"])
 def send_suggestion():
-    mongo.db.suggestions.save(request.json)
-    return Helper.get_json({"success": True})
+    data = request.json
+    user = User.get_user(data["fb_id"])
+
+    if User.does_user_exist(user):
+        mongo.db.suggestions.save(request.json)
+        return Helper.get_json({"success": True})
+
+    return Helper.get_json({"success": False})
 
 
 # POST { username: <string>, secret: <string> }
@@ -27,7 +33,7 @@ def get_suggestions():
     if Admin.authenticate_user(request.json):
         suggestions = list(mongo.db.suggestions.find())
         output = []
-        
+
         for suggestion in suggestions:
             user = User.get_user(suggestion["fb_id"])
             suggestion["user"] = user
