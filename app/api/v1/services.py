@@ -3,6 +3,7 @@ import json
 import requests
 from flask import Blueprint, request
 
+from app.api.v1.users import User
 from app.app import mongo
 from app.api.v1.admin import Admin
 from app.helpers.datasets import Datasets
@@ -25,7 +26,15 @@ def send_suggestion():
 def get_suggestions():
     if Admin.authenticate_user(request.json):
         suggestions = list(mongo.db.suggestions.find())
-        return Helper.get_json(suggestions)
+        output = []
+        
+        for suggestion in suggestions:
+            user = User.get_user(suggestion["fb_id"])
+            suggestion["user"] = user
+            del suggestion["fb_id"]
+            output.append(suggestion)
+
+        return Helper.get_json(output)
 
     return Helper.get_json({"success": False})
 
