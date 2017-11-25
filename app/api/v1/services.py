@@ -18,13 +18,9 @@ services_endpoint = Blueprint("services", __name__)
 @services_endpoint.route("/send-suggestion", methods=["POST"])
 def send_suggestion():
     data = request.json
-    user = User.get_user(data["fb_id"])
-
-    if User.does_user_exist(user):
-        mongo.db.suggestions.save(request.json)
-        return Helper.get_json({"success": True})
-
-    return Helper.get_json({"success": False})
+    data["time"] = Helper.get_current_time_in_millis()
+    mongo.db.suggestions.save(data)
+    return Helper.get_json({"success": True})
 
 
 # POST { username: <string>, secret: <string> }
