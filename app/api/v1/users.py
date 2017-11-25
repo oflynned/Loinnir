@@ -150,7 +150,8 @@ def get_nearby_users_count():
     nearby_users = list(mongo.db.users.find({"fb_id": {"$nin": excluded_users}
                                              # ,"locality": my_locality
                                              }))
-    return Helper.get_json({"count": len(nearby_users), "locality": my_locality})
+    # return Helper.get_json({"count": len(nearby_users), "locality": my_locality})
+    return Helper.get_json({"count": len(nearby_users), "locality": "Domhanda"})
 
 
 # POST { fb_id: <string> }

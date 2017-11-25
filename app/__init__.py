@@ -1,6 +1,9 @@
 import os
 import time
 from threading import Thread
+import time
+
+import schedule
 
 import requests
 from flask import Flask
@@ -13,7 +16,7 @@ from app.api.v1.messages import messages_endpoint
 from app.api.v1.services import services_endpoint
 from app.api.v1.users import user_endpoint
 from app.api.v1.admin import admin_endpoint
-from app.api.v1.topic import topic_endpoint
+from app.api.v1.topic import topic_endpoint, Topic
 from app.frontend.frontend import frontend
 
 frontend_dir = os.path.abspath("templates/")
@@ -53,8 +56,30 @@ class HerokuTools(Thread):
             time.sleep(60 * 5)
 
 
+class WeeklyTopicNotification(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.daemon = True
+        self.start()
+
+        schedule.every().minute.do(WeeklyTopicNotification.job)
+
+    @staticmethod
+    def job():
+        data = {"username": os.environ["ADMIN_USERNAME"], "secret": os.environ["ADMIN_SECRET"]}
+        requests.post("http://localhost:3000/api/v1/topic/broadcast", json=data)
+
+    def run(self):
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+
 app.secret_key = os.environ["ADMIN_SECRET"]
 
 mongo = PyMongo(app)
 
 HerokuTools()
+
+# also broadcast push notifications for topic of the week every Monday at 9am GMT
+# WeeklyTopicNotification()
