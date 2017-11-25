@@ -1,3 +1,5 @@
+dotenv
+django-scheduler
 requests==2.13.0
 Flask_PyMongo==0.4.1
 Flask==0.12.1

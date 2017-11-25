@@ -1,22 +1,19 @@
 import os
 import time
 from threading import Thread
-import time
-
-import schedule
 
 import requests
+import schedule
+from dotenv import load_dotenv, find_dotenv
 from flask import Flask
 from flask_pymongo import PyMongo
 
-from dotenv import load_dotenv, find_dotenv
-
+from app.api.v1.admin import admin_endpoint
 from app.api.v1.debug import debug_endpoint
 from app.api.v1.messages import messages_endpoint
 from app.api.v1.services import services_endpoint
-from app.api.v1.users import user_endpoint
-from app.api.v1.admin import admin_endpoint
 from app.api.v1.topic import topic_endpoint, Topic
+from app.api.v1.users import user_endpoint
 from app.frontend.frontend import frontend
 
 frontend_dir = os.path.abspath("templates/")
