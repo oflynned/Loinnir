@@ -23,4 +23,8 @@ weekly_topics = [
 def get_weekly_topic():
     start_week = 47
     current_week = datetime.utcnow().isocalendar()[1]
-    return Helper.get_json({"week": current_week, "topic": weekly_topics[current_week - start_week]})
+    topic = weekly_topics[current_week - start_week]
+    return Helper.get_json({
+        "week": current_week,
+        "topic": topic
+    })
