@@ -3,6 +3,7 @@ from flask import Blueprint, request
 
 from urllib import parse
 
+from app.api.v1.admin import Admin
 from app.api.v1.users import User
 from app.app import mongo
 from app.helpers.fcm import FCM
@@ -16,6 +17,11 @@ messages_endpoint = Blueprint("messages", __name__)
 @messages_endpoint.route('/send-partner-message', methods=["POST"])
 def send_partner_message():
     data = request.json
+    from_id = data["from_id"]
+    to_id = data["to_id"]
+
+    if from_id == to_id:
+        return Helper.get_json({"success", False})
 
     message = {
         "from_id": str(data["from_id"]),
@@ -242,10 +248,16 @@ def mark_message_seen():
     return Helper.get_json({"success": True})
 
 
+# POST { username: <string>, secret: <string>, id_to_remove: <string> }
 @messages_endpoint.route("/delete", methods=["POST"])
 def delete_message():
-    mongo.db.partner_conversations.remove({"_id": ObjectId("5a1c56f62f9679000c3c53ef")})
-    return Helper.get_json({"success": True})
+    data = request.json
+    if Admin.authenticate_user(data):
+        id_to_remove = data["id_to_remove"]
+        mongo.db.partner_conversations.remove({"_id": ObjectId(id_to_remove)})
+        return Helper.get_json({"success": True})
+
+    return Helper.get_json({"success": False})
 
 
 # POST { message_id: <string> }

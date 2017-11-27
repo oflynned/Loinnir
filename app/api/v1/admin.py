@@ -21,7 +21,7 @@ def clear_locality_chats():
 
         return Helper.get_json({"success": True})
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 # POST { username: <string>, secret: <string>, locality: <string> }
@@ -31,7 +31,7 @@ def clear_locality_chat():
         mongo.db.locality_conversations.remove({"locality": request.json["locality"]})
         return Helper.get_json({"success": True})
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 @admin_endpoint.route("/locality-messages-last-24-hours", methods=["POST"])
@@ -57,7 +57,7 @@ def get_locality_messages_last_24_hours():
 
         return Helper.get_json(output)
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 @admin_endpoint.route("/get-area-data", methods=["POST"])
@@ -65,7 +65,7 @@ def get_locality_names():
     if Admin.authenticate_user(request.json):
         return Helper.get_json(Datasets.get_area_names())
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 @admin_endpoint.route("/get-user-stats", methods=["POST"])
@@ -73,7 +73,7 @@ def get_user_stats():
     if Admin.authenticate_user(request.json):
         return Helper.get_json(Admin.get_user_stats())
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 @admin_endpoint.route("/get-message-stats", methods=["POST"])
@@ -81,7 +81,23 @@ def get_message_stats():
     if Admin.authenticate_user(request.json):
         return Helper.get_json(Admin.get_message_stats())
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
+
+
+@admin_endpoint.route("/get-hidden-location-count", methods=["POST"])
+def get_hidden_location_count():
+    if Admin.authenticate_user(request.json):
+        users_hidden_location = mongo.db.users.find({"show_location": False}).count()
+        users_showing_location = mongo.db.users.find({"show_location": True}).count()
+        total_user_count = mongo.db.users.find().count()
+
+        return Helper.get_json({
+            "hidden_count": users_hidden_location,
+            "visible_count": users_showing_location,
+            "total_count": total_user_count
+        })
+
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 # POST { username: <string>, secret: <string>, locality: <string> }
@@ -99,7 +115,7 @@ def get_locality_chat_by_name():
 
         return Helper.get_json(output)
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 @admin_endpoint.route("/get-partner-id-pairs", methods=["POST"])
@@ -117,7 +133,7 @@ def get_partner_id_pairs():
 
         return Helper.get_json(output)
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 # POST { username: <string>, secret: <string>, participants: [ <id>, <id> ] }
@@ -135,7 +151,7 @@ def get_partner_id_pair_conversation():
 
         return Helper.get_json(output)
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 @admin_endpoint.route("/get-all-locality-conversations", methods=["POST"])
@@ -160,7 +176,7 @@ def get_all_locality_conversations():
 
         return Helper.get_json(output)
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 @admin_endpoint.route("/get-past-push-notifications", methods=["POST"])
@@ -169,7 +185,7 @@ def get_past_push_notifications():
         notifications = list(mongo.db.push_notifications.find())
         return Helper.get_json(notifications)
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 # POST
@@ -198,7 +214,7 @@ def broadcast_push_notification():
 
         return FCM.notify_push_notification(title, content, link, str(notification["_id"]))
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 # POST
@@ -228,7 +244,7 @@ def broadcast_push_notification_to_id():
         return FCM.notify_singular_push_notification(title, content, link, str(notification["_id"]),
                                                      User.get_user(data["push_notification_target_fb_id"]))
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 # POST
@@ -262,7 +278,7 @@ def broadcast_push_notification_to_target_group():
         return FCM.notify_push_notification(title, content, link, str(notification["_id"]),
                                             {"$and": [{"county": target_user_filter}, {"fcm_id": {"$ne": 0}}]})
 
-    return Helper.get_json({"success": False})
+    return Helper.get_json({"success": False, "reason": "not_authenticated"})
 
 
 @admin_endpoint.route("/authenticate", methods=["POST"])
