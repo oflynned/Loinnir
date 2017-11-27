@@ -244,7 +244,7 @@ def mark_message_seen():
 
 @messages_endpoint.route("/delete", methods=["POST"])
 def delete_message():
-    mongo.db.partner_conversations.remove({"_id": ObjectId("5a1c55a62f967900094862fd")})
+    mongo.db.partner_conversations.remove({"_id": ObjectId("5a1c56f62f9679000c3c53ef")})
     return Helper.get_json({"success": True})
 
 
