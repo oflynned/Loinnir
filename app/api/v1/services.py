@@ -103,7 +103,7 @@ class Services:
             "Galway": "Gaillimh",
             "Kerry": "Ciarraí",
             "Kildare": "Cill Dara",
-            "Kilkenny": "Cill Cheannaigh",
+            "Kilkenny": "Cill Ceannaigh",
             "Laois": "Laois",
             "Leitrim": "Liatroim",
             "Limerick": "Luimneach",
@@ -165,7 +165,7 @@ class Services:
             "Galway": "Gaillimh",
             "Kerry": "Ciarraí",
             "Kildare": "Cill Dara",
-            "Kilkenny": "Cill Cheannaigh",
+            "Kilkenny": "Cill Ceannaigh",
             "Laois": "Laois",
             "Leitrim": "Liatroim",
             "Limerick": "Luimneach",
@@ -192,8 +192,6 @@ class Services:
             url = "https://maps.googleapis.com/maps/api/geocode/json?" + \
                   "latlng=" + str(lat) + "," + str(lng) + \
                   "&key=AIzaSyDKoWbfgPBfKVEgOiyG5EcSwU-ldqbN1NQ"
-
-            # https://maps.googleapis.com/maps/api/geocode/json?latlng=,&key=AIzaSyDKoWbfgPBfKVEgOiyG5EcSwU-ldqbN1NQ
 
             r = requests.get(url)
             r = json.loads(r.text)

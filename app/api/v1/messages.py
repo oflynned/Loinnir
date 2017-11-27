@@ -128,7 +128,8 @@ def get_paginated_partner_messages():
             return Helper.get_json(sorted_list)
         elif 25 > remaining_count > 0:
             print(remaining_count, last_known_count)
-            total_messages = list(mongo.db.partner_conversations.find(remaining_count_query).sort("_id", -1).limit(remaining_count))
+            total_messages = list(
+                mongo.db.partner_conversations.find(remaining_count_query).sort("_id", -1).limit(remaining_count))
 
             returned_messages = []
             for message in total_messages:
@@ -239,6 +240,16 @@ def mark_message_seen():
     FCM.notify_seen_message(User.get_user(my_id), User.get_user(partner_id))
 
     return Helper.get_json({"success": True})
+
+
+# POST { message_id: <string> }
+@messages_endpoint.route("/get-message-by-id", methods=["POST"])
+def get_message_by_id():
+    data = request.json
+    message_id = data["message_id"]
+    message = list(mongo.db.partner_conversations.find({"_id": ObjectId(message_id)}))[0]
+    message["user"] = User.get_user(message["fb_id"])
+    return Helper.get_json(message)
 
 
 # POST { fb_id: <string> }
