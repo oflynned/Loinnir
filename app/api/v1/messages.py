@@ -246,9 +246,10 @@ def mark_message_seen():
 @messages_endpoint.route("/get-message-by-id", methods=["POST"])
 def get_message_by_id():
     data = request.json
+    user_id = data["fb_id"]
     message_id = data["message_id"]
     message = list(mongo.db.partner_conversations.find({"_id": ObjectId(message_id)}))[0]
-    message["user"] = User.get_user(message["fb_id"])
+    message["user"] = User.get_user(user_id)
     return Helper.get_json(message)
 
 
