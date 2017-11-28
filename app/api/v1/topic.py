@@ -11,18 +11,18 @@ topic_endpoint = Blueprint("topic", __name__)
 
 weekly_topics = [
     "Cá astu? Inis dúinn rud suimiúil fút sa seomra ceantair!",
-    "Conas ar fhoghlaim tú an Ghaeilge?",
+    "Cad é an gné is fearr san aip seo?",
+    "Cad is brí le Gaeltacht dhigiteach?",
+    "Céard é eachtra spéisiúil a tharla duit?",
+    "An rud náireach a tharla duit?",
+    "An Ghaeilge is measa dá bhfaca tú riamh?",
     "Cad í an tslí is fearr le teanga a fhoghlaim?",
     "Conas a bhaineann tú úsáid as an nGaeilge i do shaol?",
-    "Céard é an rud is Gaelaí?",
-    "Céard í an Ghaeilge is measa dá bhfaca tú riamh?",
-    "Cad é an gné is fearr duit san aip seo?",
     "Cad é rud éigin a chuireann isteach ort?",
-    "Rud náireach a tharla duit?",
-    "Cad iad do thuairimí faoi ... ?"
+    "Conas ar fhoghlaim tú an Ghaeilge?"
 ]
 
-start_week = 47
+start_week = 48
 
 
 @topic_endpoint.route("/get", methods=["GET"])
@@ -41,8 +41,6 @@ def broadcast_weekly_topic():
         title = "Topaic na Seachtaine"
         notification_type = "weekly_topic"
         _id = str(datetime.today().year) + ("0" if current_week < 10 else "") + str(current_week)
-
-        print(os.environ["ENVIRONMENT"])
 
         if os.environ["ENVIRONMENT"] == "development":
             return FCM.notify_push_notification(title, topic, notification_type, _id)
