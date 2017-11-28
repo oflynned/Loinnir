@@ -359,11 +359,21 @@ class Admin:
                 {"to_id": {"$nin": ["1433224973407916", "1686100871401476"]}}
             ]}).count()
 
-        locality_message_count_24_hours = mongo.db.locality_conversations.find(
-            {"time": {"$gt": Admin.get_time_24_hours_ago()}}).count()
+        locality_message_count_24_hours = mongo.db.locality_conversations.find({
+            "$and": [
+                {"time": {"$gt": Admin.get_time_24_hours_ago()}},
+                {"fb_id": {"$nin": ["1433224973407916", "1686100871401476"]}}
+            ]}).count()
 
-        partner_message_count = mongo.db.partner_conversations.find().count()
-        locality_message_count = mongo.db.locality_conversations.find().count()
+        partner_message_count = mongo.db.partner_conversations.find({
+            "$and": [
+                {"from_id": {"$nin": ["1433224973407916", "1686100871401476"]}},
+                {"to_id": {"$nin": ["1433224973407916", "1686100871401476"]}}
+            ]}).count()
+
+        locality_message_count = mongo.db.locality_conversations.find({
+            "fb_id": {"$nin": ["1433224973407916", "1686100871401476"]}
+        }).count()
 
         return {
             "partner_message_count": partner_message_count,
