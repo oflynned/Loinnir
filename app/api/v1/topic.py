@@ -14,8 +14,9 @@ weekly_topics = [
     "Cad é an gné is fearr san aip seo?",
     "Cad is brí le Gaeltacht dhigiteach?",
     "Céard é eachtra spéisiúil a tharla duit?",
+    "Nollaig shona! Conas atá an ócáid á cheiliúradh agat?"
     "An rud náireach a tharla duit?",
-    "An Ghaeilge is measa dá bhfaca tú riamh?",
+    "An Ghaeilge is measa dá bhfaca tú riamh ar chomhartha?",
     "Cad í an tslí is fearr le teanga a fhoghlaim?",
     "Conas a bhaineann tú úsáid as an nGaeilge i do shaol?",
     "Cad é rud éigin a chuireann isteach ort?",
@@ -42,10 +43,10 @@ def broadcast_weekly_topic():
         notification_type = "weekly_topic"
         _id = str(datetime.today().year) + ("0" if current_week < 10 else "") + str(current_week)
 
-        if os.environ["ENVIRONMENT"] == "development":
+        if os.environ["ENVIRONMENT"] == "production":
             return FCM.notify_push_notification(title, topic, notification_type, _id)
-        else:
-            return Helper.get_json({"success": True})
+
+        return Helper.get_json({"success": True})
     return Helper.get_json({"success": False})
 
 

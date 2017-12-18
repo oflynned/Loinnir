@@ -1,9 +1,8 @@
 import os
+import threading
 import time
-from threading import Thread
 
 import requests
-import schedule
 from dotenv import load_dotenv, find_dotenv
 from flask import Flask
 from flask_pymongo import PyMongo
@@ -41,9 +40,9 @@ else:
     app.config["MONGO_URI"] = "mongodb://localhost:27017/loinnir"
 
 
-class HerokuTools(Thread):
+class HerokuTools(threading.Thread):
     def __init__(self):
-        Thread.__init__(self)
+        threading.Thread.__init__(self)
         self.daemon = True
         self.start()
 
@@ -53,30 +52,8 @@ class HerokuTools(Thread):
             time.sleep(60 * 5)
 
 
-class WeeklyTopicNotification(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-        self.daemon = True
-        self.start()
-
-        schedule.every().minute.do(WeeklyTopicNotification.job)
-
-    @staticmethod
-    def job():
-        data = {"username": os.environ["ADMIN_USERNAME"], "secret": os.environ["ADMIN_SECRET"]}
-        requests.post("http://localhost:3000/api/v1/topic/broadcast", json=data)
-
-    def run(self):
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
-
-
 app.secret_key = os.environ["ADMIN_SECRET"]
 
 mongo = PyMongo(app)
 
 HerokuTools()
-
-# also broadcast push notifications for topic of the week every Monday at 9am GMT
-# WeeklyTopicNotification()

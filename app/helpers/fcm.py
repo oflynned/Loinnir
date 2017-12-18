@@ -157,6 +157,7 @@ class FCM:
         }
 
         fcm_tokens = []
+
         for user in list(mongo.db.users.find(search_filter)):
             fcm_tokens.append(user["fcm_token"])
 
