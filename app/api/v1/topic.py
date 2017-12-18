@@ -13,13 +13,12 @@ weekly_topics = [
     "Cá astu? Inis dúinn rud suimiúil fút sa seomra ceantair!",
     "Cad é an gné is fearr san aip seo?",
     "Cad is brí le Gaeltacht dhigiteach?",
-    "Céard é eachtra spéisiúil a tharla duit?",
-    "Nollaig shona! Conas atá an ócáid á cheiliúradh agat?"
-    "An rud náireach a tharla duit?",
-    "An Ghaeilge is measa dá bhfaca tú riamh ar chomhartha?",
+    "Céard é bronntanas Gaelach? Inis dúinn sa seomra ceantair!",
+    "Nollaig shona! Conas atá an lá á cheiliúradh agat?",
+    "Céard é do rún na hAthbhliana don bhliain seo?",
     "Cad í an tslí is fearr le teanga a fhoghlaim?",
+    "Cad is brí le Gaeltacht dhigiteach?",
     "Conas a bhaineann tú úsáid as an nGaeilge i do shaol?",
-    "Cad é rud éigin a chuireann isteach ort?",
     "Conas ar fhoghlaim tú an Ghaeilge?"
 ]
 
