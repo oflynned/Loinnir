@@ -10,19 +10,12 @@ from app.helpers.helper import Helper
 topic_endpoint = Blueprint("topic", __name__)
 
 weekly_topics = [
-    "Cá astu? Inis dúinn rud suimiúil fút sa seomra ceantair!",
-    "Cad é an gné is fearr san aip seo?",
-    "Cad is brí le Gaeltacht dhigiteach?",
-    "Céard é bronntanas Gaelach? Inis dúinn sa seomra ceantair!",
-    "Nollaig shona! Conas atá an lá á cheiliúradh agat?",
-    "Céard é do rún na hAthbhliana don bhliain seo?",
+    "Athbhliain faoi mhaise! Céard é do rún na hAthbhliana don bhliain seo?",
     "Cad í an tslí is fearr le teanga a fhoghlaim?",
     "Cad is brí le Gaeltacht dhigiteach?",
     "Conas a bhaineann tú úsáid as an nGaeilge i do shaol?",
     "Conas ar fhoghlaim tú an Ghaeilge?"
 ]
-
-start_week = 48
 
 
 @topic_endpoint.route("/get", methods=["GET"])
@@ -53,5 +46,5 @@ class Topic:
     @staticmethod
     def get_topic_data():
         current_week = datetime.utcnow().isocalendar()[1]
-        topic = weekly_topics[current_week - start_week]
+        topic = weekly_topics[current_week]
         return current_week, topic
