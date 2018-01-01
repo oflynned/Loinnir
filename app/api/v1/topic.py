@@ -46,5 +46,5 @@ class Topic:
     @staticmethod
     def get_topic_data():
         current_week = datetime.utcnow().isocalendar()[1]
-        topic = weekly_topics[current_week]
+        topic = weekly_topics[current_week - 1]
         return current_week, topic
