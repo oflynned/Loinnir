@@ -14,7 +14,10 @@ weekly_topics = [
     "Cad í an tslí is fearr le teanga a fhoghlaim?",
     "Cad is brí le Gaeltacht dhigiteach?",
     "Conas a bhaineann tú úsáid as an nGaeilge i do shaol?",
-    "Conas ar fhoghlaim tú an Ghaeilge?"
+    "Conas ar fhoghlaim tú an Ghaeilge?",
+    "Missed Week 1",
+    "Missed Week 2",
+    "Missed Week 3"
 ]
 
 
