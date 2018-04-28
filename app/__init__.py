@@ -30,30 +30,11 @@ app.register_blueprint(topic_endpoint, url_prefix="/api/v1/topic")
 
 load_dotenv(find_dotenv())
 
-if "MONGO_URL" in os.environ:
-    app.config["MONGO_HOST"] = str(os.environ["MONGO_URL"])
-    app.config["MONGO_PORT"] = int(os.environ["MONGO_PORT"])
-    app.config["MONGO_USERNAME"] = str(os.environ["MONGO_USERNAME"])
-    app.config["MONGO_PASSWORD"] = str(os.environ["MONGO_PASSWORD"])
-    app.config["MONGO_DBNAME"] = "loinnir"
+if "MONGODB_URI" in os.environ:
+    app.config["MONGO_URI"] = os.environ["MONGODB_URI"]
 else:
     app.config["MONGO_URI"] = "mongodb://localhost:27017/loinnir"
-
-
-class HerokuTools(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.daemon = True
-        self.start()
-
-    def run(self):
-        while True:
-            requests.get("https://loinnir.herokuapp.com/")
-            time.sleep(60 * 5)
-
 
 app.secret_key = os.environ["ADMIN_SECRET"]
 
 mongo = PyMongo(app)
-
-HerokuTools()
