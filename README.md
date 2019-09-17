@@ -15,3 +15,21 @@ Make sure you have a local instance of MongoDB running on the default port 27017
 Environmental variables are used locally with a .env file containing keys.
 
 Dependencies are installed for the environment using `python3 install -r requirements.txt`
+
+## Environmental Variables
+`ENVIRONMENT`
+- Can be `production` or `development`
+
+`MONGODB_URL`
+- Defaults to `localhost:27017` if `ENVIRONMENT` is not production for a local development environment
+
+`FCM_API_KEY`
+- Required for dispatching notifications to client devices
+
+`ADMIN_USERNAME`
+`ADMIN_SECRET`
+- Used for logging into the admin app
+- Deprecated
+
+`PLACES_API_KEY`
+- Deprecated
