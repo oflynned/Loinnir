@@ -30,8 +30,8 @@ app.register_blueprint(topic_endpoint, url_prefix="/api/v1/topic")
 
 load_dotenv(find_dotenv())
 
-if "MONGODB_URL" in os.environ:
-    app.config["MONGO_URI"] = os.environ["MONGODB_URL"]
+if "MONGO_URL" in os.environ:
+    app.config["MONGO_URI"] = os.environ["MONGO_URL"]
 else:
     app.config["MONGO_URI"] = "mongodb://localhost:27017/loinnir"
 

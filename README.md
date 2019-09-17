@@ -20,7 +20,7 @@ Dependencies are installed for the environment using `python3 install -r require
 `ENVIRONMENT`
 - Can be `production` or `development`
 
-`MONGODB_URL`
+`MONGO_URL`
 - Defaults to `localhost:27017` if `ENVIRONMENT` is not production for a local development environment
 
 `FCM_API_KEY`
